@@ -1,0 +1,56 @@
+plugins {
+    id 'java'
+    id 'maven-publish'
+
+}
+
+group = 'dev.coph'
+version = '1.0-SNAPSHOT'
+
+repositories {
+    mavenCentral()
+}
+
+dependencies {
+    testImplementation platform('org.junit:junit-bom:5.10.0')
+    testImplementation 'org.junit.jupiter:junit-jupiter'
+
+
+
+
+    implementation 'com.zaxxer:HikariCP:6.0.0'
+    implementation 'com.mysql:mysql-connector-j:9.1.0'
+    implementation 'org.mariadb.jdbc:mariadb-java-client:3.4.1'
+
+    compileOnly 'org.projectlombok:lombok:1.18.34'
+    annotationProcessor 'org.projectlombok:lombok:1.18.34'
+    testCompileOnly 'org.projectlombok:lombok:1.18.34'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
+}
+
+
+publishing {
+    repositories {
+        maven {
+            name = "localRepository"
+            url = "http://localhost:8081/releases"
+            allowInsecureProtocol = true
+            credentials(PasswordCredentials)
+            authentication {
+                basic(BasicAuthentication)
+            }
+        }
+    }
+    publications {
+        maven(MavenPublication) {
+            groupId = "dev.coph"
+            artifactId = "simplesql"
+            version = "1.0.0"
+            from components.java
+        }
+    }
+}
+
+test {
+    useJUnitPlatform()
+}
