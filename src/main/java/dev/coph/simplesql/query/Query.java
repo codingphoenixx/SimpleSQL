@@ -2,6 +2,7 @@ package dev.coph.simplesql.query;
 
 import dev.coph.simplesql.adapter.DatabaseAdapter;
 import dev.coph.simplesql.exception.RequestNotExecutableException;
+import dev.coph.simplesql.query.providers.SelectQuereyProvider;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
@@ -82,6 +83,11 @@ public class Query {
     public Query queries(QueryProvider... queries) {
         this.queries.addAll(Arrays.asList(queries));
         return this;
+    }
+
+
+    public static SelectQuereyProvider select() {
+        return new SelectQuereyProvider();
     }
 
 }

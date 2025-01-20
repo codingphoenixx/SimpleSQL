@@ -1,14 +1,13 @@
 package dev.coph.simplesql;
 
 import dev.coph.simplesql.query.Query;
+import dev.coph.simplesql.query.QueryProvider;
 
 public class Main {
     public static void main(String[] args) {
+        QueryProvider provider = Query.select();
 
-        Query query = new Query(null);
-
-        query.queries(SELECT);
-        query.execute();
+        new Query(null).queries(provider).execute();
 
     }
 
