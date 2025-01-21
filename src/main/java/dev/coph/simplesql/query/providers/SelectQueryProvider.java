@@ -11,16 +11,16 @@ import java.sql.ResultSet;
 /**
  * The {@code SelectQueryProvider} class implements the {@link QueryProvider} interface
  * and is responsible for constructing and generating SQL SELECT queries.
- *
+ * <p>
  * This class provides additional functionality after executing a query by allowing
  * the assignment of a {@link RunnableAction} that processes the {@link ResultSet}.
  * It also includes mechanisms to store the retrieved {@link ResultSet}.
- *
  */
 @Getter
 @Accessors(fluent = true, chain = true)
 public class SelectQueryProvider implements QueryProvider {
 
+//TODO:
 
     @Override
     public String generateSQLString() {
@@ -34,7 +34,6 @@ public class SelectQueryProvider implements QueryProvider {
      */
     @Setter
     private RunnableAction<ResultSet> actionAfterQuery;
-
 
 
     /**

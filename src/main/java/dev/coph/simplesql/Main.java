@@ -22,25 +22,9 @@ public class Main {
         var tableCreateQuery = Query.tableCreate()
                 .table("test")
                 .column("uuid", DataType.VARCHAR, 64, Column.ColumnType.PRIMARY_KEY)
-                .column("comment", DataType.LONGTEXT)
-                ;
-
+                .column("comment", DataType.LONGTEXT);
 
         var insertQuery = Query.insert()
-                .table("test")
-                .insertMethode(InsertQueryProvider.InsertMethode.INSERT_IGNORE)
-                .entry("uuid", "1234567890");
-        var insertQuery2 = Query.insert()
-                .table("test")
-                .insertMethode(InsertQueryProvider.InsertMethode.INSERT_IGNORE)
-                .entry("uuid", "1234567890");
-
-        var insertQuery3 = Query.insert()
-                .table("test")
-                .insertMethode(InsertQueryProvider.InsertMethode.INSERT_IGNORE)
-                .entry("uuid", "1234567890");
-
-        var insertQuery4 = Query.insert()
                 .table("test")
                 .insertMethode(InsertQueryProvider.InsertMethode.INSERT_IGNORE)
                 .entry("uuid", "1234567890");
@@ -48,7 +32,7 @@ public class Main {
 
 
         new Query(databaseAdapter).queries(tableCreateQuery).execute();
-        new Query(databaseAdapter).queries(insertQuery, insertQuery2, insertQuery3, insertQuery4).execute();
+        new Query(databaseAdapter).queries(insertQuery).execute();
 
     }
 

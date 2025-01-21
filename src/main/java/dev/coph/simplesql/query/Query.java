@@ -2,10 +2,7 @@ package dev.coph.simplesql.query;
 
 import dev.coph.simplesql.adapter.DatabaseAdapter;
 import dev.coph.simplesql.exception.RequestNotExecutableException;
-import dev.coph.simplesql.query.providers.InsertQueryProvider;
-import dev.coph.simplesql.query.providers.SelectQueryProvider;
-import dev.coph.simplesql.query.providers.TableCreateQueryProvider;
-import dev.coph.simplesql.query.providers.UpdateQueryProvider;
+import dev.coph.simplesql.query.providers.*;
 import dev.coph.simplesql.utils.Check;
 import lombok.Getter;
 import lombok.Setter;
@@ -200,17 +197,17 @@ public class Query {
 
 
     /**
-     * Creates and returns a new instance of {@link SelectQueryProvider}.
-     * <p>
-     * This method is used to initiate a SELECT SQL query by providing a
-     * {@link SelectQueryProvider} object, which can be further configured
-     * to construct SQL SELECT statements.
+     * Creates and returns a new instance of {@link DeleteQueryProvider}.
      *
-     * @return A new {@link SelectQueryProvider} instance for constructing
-     * SELECT SQL queries.
+     * This method is used to initiate a DELETE SQL query by providing a
+     * {@link DeleteQueryProvider} object, which can be further configured
+     * to construct SQL DELETE statements.
+     *
+     * @return A new {@link DeleteQueryProvider} instance for constructing
+     * DELETE SQL queries.
      */
-    public static SelectQueryProvider select() {
-        return new SelectQueryProvider();
+    public static DeleteQueryProvider delete() {
+        return new DeleteQueryProvider();
     }
 
     /**
@@ -230,17 +227,17 @@ public class Query {
     }
 
     /**
-     * Creates and returns a new instance of {@link UpdateQueryProvider}.
+     * Creates and returns a new instance of {@link SelectQueryProvider}.
      * <p>
-     * This method is used to initiate an UPDATE SQL query by providing an
-     * {@link UpdateQueryProvider} object, which can be further configured
-     * to construct SQL UPDATE statements.
+     * This method is used to initiate a SELECT SQL query by providing a
+     * {@link SelectQueryProvider} object, which can be further configured
+     * to construct SQL SELECT statements.
      *
-     * @return A new {@link UpdateQueryProvider} instance for constructing
-     * UPDATE SQL queries.
+     * @return A new {@link SelectQueryProvider} instance for constructing
+     * SELECT SQL queries.
      */
-    public static UpdateQueryProvider update() {
-        return new UpdateQueryProvider();
+    public static SelectQueryProvider select() {
+        return new SelectQueryProvider();
     }
 
     /**
@@ -256,5 +253,34 @@ public class Query {
     public static TableCreateQueryProvider tableCreate() {
         return new TableCreateQueryProvider();
     }
+
+    /**
+     * Creates and returns a new instance of {@link TableDropQueryProvider}.
+     *
+     * This method is used to initiate a DROP TABLE SQL query by providing a
+     * {@link TableDropQueryProvider} object, which can be further configured
+     * to construct SQL DROP TABLE statements.
+     *
+     * @return A new {@link TableDropQueryProvider} instance for constructing
+     * DROP TABLE SQL queries.
+     */
+   public static TableDropQueryProvider tableDrop() {
+        return new TableDropQueryProvider();
+   }
+
+    /**
+     * Creates and returns a new instance of {@link UpdateQueryProvider}.
+     * <p>
+     * This method is used to initiate an UPDATE SQL query by providing an
+     * {@link UpdateQueryProvider} object, which can be further configured
+     * to construct SQL UPDATE statements.
+     *
+     * @return A new {@link UpdateQueryProvider} instance for constructing
+     * UPDATE SQL queries.
+     */
+    public static UpdateQueryProvider update() {
+        return new UpdateQueryProvider();
+    }
+
 
 }
