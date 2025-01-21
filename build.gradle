@@ -19,6 +19,8 @@ dependencies {
 
 
     implementation 'com.zaxxer:HikariCP:6.0.0'
+
+    implementation "org.xerial:sqlite-jdbc:3.46.0.0"
     implementation 'com.mysql:mysql-connector-j:9.1.0'
     implementation 'org.mariadb.jdbc:mariadb-java-client:3.4.1'
 

@@ -1,5 +1,6 @@
 package dev.coph.simplesql.utils;
 
+import java.io.File;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -81,6 +82,21 @@ public class Check {
         } else if (object instanceof Map<?, ?> map && map.isEmpty()) {
             throw new NullPointerException("Map '" + name + "' is empty");
         }
+    }
+
+    /**
+     * Checks if the provided file object is null or if the file does not exist on the filesystem.
+     *
+     * @param file The file to be checked.
+     * @param name The name of the file object for use in the error message.
+     * @throws NullPointerException if the file object is null.
+     * @throws IllegalArgumentException if the file does not exist.
+     */
+    public static void ifNullOrNotExits(File file, String name) {
+        if (file == null)
+            throw new NullPointerException("Object '" + name + "' is null");
+        if(!file.exists())
+            throw new IllegalArgumentException("File '" + name + "' does not exist");
     }
 
     /**

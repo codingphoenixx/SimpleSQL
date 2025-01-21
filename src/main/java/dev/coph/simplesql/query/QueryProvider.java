@@ -7,6 +7,6 @@ package dev.coph.simplesql.query;
  */
 public interface QueryProvider {
 
-    String generateSQLString();
+    String generateSQLString(Query query);
 
 }

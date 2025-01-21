@@ -1,5 +1,7 @@
 package dev.coph.simplesql.query.providers;
 
+import dev.coph.simplesql.adapter.DatabaseAdapter;
+import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.query.QueryEntry;
 import dev.coph.simplesql.query.QueryProvider;
 import dev.coph.simplesql.utils.Check;
@@ -15,7 +17,7 @@ import java.util.List;
  * SQL INSERT statements. It supports various INSERT methods such as standard INSERT,
  * INSERT with IGNORE, and INSERT with ON DUPLICATE KEY UPDATE. These operations can
  * be tailored to handle different data insertion use cases.
- *
+ * <p>
  * This class implements the {@link QueryProvider} interface, enabling the generation of
  * SQL query strings for database operations.
  */
@@ -51,14 +53,23 @@ public class InsertQueryProvider implements QueryProvider {
 
 
     @Override
-    public String generateSQLString() {
+    public String generateSQLString(Query query) {
         Check.ifNullOrEmptyMap(entries, "entries");
         Check.ifNullOrEmptyMap(table, "tablename");
 
         StringBuilder sql = new StringBuilder("INSERT ");
 
-        if (insertMethode.equals(InsertMethode.INSERT_IGNORE))
-            sql.append("IGNORE ");
+        if (insertMethode.equals(InsertMethode.INSERT_IGNORE)) {
+            if (query.databaseAdapter() == null) {
+                return null;
+            }
+            if (query.databaseAdapter().driverType().equals(DatabaseAdapter.DriverType.MYSQL) || query.databaseAdapter().driverType().equals(DatabaseAdapter.DriverType.MARIADB)) {
+                sql.append("IGNORE ");
+            } else if (query.databaseAdapter().driverType().equals(DatabaseAdapter.DriverType.SQLITE)) {
+                sql.append("OR IGNORE ");
+            }
+        }
+
 
         sql.append("INTO ").append(table);
 

@@ -1,4 +1,4 @@
-package dev.coph.simplesql.database;
+package dev.coph.simplesql.database.attributes;
 
 import lombok.Getter;
 import lombok.Setter;

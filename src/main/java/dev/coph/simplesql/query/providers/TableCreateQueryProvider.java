@@ -1,7 +1,8 @@
 package dev.coph.simplesql.query.providers;
 
 import dev.coph.simplesql.database.Column;
-import dev.coph.simplesql.database.DataType;
+import dev.coph.simplesql.database.attributes.DataType;
+import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.query.QueryProvider;
 import dev.coph.simplesql.utils.Check;
 import lombok.Getter;
@@ -48,7 +49,7 @@ public class TableCreateQueryProvider implements QueryProvider {
 
 
     @Override
-    public String generateSQLString() {
+    public String generateSQLString(Query query) {
         Check.ifNullOrEmptyMap(table, "tablename");
         Check.ifNullOrEmptyMap(columns, "columns");
         StringBuilder sql = new StringBuilder("CREATE TABLE ");

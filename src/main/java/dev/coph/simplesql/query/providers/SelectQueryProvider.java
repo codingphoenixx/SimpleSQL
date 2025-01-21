@@ -1,5 +1,6 @@
 package dev.coph.simplesql.query.providers;
 
+import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.query.QueryProvider;
 import dev.coph.simplesql.utils.RunnableAction;
 import lombok.Getter;
@@ -22,10 +23,6 @@ public class SelectQueryProvider implements QueryProvider {
 
 //TODO:
 
-    @Override
-    public String generateSQLString() {
-        return "";
-    }
 
     /**
      * A {@link Runnable} that will be executed after the query operation completes.
@@ -42,4 +39,8 @@ public class SelectQueryProvider implements QueryProvider {
     @Setter
     private ResultSet resultSet;
 
+    @Override
+    public String generateSQLString(Query query) {
+        return "";
+    }
 }

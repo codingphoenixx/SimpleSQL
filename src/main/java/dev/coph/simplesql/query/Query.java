@@ -142,7 +142,7 @@ public class Query {
 
         try (Connection connection = databaseAdapter.dataSource().getConnection()) {
             if (queries.size() == 1) {
-                var statement = connection.prepareStatement(queries.getFirst().generateSQLString());
+                var statement = connection.prepareStatement(queries.getFirst().generateSQLString(this));
                 try {
                     if (queries.getFirst() instanceof SelectQueryProvider selectRequest) {
                         ResultSet resultSet = statement.executeQuery();
@@ -162,7 +162,7 @@ public class Query {
                 var statement = connection.createStatement();
                 for (QueryProvider queryProvider : queries) {
                     try {
-                        statement.addBatch(queryProvider.generateSQLString());
+                        statement.addBatch(queryProvider.generateSQLString(this));
                     } catch (Exception e) {
                         e.printStackTrace();
                     }
