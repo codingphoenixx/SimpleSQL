@@ -63,9 +63,9 @@ public class TableCreateQueryProvider implements QueryProvider {
         StringBuilder columnString = null;
         for (Column column : columns) {
             if (columnString == null) {
-                columnString = new StringBuilder("(").append(column.toString());
+                columnString = new StringBuilder("(").append(column.toString(query));
             } else {
-                columnString.append(", ").append(column.toString());
+                columnString.append(", ").append(column.toString(query));
             }
         }
         columnString.append(")");

@@ -12,7 +12,7 @@ import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) {
-
+        startMariaDB();
         startSQLLite();
     }
 
@@ -23,24 +23,11 @@ public class Main {
                 .port(3306)
                 .database("testing")
                 .user("root")
-                .password("")
+                .password("root")
                 .driverType(DatabaseAdapter.DriverType.MARIADB)
                 .build();
         databaseAdapter.connect();
-
-        var tableCreateQuery = Query.tableCreate()
-                .table("test")
-                .column("uuid", DataType.VARCHAR, 64, Column.ColumnType.PRIMARY_KEY)
-                .column("comment", DataType.LONGTEXT);
-
-        var insertQuery = Query.insert()
-                .table("test")
-                .insertMethode(InsertQueryProvider.InsertMethode.INSERT_IGNORE)
-                .entry("uuid", "1234567890");
-
-
-        new Query(databaseAdapter).queries(tableCreateQuery).execute();
-        new Query(databaseAdapter).queries(insertQuery).execute();
+        runQuery(databaseAdapter);
     }
 
     private static void startSQLLite() {
@@ -58,14 +45,19 @@ public class Main {
                 .build();
         databaseAdapter.connect();
 
+        runQuery(databaseAdapter);
+    }
+
+    private static void runQuery(DatabaseAdapter databaseAdapter) {
         var tableCreateQuery = Query.tableCreate()
-                .table("test")
-                .column("uuid", DataType.VARCHAR, 64, Column.ColumnType.PRIMARY_KEY)
+                .table("test6")
+                .column("uuid", DataType.VARCHAR, 64, Column.ColumnType.UNIQUE)
                 .column("comment", DataType.LONGTEXT)
+                .column("number", DataType.INTEGER, Column.ColumnType.PRIMARY_KEY_AUTOINCREMENT)
                 .createMethode(TableCreateQueryProvider.CreateMethode.IF_NOT_EXISTS);
 
         var insertQuery = Query.insert()
-                .table("test")
+                .table("test6")
                 .insertMethode(InsertQueryProvider.InsertMethode.INSERT_IGNORE)
                 .entry("uuid", "1234567890");
 

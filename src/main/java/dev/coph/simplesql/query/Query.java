@@ -145,14 +145,17 @@ public class Query {
                 var statement = connection.prepareStatement(queries.getFirst().generateSQLString(this));
                 try {
                     if (queries.getFirst() instanceof SelectQueryProvider selectRequest) {
+                        System.out.println(statement);
                         ResultSet resultSet = statement.executeQuery();
                         selectRequest.resultSet(resultSet);
                         if (selectRequest.actionAfterQuery() != null) {
                             selectRequest.actionAfterQuery().run(resultSet);
                         }
                     } else if (queries.getFirst() instanceof UpdateQueryProvider) {
+                        System.out.println(statement);
                         statement.executeUpdate();
                     } else {
+                        System.out.println(statement);
                         statement.execute();
                     }
                 } catch (SQLException e) {

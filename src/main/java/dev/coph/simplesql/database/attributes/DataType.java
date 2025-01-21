@@ -51,7 +51,7 @@ public class DataType {
     /**
      * A medium integer. Signed range is from -2147483648 to 2147483647. Unsigned range is from 0 to 4294967295. The size parameter specifies the maximum display width (which is 255)
      */
-    public static final DataType INT = new DataType(true, false, "INT");
+    public static final DataType INTEGER = new DataType(true, false, "INTEGER");
 
     /**
      * A large integer. Signed range is from -9223372036854775808 to 9223372036854775807. Unsigned range is from 0 to 18446744073709551615. The size parameter specifies the maximum display width (which is 255)

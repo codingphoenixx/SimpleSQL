@@ -1,6 +1,8 @@
 package dev.coph.simplesql.database;
 
+import dev.coph.simplesql.adapter.DatabaseAdapter;
 import dev.coph.simplesql.database.attributes.DataType;
+import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.utils.Check;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,10 +31,10 @@ public class Column {
      * Represents the data type of a column in a database schema, defining the kind of values
      * that can be stored in the column. It is used to specify the type of data, such as
      * strings, integers, floating-point numbers, dates, timestamps, and others.
-     *
+     * <p>
      * The {@code DataType} includes predefined constants like {@code CHAR}, {@code VARCHAR},
      * {@code BOOLEAN}, {@code INT}, etc., to represent various SQL data types.
-     *
+     * <p>
      * This variable helps determine the structure and constraints of the database column
      * during schema creation or modification operations.
      */
@@ -40,7 +42,7 @@ public class Column {
 
     /**
      * Represents an optional parameter or additional configuration associated with the column's data type.
-     *
+     * <p>
      * This object allows for specifying parameters required by certain data types,
      * such as length, precision, or scale. It is often used for cases where a data type
      * requires or supports a specific object to define additional attributes. The exact
@@ -68,8 +70,7 @@ public class Column {
      */
     private boolean notNull;
 
-    @Override
-    public String toString() {
+    public String toString(Query query) {
         Check.ifNull(key, "column-key");
         Check.ifNull(dataType, "datatype");
         if (dataType.requireObject()) {
@@ -83,12 +84,22 @@ public class Column {
 
         if (columnType != null && columnType != ColumnType.DEFAULT) {
             if (columnType.equals(ColumnType.PRIMARY_KEY_AUTOINCREMENT)) {
-                if (!dataType.equals(DataType.TINYTEXT) && !dataType.equals(DataType.INT) && !dataType.equals(DataType.BIGINT)) {
-                    System.out.println("ERROR: You cannot set an autoincrement to a non int value. Setting it to default primary key.");
-                    columnType = ColumnType.PRIMARY_KEY;
+                if (query.databaseAdapter() == null) {
+                    return null;
+                }
+                if(query.databaseAdapter().driverType().equals(DatabaseAdapter.DriverType.MYSQL) || query.databaseAdapter().driverType().equals(DatabaseAdapter.DriverType.MARIADB)){
+                    if (!dataType.equals(DataType.TINYTEXT) && !dataType.equals(DataType.INTEGER) && !dataType.equals(DataType.BIGINT)) {
+                        System.out.println("ERROR: You cannot set an autoincrement to a non int value. Setting it to default primary key.");
+                        columnType = ColumnType.PRIMARY_KEY;
+                    }
+                }else if (query.databaseAdapter().driverType().equals(DatabaseAdapter.DriverType.SQLITE)) {
+                    if (!dataType.equals(DataType.INTEGER)) {
+                        System.out.println("ERROR: You cannot set an autoincrement to a non integer. Setting it to default primary key.");
+                        columnType = ColumnType.PRIMARY_KEY;
+                    }
                 }
             }
-            column.append(" ").append(columnType.name().replaceAll("_", " "));
+            column.append(" ").append(columnType.toString(query));
         }
 
         if (defaultValue != null) {
@@ -97,6 +108,11 @@ public class Column {
         }
 
         return column.toString();
+    }
+
+    @Override
+    public String toString() {
+        return null;
     }
 
     public Column() {
@@ -142,7 +158,6 @@ public class Column {
     }
 
 
-
     /**
      * Enum representing the various types of constraints that can be applied to a database column.
      * It is used to define the specific constraints for a column in the database schema.
@@ -171,7 +186,25 @@ public class Column {
          * The constraint prohibits duplicate entries in the column,
          * but unlike the PRIMARY_KEY constraint, it allows null values.
          */
-        UNIQUE
+        UNIQUE;
+
+
+        public String toString(Query query) {
+            if(query.databaseAdapter() == null)
+                return this.name().replaceAll("_", " ");
+
+            if(query.databaseAdapter().driverType().equals(DatabaseAdapter.DriverType.MYSQL) || query.databaseAdapter().driverType().equals(DatabaseAdapter.DriverType.MARIADB)){
+                if(this == PRIMARY_KEY_AUTOINCREMENT){
+                    return "PRIMARY KEY AUTO_INCREMENT";
+                }
+            }else if(query.databaseAdapter().driverType().equals(DatabaseAdapter.DriverType.SQLITE)){
+                if(this == PRIMARY_KEY_AUTOINCREMENT){
+                    return "PRIMARY KEY AUTOINCREMENT";
+                }
+            }
+
+            return this.name().replaceAll("_", " ");
+        }
     }
 
 
