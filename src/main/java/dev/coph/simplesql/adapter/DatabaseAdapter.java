@@ -15,6 +15,7 @@ public class DatabaseAdapter {
     @Getter
     private HikariDataSource dataSource;
 
+    @Getter
     boolean connected = false;
 
     private DatabaseAdapter(DriverType driverType, String host, int port, String database, String user, String password) {

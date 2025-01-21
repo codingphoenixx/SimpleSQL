@@ -2,7 +2,14 @@ package dev.coph.simplesql.query.providers;
 
 import dev.coph.simplesql.query.QueryProvider;
 
-public class SelectQuereyProvider implements QueryProvider {
+
+public class UpdateQueryProvider implements QueryProvider {
+
+
+    //TODO:
+
+
+
 
 
     @Override
