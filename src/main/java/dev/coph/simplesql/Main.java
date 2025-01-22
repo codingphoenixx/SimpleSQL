@@ -1,22 +1,19 @@
 package dev.coph.simplesql;
 
 import dev.coph.simplesql.adapter.DatabaseAdapter;
-import dev.coph.simplesql.database.Column;
-import dev.coph.simplesql.database.attributes.ColumnType;
-import dev.coph.simplesql.database.attributes.CreateMethode;
-import dev.coph.simplesql.database.attributes.DataType;
-import dev.coph.simplesql.database.attributes.InsertMethode;
+import dev.coph.simplesql.database.attributes.*;
 import dev.coph.simplesql.query.Query;
-import dev.coph.simplesql.query.providers.InsertQueryProvider;
-import dev.coph.simplesql.query.providers.TableCreateQueryProvider;
 
 import java.io.File;
 import java.io.IOException;
 
 public class Main {
     public static void main(String[] args) {
+        System.out.println("--------------------------- MARIADB ------------------------------");
         startMariaDB();
-        startSQLLite();
+        System.out.println("--------------------------- SQLITE ------------------------------");
+        startSQLite();
+        System.out.println("--------------------------- FINISHED ------------------------------");
     }
 
 
@@ -33,7 +30,7 @@ public class Main {
         runQuery(databaseAdapter);
     }
 
-    private static void startSQLLite() {
+    private static void startSQLite() {
         File sqliteFile = new File("test.db");
         if (!sqliteFile.exists()) {
             try {
@@ -62,7 +59,7 @@ public class Main {
         var insertQuery = Query.insert()
                 .table("test6")
                 .insertMethode(InsertMethode.INSERT_IGNORE)
-                .entry("uuid", "1234567890");
+                .entry("uuid", "0123456789");
 
         var selectQuery = Query.select()
                 .table("test6")
@@ -75,9 +72,40 @@ public class Main {
                     }
                 });
 
+        var selectQuery2 = Query.select()
+                .table("test6")
+                .orderBy("uuid")
+                .actionAfterQuery(resultSet -> {
+                    boolean next = resultSet.next();
+                    System.out.println("Has next: " + next);
+                    if(next){
+                        System.out.println("uuid: " + resultSet.getString("uuid"));
+                        System.out.println("Comment: " + resultSet.getString("comment"));
+                    }
+                });
+        var selectQuery3 = Query.select()
+                .table("test6")
+                .orderBy("uuid", Order.Direction.DESCENDING)
+                .limit(1, 1)
+                .actionAfterQuery(resultSet -> {
+                    boolean next = resultSet.next();
+                    System.out.println("Has next: " + next);
+                    if(next){
+                        System.out.println("uuid: " + resultSet.getString("uuid"));
+                        System.out.println("Comment: " + resultSet.getString("comment"));
+                    }
+                });
 
+
+        System.out.println("------  \tTableCreate\t  ------");
         new Query(databaseAdapter).queries(tableCreateQuery).execute();
+        System.out.println("------  \t Insert \t  ------");
         new Query(databaseAdapter).queries(insertQuery).execute();
+        System.out.println("------  \tSelect 1\t  ------");
         new Query(databaseAdapter).queries(selectQuery).execute();
+        System.out.println("------  \tSelect 2\t  ------");
+        new Query(databaseAdapter).queries(selectQuery2).execute();
+        System.out.println("------  \tSelect 3\t  ------");
+        new Query(databaseAdapter).queries(selectQuery3).execute();
     }
 }
