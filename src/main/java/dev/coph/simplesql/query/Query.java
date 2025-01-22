@@ -62,7 +62,7 @@ public class Query {
      * Default value is {@code false}.
      */
     @Setter
-    private boolean executedSuccessfully = false;
+    private boolean executed = false;
 
 
     /**
@@ -98,15 +98,15 @@ public class Query {
      */
     public void execute() {
         Check.ifNull(databaseAdapter, "Database Adapter");
-        executedSuccessfully = false;
+        executed = false;
         if (async) {
             CompletableFuture.runAsync(() -> {
                 executeDirectly();
-                executedSuccessfully = true;
+                executed = true;
             });
         } else {
             executeDirectly();
-            executedSuccessfully = true;
+            executed = true;
         }
     }
 

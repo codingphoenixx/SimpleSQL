@@ -44,16 +44,4 @@ public class Condition {
     public enum Type {
         AND, OR,
     }
-
-    @Getter
-    @Accessors(fluent = true)
-    public enum Operator {
-        EQUALS("="), SMALLER_THAN("<"), GREATER_THAN(">"), SMALLER_EQUALS_THAN("<="), GREATER_EQUALS_THAN(">="), NOT_EQUALS("<>");
-
-        private final String operator;
-
-        Operator(String operator) {
-            this.operator = operator;
-        }
-    }
 }

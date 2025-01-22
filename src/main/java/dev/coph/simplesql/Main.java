@@ -64,8 +64,20 @@ public class Main {
                 .insertMethode(InsertMethode.INSERT_IGNORE)
                 .entry("uuid", "1234567890");
 
+        var selectQuery = Query.select()
+                .table("test6")
+                .condition("uuid", "1234567890")
+                .actionAfterQuery(resultSet -> {
+                    boolean next = resultSet.next();
+                    System.out.println("Has next: " + next);
+                    if(next){
+                        System.out.println("Comment: " + resultSet.getString("comment"));
+                    }
+                });
+
 
         new Query(databaseAdapter).queries(tableCreateQuery).execute();
         new Query(databaseAdapter).queries(insertQuery).execute();
+        new Query(databaseAdapter).queries(selectQuery).execute();
     }
 }
