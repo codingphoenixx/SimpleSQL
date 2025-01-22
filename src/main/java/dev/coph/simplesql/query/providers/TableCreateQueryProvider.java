@@ -1,6 +1,8 @@
 package dev.coph.simplesql.query.providers;
 
 import dev.coph.simplesql.database.Column;
+import dev.coph.simplesql.database.attributes.ColumnType;
+import dev.coph.simplesql.database.attributes.CreateMethode;
 import dev.coph.simplesql.database.attributes.DataType;
 import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.query.QueryProvider;
@@ -45,7 +47,7 @@ public class TableCreateQueryProvider implements QueryProvider {
      * The order of the columns in this list reflects the order in which they will
      * appear in the table schema definition.
      */
-    private List<Column> columns = new ArrayList<>();
+    private final List<Column> columns = new ArrayList<>();
 
 
     @Override
@@ -131,7 +133,7 @@ public class TableCreateQueryProvider implements QueryProvider {
      * @param columnType the type of the column (e.g., primary key, normal column, etc.)
      * @return the current instance of TableCreateQueryProvider for method chaining
      */
-    public TableCreateQueryProvider column(String key, DataType dataType, Object dataTypeParameterObject, Column.ColumnType columnType) {
+    public TableCreateQueryProvider column(String key, DataType dataType, Object dataTypeParameterObject, ColumnType columnType) {
         columns.add(new Column(key, dataType, dataTypeParameterObject, columnType));
         return this;
     }
@@ -148,30 +150,11 @@ public class TableCreateQueryProvider implements QueryProvider {
      * @param columnType the type of the column (e.g., primary key, normal column, etc.)
      * @return the current instance of TableCreateQueryProvider for method chaining
      */
-    public TableCreateQueryProvider column(String key, DataType dataType, Column.ColumnType columnType) {
+    public TableCreateQueryProvider column(String key, DataType dataType, ColumnType columnType) {
         columns.add(new Column(key, dataType, columnType));
         return this;
     }
 
 
-    /**
-     * The {@code CreateMethode} enumeration defines the strategies that can be used
-     * during the creation of database structures, such as tables, within a SQL
-     * generation framework.
-     */
-    public enum CreateMethode {
-        /**
-         * Represents the default create method in the {@link CreateMethode} enumeration.
-         * This method indicates a standard create operation without specific conditions
-         * or checks, typically used for initializing or setting up database structures.
-         */
-        DEFAULT,
-        /**
-         * Represents the IF_NOT_EXISTS create method in the {@link CreateMethode} enumeration.
-         * This method is used to conditionally create a database structure, such as a table,
-         * only if it does not already exist. It helps to avoid errors or conflicts that may
-         * occur when attempting to create a structure that is already present.
-         */
-        IF_NOT_EXISTS,
-    }
+
 }

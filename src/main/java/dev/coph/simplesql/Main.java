@@ -2,7 +2,10 @@ package dev.coph.simplesql;
 
 import dev.coph.simplesql.adapter.DatabaseAdapter;
 import dev.coph.simplesql.database.Column;
+import dev.coph.simplesql.database.attributes.ColumnType;
+import dev.coph.simplesql.database.attributes.CreateMethode;
 import dev.coph.simplesql.database.attributes.DataType;
+import dev.coph.simplesql.database.attributes.InsertMethode;
 import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.query.providers.InsertQueryProvider;
 import dev.coph.simplesql.query.providers.TableCreateQueryProvider;
@@ -23,7 +26,7 @@ public class Main {
                 .port(3306)
                 .database("testing")
                 .user("root")
-                .password("root")
+                .password("")
                 .driverType(DatabaseAdapter.DriverType.MARIADB)
                 .build();
         databaseAdapter.connect();
@@ -51,14 +54,14 @@ public class Main {
     private static void runQuery(DatabaseAdapter databaseAdapter) {
         var tableCreateQuery = Query.tableCreate()
                 .table("test6")
-                .column("uuid", DataType.VARCHAR, 64, Column.ColumnType.UNIQUE)
+                .column("uuid", DataType.VARCHAR, 64, ColumnType.UNIQUE)
                 .column("comment", DataType.LONGTEXT)
-                .column("number", DataType.INTEGER, Column.ColumnType.PRIMARY_KEY_AUTOINCREMENT)
-                .createMethode(TableCreateQueryProvider.CreateMethode.IF_NOT_EXISTS);
+                .column("number", DataType.INTEGER, ColumnType.PRIMARY_KEY_AUTOINCREMENT)
+                .createMethode(CreateMethode.IF_NOT_EXISTS);
 
         var insertQuery = Query.insert()
                 .table("test6")
-                .insertMethode(InsertQueryProvider.InsertMethode.INSERT_IGNORE)
+                .insertMethode(InsertMethode.INSERT_IGNORE)
                 .entry("uuid", "1234567890");
 
 
