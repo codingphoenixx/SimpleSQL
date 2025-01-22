@@ -13,5 +13,5 @@ public class CreateDatabaseQueryProvider implements QueryProvider {
         return "";
     }
 
-    //TODO: NOT WORK
+    //TODO:
 }
