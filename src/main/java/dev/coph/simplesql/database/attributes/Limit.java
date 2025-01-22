@@ -11,9 +11,10 @@ import lombok.experimental.Accessors;
 public class Limit {
 
     private int limit;
+    private int offset = -1;
 
     @Override
     public String toString() {
-        return " LIMIT " + limit;
+        return " LIMIT " + limit + (offset > -1 ? " OFFSET " + offset : "");
     }
 }
