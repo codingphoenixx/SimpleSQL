@@ -6,6 +6,7 @@ import dev.coph.simplesql.query.Query;
 
 import java.io.File;
 import java.io.IOException;
+import java.util.Random;
 
 public class Main {
     public static void main(String[] args) {
@@ -72,6 +73,14 @@ public class Main {
                     }
                 });
 
+        var updateQuery = Query.update()
+                .table("test6")
+                .condition("uuid", "1234567890")
+                .updateIgnore(false)
+                .updatePriority(UpdatePriority.LOW)
+                .entry("comment", new Random().nextInt())
+                ;
+
         var selectQuery2 = Query.select()
                 .table("test6")
                 .orderBy("uuid")
@@ -103,6 +112,8 @@ public class Main {
         new Query(databaseAdapter).queries(insertQuery).execute();
         System.out.println("------  \tSelect 1\t  ------");
         new Query(databaseAdapter).queries(selectQuery).execute();
+        System.out.println("------  \tUpdate\t  ------");
+        new Query(databaseAdapter).queries(updateQuery).execute();
         System.out.println("------  \tSelect 2\t  ------");
         new Query(databaseAdapter).queries(selectQuery2).execute();
         System.out.println("------  \tSelect 3\t  ------");

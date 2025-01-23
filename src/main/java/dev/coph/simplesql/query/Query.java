@@ -142,7 +142,9 @@ public class Query {
 
         try (Connection connection = databaseAdapter.dataSource().getConnection()) {
             if (queries.size() == 1) {
-                var statement = connection.prepareStatement(queries.getFirst().generateSQLString(this));
+                String generateSQLString = queries.getFirst().generateSQLString(this);
+                System.out.println("Generated SQL-STRING: " + generateSQLString);
+                var statement = connection.prepareStatement(generateSQLString);
                 try {
                     if (queries.getFirst() instanceof SelectQueryProvider selectRequest) {
                         System.out.println(statement);

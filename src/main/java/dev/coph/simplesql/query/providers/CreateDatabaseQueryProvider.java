@@ -8,7 +8,11 @@ public class CreateDatabaseQueryProvider implements QueryProvider {
     @Override
     public String generateSQLString(Query query) {
         if(query.databaseAdapter() != null && query.databaseAdapter().driverType() == DatabaseAdapter.DriverType.SQLITE){
-            throw new UnsupportedOperationException("SQLite does not support different Databases.");
+            try {
+                throw new UnsupportedOperationException("SQLite does not support different Databases. Ignoring attribute...");
+            }catch (Exception e) {
+                e.printStackTrace();
+            }
         }
         return "";
     }
