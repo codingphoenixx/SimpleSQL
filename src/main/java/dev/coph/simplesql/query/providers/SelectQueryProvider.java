@@ -25,6 +25,11 @@ import java.util.Set;
 @Accessors(fluent = true, chain = true)
 public class SelectQueryProvider implements QueryProvider {
 
+    /**
+     * Represents the name of the database table to be queried.
+     * This field is used to specify the table from which data will be selected
+     * in a SQL SELECT query.
+     */
     @Setter
     private String table;
 
