@@ -202,17 +202,17 @@ public class Query {
 
 
     /**
-     * Creates and returns a new instance of {@link CreateDatabaseQueryProvider}.
+     * Creates and returns a new instance of {@link DatabaseCreateQueryProvider}.
      *
      * This method is used to initiate a CREATE DATABASE SQL query by providing a
-     * {@link CreateDatabaseQueryProvider} object, which can be further configured
+     * {@link DatabaseCreateQueryProvider} object, which can be further configured
      * to construct SQL CREATE DATABASE statements.
      *
-     * @return A new {@link CreateDatabaseQueryProvider} instance for constructing
+     * @return A new {@link DatabaseCreateQueryProvider} instance for constructing
      * CREATE DATABASE SQL queries.
      */
-    public static CreateDatabaseQueryProvider createDatabase(){
-        return new CreateDatabaseQueryProvider();
+    public static DatabaseCreateQueryProvider createDatabase(){
+        return new DatabaseCreateQueryProvider();
     }
 
 

@@ -44,7 +44,6 @@ public class TableDropQueryProvider implements QueryProvider {
     public String generateSQLString(Query query) {
         Check.ifNullOrEmptyMap(tables, "tables");
 
-
         StringBuilder sql = new StringBuilder("DROP TABLE");
 
         if(deleteMethode.equals(DeleteMethode.IF_EXISTS))
@@ -53,6 +52,7 @@ public class TableDropQueryProvider implements QueryProvider {
         for (String table : tables) {
             sql.append(" ").append(table).append(",");
         }
+
         sql.deleteCharAt(sql.length() - 1);
         sql.append(";");
         return sql.toString();
@@ -63,6 +63,8 @@ public class TableDropQueryProvider implements QueryProvider {
         if (this.tables == null) {
             this.tables = new ArrayList<>();
         }
+
+
         this.tables.addAll(Arrays.asList(tables));
         return this;
     }

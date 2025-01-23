@@ -4,7 +4,7 @@ import dev.coph.simplesql.adapter.DatabaseAdapter;
 import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.query.QueryProvider;
 
-public class CreateDatabaseQueryProvider implements QueryProvider {
+public class DatabaseCreateQueryProvider implements QueryProvider {
     @Override
     public String generateSQLString(Query query) {
         if (query.databaseAdapter() != null && query.databaseAdapter().driverType() == DatabaseAdapter.DriverType.SQLITE) {
