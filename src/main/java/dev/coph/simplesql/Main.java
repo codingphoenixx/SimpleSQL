@@ -10,11 +10,11 @@ import java.util.Random;
 
 public class Main {
     public static void main(String[] args) {
-        System.out.println("--------------------------- MARIADB ------------------------------");
+        System.out.println("--------------------------------------- MARIADB ------------------------------------------");
         startMariaDB();
-        System.out.println("--------------------------- SQLITE ------------------------------");
+        System.out.println("--------------------------------------- SQLITE ------------------------------------------");
         startSQLite();
-        System.out.println("--------------------------- FINISHED ------------------------------");
+        System.out.println("--------------------------------------- FINISHED ------------------------------------------");
     }
 
 
@@ -110,19 +110,19 @@ public class Main {
         var tableTruncate = Query.tableTruncate()
                 .table("test6");
 
-        System.out.println("------  \tTableCreate\t  ------");
+        System.out.println("------------------------  \tTableCreate\t  ------------------------");
         new Query(databaseAdapter).queries(tableCreateQuery).execute();
-        System.out.println("------  \t Insert \t  ------");
+        System.out.println("------------------------  \t Insert \t  ------------------------");
         new Query(databaseAdapter).queries(insertQuery).execute();
-        System.out.println("------  \tSelect 1\t  ------");
+        System.out.println("------------------------  \tSelect 1\t  ------------------------");
         new Query(databaseAdapter).queries(selectQuery).execute();
-        System.out.println("------  \tUpdate\t  ------");
+        System.out.println("------------------------  \tUpdate\t  ------------------------");
         new Query(databaseAdapter).queries(updateQuery).execute();
-        System.out.println("------  \tSelect 2\t  ------");
+        System.out.println("------------------------  \tSelect 2\t  ------------------------");
         new Query(databaseAdapter).queries(selectQuery2).execute();
-        System.out.println("------  \tSelect 3\t  ------");
+        System.out.println("------------------------  \tSelect 3\t  ------------------------");
         new Query(databaseAdapter).queries(selectQuery3).execute();
-        System.out.println("------  \tTruncate\t  ------");
+        System.out.println("------------------------  \tTruncate\t  ------------------------");
         new Query(databaseAdapter).queries(tableTruncate).execute();
     }
 }
