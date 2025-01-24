@@ -14,6 +14,7 @@ import lombok.experimental.Accessors;
  * that truncate database tables.
  *
  * The {@code TRUNCATE TABLE} command quickly deletes all rows from a table, resets auto-increment values, and retains the table structure.
+ * Not working with {@code DriverType.SQLITE}
  */
 @Getter
 @Accessors(fluent = true, chain = true)
