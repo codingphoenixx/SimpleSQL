@@ -68,7 +68,7 @@ public class Main {
                 .actionAfterQuery(resultSet -> {
                     boolean next = resultSet.next();
                     System.out.println("Has next: " + next);
-                    if(next){
+                    if (next) {
                         System.out.println("Comment: " + resultSet.getString("comment"));
                     }
                 });
@@ -78,8 +78,7 @@ public class Main {
                 .condition("uuid", "1234567890")
                 .updateIgnore(false)
                 .updatePriority(UpdatePriority.LOW)
-                .entry("comment", new Random().nextInt())
-                ;
+                .entry("comment", new Random().nextInt());
 
         var selectQuery2 = Query.select()
                 .table("test6")
@@ -87,7 +86,7 @@ public class Main {
                 .actionAfterQuery(resultSet -> {
                     boolean next = resultSet.next();
                     System.out.println("Has next: " + next);
-                    if(next){
+                    if (next) {
                         System.out.println("uuid: " + resultSet.getString("uuid"));
                         System.out.println("Comment: " + resultSet.getString("comment"));
                     }
@@ -100,12 +99,15 @@ public class Main {
                 .actionAfterQuery(resultSet -> {
                     boolean next = resultSet.next();
                     System.out.println("Has next: " + next);
-                    if(next){
+                    if (next) {
                         System.out.println("uuid: " + resultSet.getString("uuid"));
                         System.out.println("Comment: " + resultSet.getString("comment"));
                     }
                 });
 
+
+        var tableTruncate = Query.tableTruncate()
+                .table("test6");
 
         System.out.println("------  \tTableCreate\t  ------");
         new Query(databaseAdapter).queries(tableCreateQuery).execute();
@@ -119,5 +121,7 @@ public class Main {
         new Query(databaseAdapter).queries(selectQuery2).execute();
         System.out.println("------  \tSelect 3\t  ------");
         new Query(databaseAdapter).queries(selectQuery3).execute();
+        System.out.println("------  \tTruncate\t  ------");
+        new Query(databaseAdapter).queries(tableTruncate).execute();
     }
 }

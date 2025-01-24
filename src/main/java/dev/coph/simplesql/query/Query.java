@@ -82,6 +82,7 @@ public class Query {
      */
     private ArrayList<QueryProvider> queries = new ArrayList<>();
 
+
     /**
      * Executes the given SQL queries associated with this Query instance.
      * <p>
@@ -203,7 +204,7 @@ public class Query {
 
     /**
      * Creates and returns a new instance of {@link DatabaseCreateQueryProvider}.
-     *
+     * <p>
      * This method is used to initiate a CREATE DATABASE SQL query by providing a
      * {@link DatabaseCreateQueryProvider} object, which can be further configured
      * to construct SQL CREATE DATABASE statements.
@@ -211,14 +212,14 @@ public class Query {
      * @return A new {@link DatabaseCreateQueryProvider} instance for constructing
      * CREATE DATABASE SQL queries.
      */
-    public static DatabaseCreateQueryProvider createDatabase(){
+    public static DatabaseCreateQueryProvider createDatabase() {
         return new DatabaseCreateQueryProvider();
     }
 
 
     /**
      * Creates and returns a new instance of {@link DeleteQueryProvider}.
-     *
+     * <p>
      * This method is used to initiate a DELETE SQL query by providing a
      * {@link DeleteQueryProvider} object, which can be further configured
      * to construct SQL DELETE statements.
@@ -276,7 +277,7 @@ public class Query {
 
     /**
      * Creates and returns a new instance of {@link TableDropQueryProvider}.
-     *
+     * <p>
      * This method is used to initiate a DROP TABLE SQL query by providing a
      * {@link TableDropQueryProvider} object, which can be further configured
      * to construct SQL DROP TABLE statements.
@@ -284,9 +285,24 @@ public class Query {
      * @return A new {@link TableDropQueryProvider} instance for constructing
      * DROP TABLE SQL queries.
      */
-   public static TableDropQueryProvider tableDrop() {
+    public static TableDropQueryProvider tableDrop() {
         return new TableDropQueryProvider();
-   }
+    }
+
+
+    /**
+     * Creates and returns a new instance of {@link TableTruncateQueryProvider}.
+     *
+     * This method is used to initiate a TRUNCATE TABLE SQL query by providing
+     * a {@link TableTruncateQueryProvider} object, which can be further configured
+     * to specify the table to be truncated.
+     *
+     * @return A new {@link TableTruncateQueryProvider} instance for constructing
+     * TRUNCATE TABLE SQL queries.
+     */
+    public static TableTruncateQueryProvider tableTruncate() {
+        return new TableTruncateQueryProvider();
+    }
 
     /**
      * Creates and returns a new instance of {@link UpdateQueryProvider}.

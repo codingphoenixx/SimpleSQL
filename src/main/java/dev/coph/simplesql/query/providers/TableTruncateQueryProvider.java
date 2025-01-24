@@ -1,5 +1,6 @@
 package dev.coph.simplesql.query.providers;
 
+import dev.coph.simplesql.adapter.DatabaseAdapter;
 import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.query.QueryProvider;
 import dev.coph.simplesql.utils.Check;
@@ -26,6 +27,14 @@ public class TableTruncateQueryProvider implements QueryProvider {
 
     @Override
     public String generateSQLString(Query query) {
+        if (query.databaseAdapter() != null && query.databaseAdapter().driverType() == DatabaseAdapter.DriverType.SQLITE) {
+            try {
+                throw new UnsupportedOperationException("SQLite does not support different Databases. Ignoring attribute...");
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+            return "";
+        }
         Check.ifNull(table, "table name");
         return "TRUNCATE TABLE %s;".formatted(table);
     }

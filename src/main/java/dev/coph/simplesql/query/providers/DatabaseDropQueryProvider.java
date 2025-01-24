@@ -13,6 +13,7 @@ public class DatabaseDropQueryProvider implements QueryProvider {
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            return "";
         }
         return "";
     }
