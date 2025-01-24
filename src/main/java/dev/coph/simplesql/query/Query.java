@@ -64,6 +64,18 @@ public class Query {
     @Setter
     private boolean executed = false;
 
+    /**
+     * Represents the success status of the most recent query execution.
+     * This variable tracks whether the queries executed in the current or previous
+     * operation within the {@code Query} class completed successfully.
+     *
+     * The value is set to {@code false} at the start of each execution and updated
+     * upon completion based on the success or failure of the operation.
+     * It is primarily used to determine whether subsequent actions or workflows
+     * should proceed depending on the result of the SQL query execution.
+     */
+    private boolean succeeded = false;
+
 
     /**
      * A list containing all the SQL queries associated with the current Query instance.
@@ -100,6 +112,7 @@ public class Query {
     public void execute() {
         Check.ifNull(databaseAdapter, "Database Adapter");
         executed = false;
+        succeeded = false;
         if (async) {
             CompletableFuture.runAsync(() -> {
                 executeDirectly();
@@ -145,6 +158,10 @@ public class Query {
             if (queries.size() == 1) {
                 String generateSQLString = queries.getFirst().generateSQLString(this);
                 System.out.println("Generated SQL-STRING: " + generateSQLString);
+                if(generateSQLString == null){
+                    System.out.println("Generated SQL-String is null. Canceling request.");
+                    return;
+                }
                 var statement = connection.prepareStatement(generateSQLString);
                 try {
                     if (queries.getFirst() instanceof SelectQueryProvider selectRequest) {
@@ -154,34 +171,48 @@ public class Query {
                         if (selectRequest.actionAfterQuery() != null) {
                             selectRequest.actionAfterQuery().run(resultSet);
                         }
+                        succeeded = true;
                     } else if (queries.getFirst() instanceof UpdateQueryProvider) {
                         System.out.println(statement);
                         statement.executeUpdate();
+                        succeeded = true;
                     } else {
                         System.out.println(statement);
                         statement.execute();
+                        succeeded = true;
                     }
                 } catch (SQLException e) {
                     e.printStackTrace();
+                    succeeded = false;
                 }
             } else {
                 var statement = connection.createStatement();
                 for (QueryProvider queryProvider : queries) {
                     try {
-                        statement.addBatch(queryProvider.generateSQLString(this));
+                        String generateSQLString = queryProvider.generateSQLString(this);
+                        System.out.println("Generated SQL-STRING: " + generateSQLString);
+                        if(generateSQLString == null){
+                            System.out.println("Generated SQL-String is null. Ignoring request.");
+                            continue;
+                        }
+                        statement.addBatch(generateSQLString);
                     } catch (Exception e) {
                         e.printStackTrace();
+                        succeeded = false;
                     }
                 }
                 try {
                     statement.executeBatch();
+                    succeeded = true;
                 } catch (SQLException e) {
                     e.printStackTrace();
+                    succeeded = false;
                 }
             }
 
 
         } catch (Exception e) {
+            succeeded = false;
             throw new RequestNotExecutableException(e);
         }
     }

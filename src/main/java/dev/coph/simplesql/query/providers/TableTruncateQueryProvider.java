@@ -30,11 +30,11 @@ public class TableTruncateQueryProvider implements QueryProvider {
     public String generateSQLString(Query query) {
         if (query.databaseAdapter() != null && query.databaseAdapter().driverType() == DatabaseAdapter.DriverType.SQLITE) {
             try {
-                throw new UnsupportedOperationException("SQLite does not support different Databases. Ignoring attribute...");
+                throw new UnsupportedOperationException("SQLite does not support truncate. Ignoring attribute...");
             } catch (Exception e) {
                 e.printStackTrace();
             }
-            return "";
+            return null;
         }
         Check.ifNull(table, "table name");
         return "TRUNCATE TABLE %s;".formatted(table);
