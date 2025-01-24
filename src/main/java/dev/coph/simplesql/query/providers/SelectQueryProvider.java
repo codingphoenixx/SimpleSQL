@@ -25,8 +25,6 @@ import java.util.Set;
 @Accessors(fluent = true, chain = true)
 public class SelectQueryProvider implements QueryProvider {
 
-    //TODO: Select distinct
-
     /**
      * Represents the name of the database table to be queried.
      * This field is used to specify the table from which data will be selected
@@ -41,6 +39,16 @@ public class SelectQueryProvider implements QueryProvider {
      */
     @Setter
     private SelectFunction selectFunction = SelectFunction.NORMAL;
+
+    /**
+     * Specifies the type of selection to be used in the SQL query.
+     * It determines whether the query selects all matching rows (`NORMAL`)
+     * or only distinct rows (`DISTINCT`).
+     *
+     * The default value is {@code SelectType.NORMAL}.
+     */
+    @Setter
+    private SelectType selectType = SelectType.NORMAL;
 
     /**
      * A collection of {@link Order} objects that define the sorting rules for a SQL SELECT query.
@@ -92,7 +100,11 @@ public class SelectQueryProvider implements QueryProvider {
         Check.ifNullOrEmptyMap(table, "table name");
 
         StringBuilder sql = new StringBuilder("SELECT ");
-        if (!selectFunction.equals(SelectFunction.NORMAL) && !isStarRequest()) {
+
+        if(selectType != null && selectType == SelectType.DISTINCT)
+            sql.append("DISTINCT ");
+
+        if (selectFunction != null && !selectFunction.equals(SelectFunction.NORMAL) && !isStarRequest()) {
             sql.append(selectFunction.function()).append("(").append(parseColumnName()).append(")");
         } else {
             sql.append(parseColumnName());

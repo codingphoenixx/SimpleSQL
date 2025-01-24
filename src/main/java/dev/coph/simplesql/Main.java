@@ -65,6 +65,7 @@ public class Main {
         var selectQuery = Query.select()
                 .table("test6")
                 .condition("uuid", "1234567890")
+                .selectType(SelectType.DISTINCT)
                 .actionAfterQuery(resultSet -> {
                     boolean next = resultSet.next();
                     System.out.println("Has next: " + next);
