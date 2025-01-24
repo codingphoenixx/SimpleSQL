@@ -11,6 +11,11 @@ import lombok.experimental.Accessors;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+/**
+ * A provider for generating SQL queries to drop database tables.
+ * This class constructs SQL "DROP TABLE" statements with configurable options
+ * such as the set of targeted tables and the deletion method.
+ */
 @Getter
 @Accessors(fluent = true, chain = true)
 public class TableDropQueryProvider implements QueryProvider {

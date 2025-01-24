@@ -19,6 +19,24 @@ import java.util.List;
 import java.util.Set;
 
 
+/**
+ * The UpdateQueryProvider class facilitates the creation and configuration of SQL
+ * "UPDATE" queries. It allows developers to define parameters, conditions, and
+ * constraints required to construct a valid update query for a database.
+ * This class provides a fluent API for chaining method calls to build complex
+ * SQL update statements.
+ *
+ * The generated SQL update query supports the following:
+ * - Defining the target table for the update operation.
+ * - Specifying priority levels for the execution of the query.
+ * - Adding "IGNORE" directives to handle errors during update.
+ * - Incorporating multiple conditions in the "WHERE" clause for targeted updates.
+ * - Setting column-value pairs to modify specific records.
+ * - Applying "LIMIT" clauses for constraining the number of affected rows.
+ *
+ * This implementation adheres to the QueryProvider interface, ensuring
+ * compatibility with a broader query management system.
+ */
 @Getter
 @Accessors(fluent = true)
 public class UpdateQueryProvider implements QueryProvider {

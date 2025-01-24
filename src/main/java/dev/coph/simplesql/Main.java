@@ -92,6 +92,7 @@ public class Main {
                         System.out.println("Comment: " + resultSet.getString("comment"));
                     }
                 });
+
         var selectQuery3 = Query.select()
                 .table("test6")
                 .orderBy("uuid", Order.Direction.DESCENDING)
