@@ -366,6 +366,16 @@ public class Query {
         return new TableAlterModifyTypeQueryProvider();
     }
 
+    /**
+     * Creates and returns a new instance of TableAlterRenameQueryProvider.
+     * This method is used to initialize and retrieve an object for
+     * handling table alteration and renaming queries.
+     *
+     * @return a new instance of TableAlterRenameQueryProvider
+     */
+    public static TableAlterRenameQueryProvider tableAlterRename(){
+        return new TableAlterRenameQueryProvider();
+    }
 
     /**
      * Creates and returns a new instance of {@link TableCreateQueryProvider}.
