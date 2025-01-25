@@ -10,7 +10,7 @@ import lombok.experimental.Accessors;
 
 @Getter
 @Accessors(fluent = true, chain = true)
-public abstract class AlterTableQueryProvider implements QueryProvider {
+public abstract class TableAlterQueryProvider implements QueryProvider {
 
     @Setter
     protected String table;
