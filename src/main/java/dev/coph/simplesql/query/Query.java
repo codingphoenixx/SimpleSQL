@@ -293,6 +293,81 @@ public class Query {
     }
 
     /**
+     * Creates and returns an instance of {@link TableAlterAddAttributeQueryProvider}.
+     *
+     * This method is used to initiate an ALTER TABLE SQL query for adding an attribute
+     * (such as UNIQUE or PRIMARY KEY) to an existing column of a table. The returned
+     * {@link TableAlterAddAttributeQueryProvider} object can be further configured
+     * to specify the column name and the type of attribute to be added.
+     *
+     * @return A new {@link TableAlterAddAttributeQueryProvider} instance for constructing
+     * ALTER TABLE SQL queries to add attributes to a column.
+     */
+    public static TableAlterAddAttributeQueryProvider tableAlterAddAttribute() {
+        return new TableAlterAddAttributeQueryProvider();
+    }
+
+    /**
+     * Creates and returns a new instance of {@link TableAlterAddColumnQueryProvider}.
+     *
+     * This method is used to initiate an ALTER TABLE SQL query for adding a new column
+     * to an existing table. The returned {@link TableAlterAddColumnQueryProvider} object
+     * allows further configuration, such as specifying the column name, data type,
+     * position, default value, and whether the column should only be added if it does not already exist.
+     *
+     * @return A new {@link TableAlterAddColumnQueryProvider} instance for constructing
+     * ALTER TABLE SQL queries to add columns.
+     */
+    public static TableAlterAddColumnQueryProvider tableAlterAddColumn() {
+        return new TableAlterAddColumnQueryProvider();
+    }
+
+    /**
+     * Creates and returns a new instance of {@link TableAlterColumnDefaultValueQueryProvider}.
+     *
+     * This method is used to initiate an ALTER TABLE SQL query to set or remove
+     * a default value for a specific column in a database table. The returned
+     * {@link TableAlterColumnDefaultValueQueryProvider} object allows further
+     * configuration, such as specifying the column name, the default value to
+     * set, or whether to drop an existing default value.
+     *
+     * @return A new {@link TableAlterColumnDefaultValueQueryProvider} instance for constructing
+     * ALTER TABLE SQL queries to modify the default value of a column.
+     */
+    public static TableAlterColumnDefaultValueQueryProvider tableAlterColumnDefaultValue() {
+        return new TableAlterColumnDefaultValueQueryProvider();
+    }
+
+    /**
+     * Creates and returns a new instance of {@link TableAlterDropQueryProvider}.
+     *
+     * This method is used to initiate an ALTER TABLE SQL query for dropping a column or constraint from an existing table.
+     * The returned {@link TableAlterDropQueryProvider} object allows further configuration
+     * to specify the table name, the column or constraint to be dropped, and additional drop options.
+     *
+     * @return A new {@link TableAlterDropQueryProvider} instance for constructing ALTER TABLE SQL queries to drop columns or constraints.
+     */
+    public static TableAlterDropQueryProvider tableAlterDrop() {
+        return new TableAlterDropQueryProvider();
+    }
+
+    /**
+     * Creates and returns a new instance of {@link TableAlterModifyTypeQueryProvider}.
+     *
+     * This method is used to initiate an ALTER TABLE SQL query for modifying the
+     * data type of an existing column in a database table. The returned
+     * {@link TableAlterModifyTypeQueryProvider} object allows further configuration,
+     * such as specifying the table name, column name, and the new data type to be applied.
+     *
+     * @return A new {@link TableAlterModifyTypeQueryProvider} instance for constructing
+     * ALTER TABLE SQL queries to modify column data types.
+     */
+    public static TableAlterModifyTypeQueryProvider tableAlterModifyType(){
+        return new TableAlterModifyTypeQueryProvider();
+    }
+
+
+    /**
      * Creates and returns a new instance of {@link TableCreateQueryProvider}.
      * <p>
      * This method is used to initiate a CREATE TABLE SQL query by providing

@@ -23,5 +23,4 @@ public abstract class TableAlterQueryProvider implements QueryProvider {
         return "ALTER TABLE " + table + " " + getAlterTableString(query) + ";";
     }
 
-    //TODO:
 }

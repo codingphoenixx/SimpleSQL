@@ -8,7 +8,15 @@ group = 'dev.coph'
 version = '1.0-SNAPSHOT'
 
 repositories {
+
+
+    maven {
+        url = uri("http://78.47.87.126:8080/releases")
+        allowInsecureProtocol = true
+    }
+
     mavenCentral()
+
 }
 
 dependencies {
@@ -28,14 +36,16 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok:1.18.34'
     testCompileOnly 'org.projectlombok:lombok:1.18.34'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
+
+    implementation("dev.coph:simplelogger:1.0.0")
 }
 
 
 publishing {
     repositories {
         maven {
-            name = "localRepository"
-            url = "http://localhost:8081/releases"
+            name = "cophrepository"
+            url = "http://78.47.87.126:8080/releases"
             allowInsecureProtocol = true
             credentials(PasswordCredentials)
             authentication {

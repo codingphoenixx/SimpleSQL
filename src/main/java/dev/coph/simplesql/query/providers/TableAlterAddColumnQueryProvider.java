@@ -1,20 +1,20 @@
 package dev.coph.simplesql.query.providers;
 
-import de.codingphoenix.phoenixbase.check.Checks;
-import de.codingphoenix.phoenixbase.database.DataType;
-import de.codingphoenix.phoenixbase.database.DatabaseEntry;
-import de.codingphoenix.phoenixbase.database.request.tablealter.TableAlterRequest;
+import dev.coph.simplesql.database.attributes.DataType;
+import dev.coph.simplesql.query.Query;
+import dev.coph.simplesql.query.QueryEntry;
+import dev.coph.simplesql.utils.Check;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
 /**
- * Action for the {@link TableAlterRequest} that will add a column.
+ * Action for the {@link TableAlterQueryProvider} that will add a column.
  */
 @Setter
 @Getter
 @Accessors(fluent = true)
-public class TableAlterAddColumnAction implements TableAlterRequest.AlterRequestAction {
+public class TableAlterAddColumnQueryProvider extends TableAlterQueryProvider {
     /**
      * The name of the column the attribute should be added.
      */
@@ -28,7 +28,7 @@ public class TableAlterAddColumnAction implements TableAlterRequest.AlterRequest
      */
     private Postion postion = Postion.DEFAULT;
     /**
-     * If {@link Postion} is set to {@linkplain Postion.AFTER} the name of the column the new will be added after.
+     * If {@link Postion} is set to {@code  Postion.AFTER} the name of the column the new will be added after.
      */
     private String afterColumnName;
 
@@ -41,24 +41,25 @@ public class TableAlterAddColumnAction implements TableAlterRequest.AlterRequest
      */
     private boolean ifNotExists = false;
 
-    @Override
-    public StringBuilder generateSQL() {
-        Checks.checkIfNullOrEmptyMap(columnName, "columnName");
-        Checks.checkIfNullOrEmptyMap(dataType, "dataType");
-        Checks.checkIfStringOnlyHasAllowedCharacters(columnName, "columnName");
 
-//TODO: Add default value to column
-        StringBuilder stringBuilder = new StringBuilder("ADD COLUMN ").append((ifNotExists ? "IF NOT EXISTS " : null)).append(columnName).append(" ").append(dataType).append((defaultValue == null ? null : " DEFAULT " + DatabaseEntry.parseSQLValue(defaultValue)));
+
+    @Override
+    public String getAlterTableString(Query query) {
+        Check.ifNullOrEmptyMap(columnName, "columnName");
+        Check.ifNullOrEmptyMap(dataType, "dataType");
+        Check.ifStringOnlyHasAllowedCharacters(columnName, "columnName");
+
+        StringBuilder stringBuilder = new StringBuilder("ADD COLUMN ").append((ifNotExists ? "IF NOT EXISTS " : null)).append(columnName).append(" ").append(dataType).append((defaultValue == null ? null : " DEFAULT " + QueryEntry.parseSQLValue(defaultValue)));
 
         if (postion == Postion.DEFAULT) {
-            return stringBuilder;
+            return stringBuilder.toString();
         } else if (postion == Postion.FIRST) {
             stringBuilder.append(" FIRST");
         } else if (postion == Postion.AFTER) {
             stringBuilder.append(" AFTER ").append(afterColumnName);
         }
 
-        return stringBuilder;
+        return stringBuilder.toString();
     }
 
     /**
