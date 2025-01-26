@@ -243,10 +243,19 @@ public class Query {
      * @return A new {@link DatabaseCreateQueryProvider} instance for constructing
      * CREATE DATABASE SQL queries.
      */
-    public static DatabaseCreateQueryProvider createDatabase() {
+    public static DatabaseCreateQueryProvider databaseCreate() {
         return new DatabaseCreateQueryProvider();
     }
 
+    /**
+     * Creates and returns an instance of DatabaseDropQueryProvider, which can be used to handle
+     * database drop operations or generate queries related to dropping database structures.
+     *
+     * @return an instance of DatabaseDropQueryProvider to manage database drop functionalities
+     */
+    public static DatabaseDropQueryProvider databaseDrop() {
+        return new DatabaseDropQueryProvider();
+    }
 
     /**
      * Creates and returns a new instance of {@link DeleteQueryProvider}.
@@ -339,16 +348,16 @@ public class Query {
     }
 
     /**
-     * Creates and returns a new instance of {@link TableAlterDropQueryProvider}.
+     * Creates and returns a new instance of {@link TableAlterDropColumnQueryProvider}.
      *
      * This method is used to initiate an ALTER TABLE SQL query for dropping a column or constraint from an existing table.
-     * The returned {@link TableAlterDropQueryProvider} object allows further configuration
+     * The returned {@link TableAlterDropColumnQueryProvider} object allows further configuration
      * to specify the table name, the column or constraint to be dropped, and additional drop options.
      *
-     * @return A new {@link TableAlterDropQueryProvider} instance for constructing ALTER TABLE SQL queries to drop columns or constraints.
+     * @return A new {@link TableAlterDropColumnQueryProvider} instance for constructing ALTER TABLE SQL queries to drop columns or constraints.
      */
-    public static TableAlterDropQueryProvider tableAlterDrop() {
-        return new TableAlterDropQueryProvider();
+    public static TableAlterDropColumnQueryProvider tableAlterDropColumn() {
+        return new TableAlterDropColumnQueryProvider();
     }
 
     /**

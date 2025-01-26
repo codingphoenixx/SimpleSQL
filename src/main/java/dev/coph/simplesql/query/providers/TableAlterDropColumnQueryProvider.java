@@ -12,7 +12,7 @@ import lombok.experimental.Accessors;
 @Setter
 @Getter
 @Accessors(fluent = true)
-public class TableAlterDropQueryProvider extends TableAlterQueryProvider {
+public class TableAlterDropColumnQueryProvider extends TableAlterQueryProvider {
 
     /**
      * The type of Action.
