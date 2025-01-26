@@ -9,7 +9,9 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 /**
- * Action for the {@link TableAlterQueryProvider} that will add a column.
+ * A query provider class for generating SQL "ALTER TABLE" statements to add a new column to a table.
+ * This class extends the {@link TableAlterQueryProvider} and implements the specific logic required
+ * to construct the "ADD COLUMN" action within an "ALTER TABLE" statement.
  */
 @Setter
 @Getter

@@ -8,7 +8,10 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 /**
- * Action for the {@link TableAlterQueryProvider} that will add an attribute to a column.
+ * A class responsible for constructing SQL "ALTER TABLE" queries
+ * to add attributes to existing table columns. This class extends
+ * {@link TableAlterQueryProvider}, providing specific implementation for
+ * adding attributes such as UNIQUE or PRIMARY KEY to a column.
  */
 @Setter
 @Getter

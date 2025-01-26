@@ -8,7 +8,9 @@ import lombok.experimental.Accessors;
 
 
 /**
- * Action for the {@link TableAlterQueryProvider} that will rename a table.
+ * A provider for generating SQL "ALTER TABLE" queries specifically for renaming a table.
+ * This class extends the base functionality provided by {@link TableAlterQueryProvider}
+ * and implements the logic for constructing the query to rename an existing table.
  */
 @Setter
 @Getter
@@ -25,7 +27,5 @@ public class TableAlterRenameQueryProvider extends TableAlterQueryProvider {
         Check.ifNullOrEmptyMap(newTableName, "newTableName");
         return new StringBuilder("RENAME TO ").append(newTableName).toString();
     }
-
-    //    ALTER TABLE tabellenname RENAME TO neuer_tabellenname;
 
 }

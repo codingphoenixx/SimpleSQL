@@ -7,7 +7,12 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
-
+/**
+ * Abstract class representing a provider for generating SQL "ALTER TABLE" queries.
+ * Subclasses are expected to implement the logic for constructing specific "ALTER TABLE"
+ * operations such as adding a column, renaming a table, or modifying attributes.
+ * This class provides a base structure with shared functionality for table alterations.
+ */
 @Getter
 @Accessors(fluent = true, chain = true)
 public abstract class TableAlterQueryProvider implements QueryProvider {

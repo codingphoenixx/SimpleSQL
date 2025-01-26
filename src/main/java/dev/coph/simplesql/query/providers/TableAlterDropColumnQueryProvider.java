@@ -7,7 +7,12 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 /**
- * Action for the {@link TableAlterQueryProvider} that will drop a table.
+ * Provides functionality to generate SQL "ALTER TABLE" queries for dropping columns, indexes, or primary keys
+ * from a database table. It extends the {@link TableAlterQueryProvider} to reuse shared table alteration logic.
+ *
+ * This class allows the specification of a drop type, indicating whether the action is for a column, index,
+ * or primary key. For column and index drop operations, the name of the target column or index must also
+ * be provided.
  */
 @Setter
 @Getter
@@ -50,11 +55,4 @@ public class TableAlterDropColumnQueryProvider extends TableAlterQueryProvider {
         }
         return new StringBuilder("DROP ").append((dropType == COLUMN_DROP_TYPE ? "COLUMN " : "INDEX ")).append(dropObjectName).toString();
     }
-
-
-//    ALTER TABLE tabellenname DROP COLUMN spaltenname;
-//    ALTER TABLE tabellenname DROP INDEX indexname;
-//    ALTER TABLE tabellenname DROP PRIMARY KEY;
-
-
 }

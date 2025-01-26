@@ -10,6 +10,26 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;
 
+/**
+ * The {@code DatabaseCreateQueryProvider} class provides functionality to construct
+ * SQL CREATE DATABASE queries. It implements the {@link QueryProvider} interface,
+ * enabling the generation of SQL strings based on specific parameters such as
+ * database name, creation mode, and character set.
+ *
+ * This class supports customization of the following attributes:
+ * - Database name: The name of the database to be created.
+ * - CreateMethode: Specifies whether the query should include a condition to
+ *   only create the database if it does not already exist.
+ * - CharacterSet: Defines the character set for the database.
+ *
+ * The generated SQL query is tailored to the underlying database adapter, except
+ * for certain limitations (e.g., SQLite does not support specifying databases).
+ *
+ * Note:
+ * - If the database name is null, an exception will be thrown.
+ * - For unsupported drivers or scenarios, an exception might be logged, and the
+ *   resulting SQL string generation may return null.
+ */
 @Getter
 @Accessors(fluent = true, chain = true)
 public class DatabaseCreateQueryProvider implements QueryProvider {

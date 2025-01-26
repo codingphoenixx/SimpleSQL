@@ -14,6 +14,16 @@ import lombok.experimental.Accessors;
 import java.util.ArrayList;
 import java.util.List;
 
+
+/**
+ * This class is responsible for generating SQL statements to create database tables.
+ * It implements the {@link QueryProvider} interface and provides methods to configure
+ * the table name, creation method, and columns. Additionally, it allows the creation of
+ * a SQL query string based on the configuration provided.
+ *
+ * The {@code TableCreateQueryProvider} supports a fluent API style, enabling method chaining
+ * to configure the table schema with columns and other attributes efficiently.
+ */
 @Getter
 @Accessors(fluent = true, chain = true)
 public class TableCreateQueryProvider implements QueryProvider {

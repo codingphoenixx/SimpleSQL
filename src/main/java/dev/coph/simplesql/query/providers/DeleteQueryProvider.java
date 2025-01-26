@@ -16,7 +16,12 @@ import java.util.Set;
 
 
 /**
- * A {@link QueryProvider} that requests a deletion of a table
+ * Provides functionality to generate SQL DELETE queries. This class allows you to specify
+ * the table to delete from, apply conditions for deletion, set limits on the number of rows
+ * to be deleted, and define the order of rows to be affected.
+ *
+ * This class implements the {@link QueryProvider} interface to generate SQL strings
+ * for a DELETE query operation.
  */
 @Getter
 @Accessors(fluent = true)
