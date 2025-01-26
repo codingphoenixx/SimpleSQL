@@ -189,7 +189,8 @@ public enum CharacterSet {
      */
     LATIN7,
     /**
-     * Mac Central European
+     * The `MACCE` character set is used for Central European languages on classic Macintosh systems,
+     * supporting characters specific to these languages.
      */
     MACCE,
     /**
