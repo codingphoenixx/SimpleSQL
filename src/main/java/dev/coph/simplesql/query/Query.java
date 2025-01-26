@@ -13,6 +13,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 
 @Getter
@@ -109,7 +110,7 @@ public class Query {
      * A {@code RequestNotExecutableException} if an error occurs that prevents
      * execution of the queries.
      */
-    public void execute() {
+    public Query execute() {
         Check.ifNull(databaseAdapter, "Database Adapter");
         executed = false;
         succeeded = false;
@@ -122,8 +123,22 @@ public class Query {
             executeDirectly();
             executed = true;
         }
+        return this;
     }
 
+    /**
+     * Executes the provided queries by adding them to the internal query collection
+     * and running the execution process.
+     *
+     * @param queries an array of QueryProvider objects to be executed. Cannot be null or empty.
+     * @throws IllegalArgumentException if the queries array is null or empty.
+     */
+    public Query executeQuery(QueryProvider...queries){
+        Check.ifNullOrEmptyMap(queries, "Query");
+        Arrays.stream(queries).forEach(query -> this.queries.add(query));
+        execute();
+        return this;
+    }
 
     /**
      * Executes the queries contained in the query object directly and synchronously.
@@ -156,7 +171,7 @@ public class Query {
 
         try (Connection connection = databaseAdapter.dataSource().getConnection()) {
             if (queries.size() == 1) {
-                String generateSQLString = queries.getFirst().generateSQLString(this);
+                String generateSQLString = queries.get(0).generateSQLString(this);
                 System.out.println("Generated SQL-STRING: " + generateSQLString);
                 if(generateSQLString == null){
                     System.out.println("Generated SQL-String is null. Canceling request.");
@@ -164,7 +179,7 @@ public class Query {
                 }
                 var statement = connection.prepareStatement(generateSQLString);
                 try {
-                    if (queries.getFirst() instanceof SelectQueryProvider selectRequest) {
+                    if (queries.get(0) instanceof SelectQueryProvider selectRequest) {
                         System.out.println(statement);
                         ResultSet resultSet = statement.executeQuery();
                         selectRequest.resultSet(resultSet);
@@ -172,7 +187,7 @@ public class Query {
                             selectRequest.actionAfterQuery().run(resultSet);
                         }
                         succeeded = true;
-                    } else if (queries.getFirst() instanceof UpdateQueryProvider) {
+                    } else if (queries.get(0) instanceof UpdateQueryProvider) {
                         System.out.println(statement);
                         statement.executeUpdate();
                         succeeded = true;

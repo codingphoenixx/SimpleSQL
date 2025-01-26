@@ -11,7 +11,7 @@ repositories {
 
 
     maven {
-        url = uri("http://78.47.87.126:8080/releases")
+        url = uri("http://116.203.53.70:8080/releases")
         allowInsecureProtocol = true
     }
 
@@ -22,8 +22,6 @@ repositories {
 dependencies {
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
-
-
 
 
     implementation 'com.zaxxer:HikariCP:6.0.0'
@@ -45,7 +43,7 @@ publishing {
     repositories {
         maven {
             name = "cophrepository"
-            url = "http://78.47.87.126:8080/releases"
+            url = "http://116.203.53.70:8080/releases"
             allowInsecureProtocol = true
             credentials(PasswordCredentials)
             authentication {
@@ -63,6 +61,25 @@ publishing {
     }
 }
 
+jar {
+    from {
+        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
+    }
+    duplicatesStrategy = DuplicatesStrategy.EXCLUDE
+}
+
+java {
+    withSourcesJar()
+    withJavadocJar()
+}
+
 test {
     useJUnitPlatform()
+}
+
+
+javadoc {
+    if(JavaVersion.current().isJava9Compatible()) {
+        options.addBooleanOption('html5', true)
+    }
 }
