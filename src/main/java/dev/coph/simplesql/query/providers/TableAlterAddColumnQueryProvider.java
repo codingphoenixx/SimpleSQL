@@ -3,8 +3,10 @@ package dev.coph.simplesql.query.providers;
 import dev.coph.simplesql.database.Column;
 import dev.coph.simplesql.database.attributes.ColumnPosition;
 import dev.coph.simplesql.database.attributes.ColumnType;
+import dev.coph.simplesql.database.attributes.CreateMethode;
 import dev.coph.simplesql.database.attributes.DataType;
 import dev.coph.simplesql.query.Query;
+import dev.coph.simplesql.query.QueryEntry;
 import dev.coph.simplesql.utils.Check;
 import lombok.Getter;
 import lombok.Setter;
@@ -31,24 +33,27 @@ public class TableAlterAddColumnQueryProvider extends TableAlterQueryProvider {
 
 
     /**
-     * Sets if the action should be "ignored" when the column already exits.
+     * Defines the strategy for creating database structures such as tables
+     * as part of the query generation process within the {@code TableAlterAddColumnQueryProvider}.
+     *
+     * The {@code createMethode} variable determines how the database structure
+     * creation logic is applied, based on the selected strategy from the
+     * {@link CreateMethode} enumeration. It defaults to {@link CreateMethode#DEFAULT}.
      */
-    private boolean ifNotExists = false;
+    private CreateMethode createMethode = CreateMethode.DEFAULT;
 
     /**
-     * Represents the column definition to be added to a table within an "ALTER TABLE" query.
-     * This variable is an instance of the {@link Column} class, which encapsulates details
-     * about the column such as its key, data type, constraints, default value, and more.
-     * It is used to specify the structure and attributes of the column to be added.
+     * Represents a column to be added to the table schema in the context of a table alteration query.
+     * The column encapsulates the properties and metadata required for defining a database column,
+     * such as name, data type, and constraints.
      */
     private Column column;
-
 
     @Override
     public String getAlterTableString(Query query) {
         Check.ifNull(column, "column");
 
-        StringBuilder stringBuilder = new StringBuilder("ADD COLUMN ").append((ifNotExists ? "IF NOT EXISTS " : null)).append(column.toString(query));
+        StringBuilder stringBuilder = new StringBuilder("ADD COLUMN ").append((createMethode == CreateMethode.IF_NOT_EXISTS ? "IF NOT EXISTS " : null)).append(column.toString(query));
 
         if (postion == ColumnPosition.DEFAULT) {
             return stringBuilder.toString();
