@@ -6,7 +6,6 @@ import dev.coph.simplesql.database.attributes.ColumnType;
 import dev.coph.simplesql.database.attributes.CreateMethode;
 import dev.coph.simplesql.database.attributes.DataType;
 import dev.coph.simplesql.query.Query;
-import dev.coph.simplesql.query.QueryEntry;
 import dev.coph.simplesql.utils.Check;
 import lombok.Getter;
 import lombok.Setter;
