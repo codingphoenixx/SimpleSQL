@@ -11,7 +11,7 @@ repositories {
 
 
     maven {
-        url = uri("http://116.203.53.70:8080/releases")
+        url = uri("https://api.netnode.dev/repo/releases")
         allowInsecureProtocol = true
     }
 

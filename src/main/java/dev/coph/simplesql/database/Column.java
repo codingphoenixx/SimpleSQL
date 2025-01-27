@@ -149,6 +149,14 @@ public class Column {
         this.columnType = columnType;
     }
 
+    public Column(String key, DataType dataType, Object dataTypeParamenterObject, ColumnType columnType, boolean notNull) {
+        this.key = key;
+        this.dataType = dataType;
+        this.dataTypeParamenterObject = dataTypeParamenterObject;
+        this.columnType = columnType;
+        this.notNull = notNull;
+    }
+
     public Column(String key, DataType dataType, Object dataTypeParamenterObject, ColumnType columnType, Object defaultValue, boolean notNull) {
         this.key = key;
         this.dataType = dataType;
