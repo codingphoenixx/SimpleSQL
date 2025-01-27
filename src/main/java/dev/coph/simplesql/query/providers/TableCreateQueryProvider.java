@@ -131,6 +131,23 @@ public class TableCreateQueryProvider implements QueryProvider {
     }
 
     /**
+     * Adds a column with the specified key, data type, and an additional parameter object
+     * to the list of columns to be included in the table creation query.
+     * If the list of columns has not been initialized, it is initialized before adding the column.
+     * This method supports a fluent API style, allowing method chaining.
+     *
+     * @param key the name of the column to be added
+     * @param dataType the data type of the column to be added
+     * @param dataTypeParameterObject an additional parameter object associated with the column's data type
+     * @param notNull if the column is allowed to have no value
+     * @return the current instance of TableCreateQueryProvider for method chaining
+     */
+    public TableCreateQueryProvider column(String key, DataType dataType, Object dataTypeParameterObject, boolean notNull) {
+        columns.add(new Column(key, dataType, dataTypeParameterObject, notNull));
+        return this;
+    }
+
+    /**
      * Adds a column with the specified key, data type, an additional parameter object,
      * and column type to the list of columns to be included in the table creation query.
      * If the list of columns has not been initialized, it is initialized before adding the column.
