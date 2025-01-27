@@ -12,7 +12,6 @@ repositories {
 
     maven {
         url = uri("https://api.netnode.dev/repo/releases")
-        allowInsecureProtocol = true
     }
 
     mavenCentral()
@@ -43,7 +42,7 @@ publishing {
     repositories {
         maven {
             name = "cophrepository"
-            url = "http://116.203.53.70:8080/releases"
+            url = "https://api.netnode.dev/repo/releases"
             allowInsecureProtocol = true
             credentials(PasswordCredentials)
             authentication {
