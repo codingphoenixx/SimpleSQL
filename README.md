@@ -60,6 +60,7 @@ import de.codingphoenix.phoenixbase.database.DatabaseAdapter;
 
 public class Main {
     public static void main(String[] args) {
+       //Create DatabaseAdapter and connect
        DatabaseAdapter databaseAdapter = new DatabaseAdapter.Builder()
                 .driverType(DatabaseAdapter.DriverType.MARIADB)
                 .host(HOST)
@@ -71,9 +72,6 @@ public class Main {
         databaseAdapter.connect();
 
         //Erstellen der Request ...
-
-        //Senden der Request
-
         TableCreateQueryProvider tableCreateQuery = Query.tableCreate()
                 .table("test")
                 .column("uuid", DataType.VARCHAR, 64, ColumnType.UNIQUE)
@@ -81,6 +79,7 @@ public class Main {
                 .column("number", DataType.INTEGER, ColumnType.PRIMARY_KEY_AUTOINCREMENT)
                 .createMethode(CreateMethode.IF_NOT_EXISTS);
 
+        //Senden der Request
         new Query(databaseAdapter).async(true).queries(tableCreateQuery).execute();
     }
 }
