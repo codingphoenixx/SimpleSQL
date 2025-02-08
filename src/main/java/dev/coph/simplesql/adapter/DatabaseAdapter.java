@@ -3,7 +3,8 @@ package dev.coph.simplesql.adapter;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
 import dev.coph.simplesql.exception.DriverNotLoadedException;
-import dev.coph.simplesql.utils.Check;
+
+import dev.coph.simpleutilities.check.Check;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;

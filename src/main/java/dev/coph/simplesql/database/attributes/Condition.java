@@ -1,6 +1,6 @@
 package dev.coph.simplesql.database.attributes;
 
-import dev.coph.simplesql.utils.Check;
+import dev.coph.simpleutilities.check.Check;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;

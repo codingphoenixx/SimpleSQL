@@ -4,7 +4,7 @@ import dev.coph.simplesql.adapter.DatabaseAdapter;
 import dev.coph.simplesql.database.attributes.DeleteMethode;
 import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.query.QueryProvider;
-import dev.coph.simplesql.utils.Check;
+import dev.coph.simpleutilities.check.Check;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;

@@ -8,7 +8,7 @@ import dev.coph.simplesql.database.attributes.UpdatePriority;
 import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.query.QueryEntry;
 import dev.coph.simplesql.query.QueryProvider;
-import dev.coph.simplesql.utils.Check;
+import dev.coph.simpleutilities.check.Check;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.experimental.Accessors;

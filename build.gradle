@@ -22,7 +22,6 @@ dependencies {
     testImplementation platform('org.junit:junit-bom:5.10.0')
     testImplementation 'org.junit.jupiter:junit-jupiter'
 
-
     implementation 'com.zaxxer:HikariCP:6.0.0'
 
     implementation "org.xerial:sqlite-jdbc:3.46.0.0"
@@ -34,7 +33,9 @@ dependencies {
     testCompileOnly 'org.projectlombok:lombok:1.18.34'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
 
-    implementation("dev.coph:simplelogger:1.0.2b")
+    implementation "dev.coph:simplelogger:1.0.2b"
+    implementation "dev.coph:simpleutilities:1.0.2a"
+
 }
 
 
