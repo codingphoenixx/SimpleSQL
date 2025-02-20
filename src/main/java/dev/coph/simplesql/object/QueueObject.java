@@ -4,7 +4,7 @@ import java.util.concurrent.CompletableFuture;
 
 public class QueueObject<T> {
 
-    private QueueObject appended;
+    private QueueObject<?> appended;
 
     private final Action<T> action;
 
@@ -12,20 +12,29 @@ public class QueueObject<T> {
         this.action = action;
     }
 
-    private  void append(QueueObject<?> queueObject) {
+    public void append(QueueObject<?> queueObject) {
         this.appended = queueObject;
     }
 
-
-    public CompletableFuture<T> queue() {
-        return CompletableFuture.supplyAsync(action::run);
+    public CompletableFuture<Void> queue() {
+        return CompletableFuture.runAsync(action::run)
+                .thenCompose(v -> {
+                    if (appended != null) {
+                        return appended.queue();
+                    }
+                    return CompletableFuture.completedFuture(null);
+                });
     }
 
     public T complete() {
-        return action.run();
+        T result = action.run();
+        if (appended != null) {
+            appended.complete();
+        }
+        return result;
     }
 
-    public interface Action<T>{
+    public interface Action<T> {
         T run();
     }
 }

@@ -11,7 +11,7 @@ repositories {
 
 
     maven {
-        url = uri("https://api.netnode.dev/repo/releases")
+        url = uri("https://repo.coph.dev/releases")
     }
 
     mavenCentral()
@@ -34,7 +34,7 @@ dependencies {
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
 
     implementation "dev.coph:simplelogger:1.0.2b"
-    implementation "dev.coph:simpleutilities:1.0.2a"
+    implementation "dev.coph:simpleutilities:1.0.5a"
 
 }
 

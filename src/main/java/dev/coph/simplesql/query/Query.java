@@ -180,7 +180,6 @@ public class Query {
                 var statement = connection.prepareStatement(generateSQLString);
                 try {
                     if (queries.get(0) instanceof SelectQueryProvider selectRequest) {
-                        System.out.println(statement);
                         ResultSet resultSet = statement.executeQuery();
                         selectRequest.resultSet(resultSet);
                         if (selectRequest.actionAfterQuery() != null) {
