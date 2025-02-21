@@ -67,6 +67,16 @@ public class Group {
         return parsedKey.toString();
     }
 
+    /**
+     * Adds a key to the group for query or matching purposes.
+     *
+     * @param key The key to be added to the group.
+     * @return {@link Group} for method chaining.
+     */
+    public Group key(String key) {
+        keys.add(key);
+        return this;
+    }
 
 
     /**
