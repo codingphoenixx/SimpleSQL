@@ -65,6 +65,14 @@ public class Main {
         //Database database = new Database(databaseAdapter, "testing");
         //database.getTable("testing");
 
+        /*
+        TODO:
+        SELECT department_id FROM employees GROUP BY department_id HAVING COUNT (*) > 3
+        SELECT * FROM employees WHERE last_name SIMILAR TO '[STU]%' AND salary BETWEEN 1000 AND 10000 ORDER BY last_name
+        SELECT first_name, last_name, salary, job_title FROM employees JOIN jobs ON employees.job_id = jobs.job_id ORDER BY salary DESC LIMIT 1
+        SELECT first_name, last_name, salary AS netto, salary * 1.3 AS brutto FROM employees
+         */
+
 
 
         SelectQueryProvider selectQueryProvider = new SelectQueryProvider()
