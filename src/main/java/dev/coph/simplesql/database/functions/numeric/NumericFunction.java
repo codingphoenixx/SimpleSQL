@@ -1,141 +1,322 @@
 package dev.coph.simplesql.database.functions.numeric;
 
 import dev.coph.simplesql.database.functions.Function;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
 public class NumericFunction {
-    public class Abs implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Abs implements Function {
         /*TODO*/
     }
 
-    public class ACos implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ACos implements Function {
         /*TODO*/
     }
 
-    public class ASin implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ASin implements Function {
         /*TODO*/
     }
 
-    public class ATan implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ATan implements Function {
         /*TODO*/
     }
 
-    public class ATan2 implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ATan2 implements Function {
         /*TODO*/
     }
 
-    public class Avg implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Avg implements Function {
         /*TODO*/
     }
 
-    public class Ceiling implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Ceiling implements Function {
         /*TODO*/
     }
 
-    public class Cos implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Cos implements Function {
         /*TODO*/
     }
 
-    public class Cot implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Cot implements Function {
         /*TODO*/
     }
 
-    public class Count implements Function {
+
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Count implements Function {
+        private String columnName = "*";
+
+        @Override
+        public String toString() {
+            return " COUNT(" + columnName + ")";
+        }
+    }
+
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Degrees implements Function {
         /*TODO*/
     }
 
-    public class Degrees implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Div implements Function {
         /*TODO*/
     }
 
-    public class Div implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Exp implements Function {
         /*TODO*/
     }
 
-    public class Exp implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Floor implements Function {
         /*TODO*/
     }
 
-    public class Floor implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Greatest implements Function {
         /*TODO*/
     }
 
-    public class Greatest implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Least implements Function {
         /*TODO*/
     }
 
-    public class Least implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Ln implements Function {
         /*TODO*/
     }
 
-    public class Ln implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Log implements Function {
         /*TODO*/
     }
 
-    public class Log implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Log10 implements Function {
         /*TODO*/
     }
 
-    public class Log10 implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Log2 implements Function {
         /*TODO*/
     }
 
-    public class Log2 implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Max implements Function {
         /*TODO*/
     }
 
-    public class Max implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Min implements Function {
         /*TODO*/
     }
 
-    public class Min implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Mod implements Function {
         /*TODO*/
     }
 
-    public class Mod implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Pi implements Function {
         /*TODO*/
     }
 
-    public class Pi implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Power implements Function {
         /*TODO*/
     }
 
-    public class Power implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Radians implements Function {
         /*TODO*/
     }
 
-    public class Radians implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Rand implements Function {
         /*TODO*/
     }
 
-    public class Rand implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Round implements Function {
         /*TODO*/
     }
 
-    public class Round implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Sign implements Function {
         /*TODO*/
     }
 
-    public class Sign implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Sin implements Function {
         /*TODO*/
     }
 
-    public class Sin implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SqRt implements Function {
         /*TODO*/
     }
 
-    public class SqRt implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Sum implements Function {
         /*TODO*/
     }
 
-    public class Sum implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Tan implements Function {
         /*TODO*/
     }
 
-    public class Tan implements Function {
-        /*TODO*/
-    }
-
-    public class Turncate implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Turncate implements Function {
         /*TODO*/
     }
 }

@@ -1,193 +1,433 @@
 package dev.coph.simplesql.database.functions.date;
 
 import dev.coph.simplesql.database.functions.Function;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
 public class DateFunction {
-    public class AddDate implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class AddDate implements Function {
         /*TODO*/
     }
 
-    public class AddTime implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class AddTime implements Function {
         /*TODO*/
     }
 
-    public class CurrentDate implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CurrentDate implements Function {
         /*TODO*/
     }
 
-    public class CurrentTime implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CurrentTime implements Function {
         /*TODO*/
     }
 
-    public class CurrentTimeStamp implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class CurrentTimeStamp implements Function {
         /*TODO*/
     }
 
-    public class Date implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Date implements Function {
         /*TODO*/
     }
 
-    public class DateDiff implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class DateDiff implements Function {
         /*TODO*/
     }
 
-    public class DateFormat implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class DateFormat implements Function {
         /*TODO*/
     }
 
-    public class DateSub implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class DateSub implements Function {
         /*TODO*/
     }
 
-    public class Day implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Day implements Function {
         /*TODO*/
     }
 
-    public class DayName implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class DayName implements Function {
         /*TODO*/
     }
 
-    public class DayOfMonth implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class DayOfMonth implements Function {
         /*TODO*/
     }
 
-    public class DayOfWeek implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class DayOfWeek implements Function {
         /*TODO*/
     }
 
-    public class DayOfYear implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class DayOfYear implements Function {
         /*TODO*/
     }
 
-    public class Extract implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Extract implements Function {
         /*TODO*/
     }
 
-    public class FromDays implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class FromDays implements Function {
         /*TODO*/
     }
 
-    public class Hour implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Hour implements Function {
         /*TODO*/
     }
 
-    public class LastDay implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class LastDay implements Function {
         /*TODO*/
     }
 
-    public class LocalTime implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class LocalTime implements Function {
         /*TODO*/
     }
 
-    public class LocalTimeStamp implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class LocalTimeStamp implements Function {
         /*TODO*/
     }
 
-    public class MakeDate implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class MakeDate implements Function {
         /*TODO*/
     }
 
-    public class MakeTime implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class MakeTime implements Function {
         /*TODO*/
     }
 
-    public class MicroSecond implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class MicroSecond implements Function {
         /*TODO*/
     }
 
-    public class Minute implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Minute implements Function {
         /*TODO*/
     }
 
-    public class Month implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Month implements Function {
         /*TODO*/
     }
 
-    public class MonthName implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class MonthName implements Function {
         /*TODO*/
     }
 
-    public class Now implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Now implements Function {
         /*TODO*/
     }
 
-    public class PeriodAdd implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PeriodAdd implements Function {
         /*TODO*/
     }
 
-    public class PeriodDiff implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class PeriodDiff implements Function {
         /*TODO*/
     }
 
-    public class Quarter implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Quarter implements Function {
         /*TODO*/
     }
 
-    public class Second implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Second implements Function {
         /*TODO*/
     }
 
-    public class SecToTime implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SecToTime implements Function {
         /*TODO*/
     }
 
-    public class SecToDate implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SecToDate implements Function {
         /*TODO*/
     }
 
-    public class SubDate implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SubDate implements Function {
         /*TODO*/
     }
 
-    public class SubTime implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SubTime implements Function {
         /*TODO*/
     }
 
-    public class SysDate implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class SysDate implements Function {
         /*TODO*/
     }
 
-    public class Time implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Time implements Function {
         /*TODO*/
     }
 
-    public class TimeFormat implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class TimeFormat implements Function {
         /*TODO*/
     }
 
-    public class TimeToSec implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class TimeToSec implements Function {
         /*TODO*/
     }
 
-    public class TimeDiff implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class TimeDiff implements Function {
         /*TODO*/
     }
 
-    public class TimeStamp implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class TimeStamp implements Function {
         /*TODO*/
     }
 
-    public class ToDays implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class ToDays implements Function {
         /*TODO*/
     }
 
-    public class Week implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Week implements Function {
         /*TODO*/
     }
 
-    public class Weekday implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Weekday implements Function {
         /*TODO*/
     }
 
-    public class WeekOfYear implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class WeekOfYear implements Function {
         /*TODO*/
     }
 
-    public class Year implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Year implements Function {
         /*TODO*/
     }
 
-    public class YearWeek implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class YearWeek implements Function {
         /*TODO*/
     }
 }

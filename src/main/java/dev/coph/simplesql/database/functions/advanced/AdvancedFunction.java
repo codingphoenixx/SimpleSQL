@@ -1,53 +1,118 @@
 package dev.coph.simplesql.database.functions.advanced;
 
 import dev.coph.simplesql.database.functions.Function;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
+import lombok.experimental.Accessors;
 
 public class AdvancedFunction {
-    public class Binary implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Binary implements Function {
         /*TODO*/
     }
 
-    public class Bin implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Bin implements Function {
         /*TODO*/
     }
 
-    public class Case implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Case implements Function {
         /*TODO*/
     }
 
-    public class Cast implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Cast implements Function {
         /*TODO*/
     }
 
-    public class Coalesce implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Coalesce implements Function {
         /*TODO*/
     }
 
-    public class Convert implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Convert implements Function {
         /*TODO*/
     }
 
-    public class Conv implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class Conv implements Function {
         /*TODO*/
     }
 
-    public class If implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class If implements Function {
         /*TODO*/
     }
 
-    public class IfNull implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class IfNull implements Function {
         /*TODO*/
     }
 
-    public class IsNull implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class IsNull implements Function {
         /*TODO*/
     }
 
-    public class LastInsertId implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class LastInsertId implements Function {
         /*TODO*/
     }
 
-    public class NullIf implements Function {
+    @Getter
+    @Setter
+    @Accessors(fluent = true, chain = true)
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public static class NullIf implements Function {
         /*TODO*/
     }
 }
