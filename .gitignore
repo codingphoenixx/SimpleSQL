@@ -9,6 +9,8 @@ build/
 .idea/jarRepositories.xml
 .idea/compiler.xml
 .idea/libraries/
+.idea/discord.xml
+.idea/uiDesigner.xml
 *.iws
 *.iml
 *.ipr
@@ -37,6 +39,9 @@ bin/
 
 ### VS Code ###
 .vscode/
+
+logs/
+./test.db
 
 ### Mac OS ###
 .DS_Store

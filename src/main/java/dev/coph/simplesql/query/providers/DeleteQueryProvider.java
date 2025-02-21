@@ -84,7 +84,7 @@ public class DeleteQueryProvider implements QueryProvider {
                 parsedCondition = new StringBuilder(condition.not() ? " NOT " : "").append(condition);
                 continue;
             }
-            parsedCondition.append(condition.type().equals(Condition.Type.AND) ? " AND " : " OR ").append(condition);
+            parsedCondition.append(condition.type().equals(Condition.Type.AND) ? " AND " : " OR ").append(condition.not() ? " NOT " : "").append(condition);
         }
         return parsedCondition.toString();
     }

@@ -1,6 +1,8 @@
 package dev.coph.simplesql.query.providers;
 
 import dev.coph.simplesql.database.attributes.*;
+import dev.coph.simplesql.database.functions.Function;
+import dev.coph.simplesql.database.functions.date.DateFunction;
 import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.query.QueryProvider;
 import dev.coph.simpleutilities.action.RunnableAction;
@@ -38,13 +40,13 @@ public class SelectQueryProvider implements QueryProvider {
      * The function for the select request. E.g. the amount of rows that will match the conditions.
      */
     @Setter
-    private SelectFunction selectFunction = SelectFunction.NORMAL;
+    private Function function = null;
 
     /**
      * Specifies the type of selection to be used in the SQL query.
      * It determines whether the query selects all matching rows (`NORMAL`)
      * or only distinct rows (`DISTINCT`).
-     *
+     * <p>
      * The default value is {@code SelectType.NORMAL}.
      */
     @Setter
@@ -85,6 +87,16 @@ public class SelectQueryProvider implements QueryProvider {
     @Setter
     private RunnableAction<ResultSet> actionAfterQuery;
 
+    /**
+     * Represents the grouping configuration for the SQL query.
+     * This field specifies a {@link Group} object that determines
+     * how the rows should be grouped together in the resultant dataset.
+     * Additionally, it can include complex conditions to be applied
+     * post-grouping using the HAVING clause.
+     */
+    @Setter
+    private Group group;
+
 
     /**
      * The ResultSet will be stored here after the request is executed.
@@ -101,15 +113,19 @@ public class SelectQueryProvider implements QueryProvider {
 
         StringBuilder sql = new StringBuilder("SELECT ");
 
-        if(selectType != null && selectType == SelectType.DISTINCT)
+        if (selectType != null && selectType == SelectType.DISTINCT)
             sql.append("DISTINCT ");
 
-        if (selectFunction != null && !selectFunction.equals(SelectFunction.NORMAL) && !isStarRequest()) {
-            sql.append(selectFunction.function()).append("(").append(parseColumnName()).append(")");
+        if (function != null && !function.equals(SelectFunction.NORMAL)) {
+            sql.append(function);
         } else {
             sql.append(parseColumnName());
         }
         sql.append(" FROM ").append(table);
+
+        if (group != null) {
+            sql.append(group);
+        }
 
         if (conditions != null && !conditions.isEmpty())
             sql.append(" WHERE ").append(parseCondition());
@@ -122,7 +138,7 @@ public class SelectQueryProvider implements QueryProvider {
 
         sql.append(";");
 
-
+        System.out.println(sql.toString());
         return sql.toString();
     }
 
@@ -223,7 +239,7 @@ public class SelectQueryProvider implements QueryProvider {
     /**
      * Sets the {@link Order} of the table when the selection will occur
      *
-     * @param key       The key of the column the order will be assigned on.
+     * @param key The key of the column the order will be assigned on.
      * @return {@link SelectQueryProvider} for chaining.
      */
     public SelectQueryProvider orderBy(String key) {
@@ -298,7 +314,7 @@ public class SelectQueryProvider implements QueryProvider {
                 parsedCondition = new StringBuilder(condition.not() ? " NOT " : "").append(condition);
                 continue;
             }
-            parsedCondition.append(condition.type().equals(Condition.Type.AND) ? " AND " : " OR ").append(condition);
+            parsedCondition.append(condition.type().equals(Condition.Type.AND) ? " AND " : " OR ").append(condition.not() ? " NOT " : "").append(condition);
         }
         return parsedCondition.toString();
     }
