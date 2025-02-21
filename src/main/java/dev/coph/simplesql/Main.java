@@ -6,6 +6,7 @@ import dev.coph.simplesql.database.attributes.Condition;
 import dev.coph.simplesql.database.attributes.Group;
 import dev.coph.simplesql.database.attributes.Operator;
 import dev.coph.simplesql.database.attributes.SelectFunction;
+import dev.coph.simplesql.database.functions.numeric.NumericFunction;
 import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.query.providers.InsertQueryProvider;
 import dev.coph.simplesql.query.providers.SelectQueryProvider;
@@ -68,7 +69,7 @@ public class Main {
 
         SelectQueryProvider selectQueryProvider = new SelectQueryProvider()
                 .table("test6")
-                .function(SelectFunction.COUNT)
+                .function(new NumericFunction.Count("*"))
                 .group(new Group().key("number").condition(new Condition("number", Operator.GREATER_THAN, 10)))
                 .actionAfterQuery(resultSet -> {
                     parseResultSet(resultSet);
