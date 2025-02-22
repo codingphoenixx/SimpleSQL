@@ -11,7 +11,6 @@ public class NumericFunction {
     @Getter
     @Setter
     @Accessors(fluent = true, chain = true)
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class Abs implements Function {
         /*TODO*/
@@ -20,7 +19,6 @@ public class NumericFunction {
     @Getter
     @Setter
     @Accessors(fluent = true, chain = true)
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class ACos implements Function {
         /*TODO*/
@@ -29,7 +27,6 @@ public class NumericFunction {
     @Getter
     @Setter
     @Accessors(fluent = true, chain = true)
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class ASin implements Function {
         /*TODO*/
@@ -38,7 +35,6 @@ public class NumericFunction {
     @Getter
     @Setter
     @Accessors(fluent = true, chain = true)
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class ATan implements Function {
         /*TODO*/
@@ -47,7 +43,6 @@ public class NumericFunction {
     @Getter
     @Setter
     @Accessors(fluent = true, chain = true)
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class ATan2 implements Function {
         /*TODO*/
@@ -56,7 +51,6 @@ public class NumericFunction {
     @Getter
     @Setter
     @Accessors(fluent = true, chain = true)
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class Avg implements Function {
         /*TODO*/
@@ -65,7 +59,6 @@ public class NumericFunction {
     @Getter
     @Setter
     @Accessors(fluent = true, chain = true)
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class Ceiling implements Function {
         /*TODO*/
@@ -74,7 +67,6 @@ public class NumericFunction {
     @Getter
     @Setter
     @Accessors(fluent = true, chain = true)
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class Cos implements Function {
         /*TODO*/
@@ -83,7 +75,6 @@ public class NumericFunction {
     @Getter
     @Setter
     @Accessors(fluent = true, chain = true)
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class Cot implements Function {
         /*TODO*/
@@ -93,7 +84,6 @@ public class NumericFunction {
     @Getter
     @Setter
     @Accessors(fluent = true, chain = true)
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class Count implements Function {
         private String columnName = "*";
@@ -107,7 +97,6 @@ public class NumericFunction {
     @Getter
     @Setter
     @Accessors(fluent = true, chain = true)
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class Degrees implements Function {
         /*TODO*/
@@ -116,7 +105,6 @@ public class NumericFunction {
     @Getter
     @Setter
     @Accessors(fluent = true, chain = true)
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class Div implements Function {
         /*TODO*/
@@ -125,7 +113,6 @@ public class NumericFunction {
     @Getter
     @Setter
     @Accessors(fluent = true, chain = true)
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class Exp implements Function {
         /*TODO*/
@@ -134,7 +121,6 @@ public class NumericFunction {
     @Getter
     @Setter
     @Accessors(fluent = true, chain = true)
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class Floor implements Function {
         /*TODO*/
@@ -143,7 +129,6 @@ public class NumericFunction {
     @Getter
     @Setter
     @Accessors(fluent = true, chain = true)
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class Greatest implements Function {
         /*TODO*/
@@ -152,7 +137,6 @@ public class NumericFunction {
     @Getter
     @Setter
     @Accessors(fluent = true, chain = true)
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class Least implements Function {
         /*TODO*/
@@ -161,7 +145,6 @@ public class NumericFunction {
     @Getter
     @Setter
     @Accessors(fluent = true, chain = true)
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class Ln implements Function {
         /*TODO*/
@@ -170,7 +153,6 @@ public class NumericFunction {
     @Getter
     @Setter
     @Accessors(fluent = true, chain = true)
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class Log implements Function {
         /*TODO*/
@@ -179,7 +161,6 @@ public class NumericFunction {
     @Getter
     @Setter
     @Accessors(fluent = true, chain = true)
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class Log10 implements Function {
         /*TODO*/
@@ -188,7 +169,6 @@ public class NumericFunction {
     @Getter
     @Setter
     @Accessors(fluent = true, chain = true)
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class Log2 implements Function {
         /*TODO*/
@@ -197,7 +177,6 @@ public class NumericFunction {
     @Getter
     @Setter
     @Accessors(fluent = true, chain = true)
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class Max implements Function {
         /*TODO*/
@@ -206,7 +185,6 @@ public class NumericFunction {
     @Getter
     @Setter
     @Accessors(fluent = true, chain = true)
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class Min implements Function {
         /*TODO*/
@@ -215,7 +193,6 @@ public class NumericFunction {
     @Getter
     @Setter
     @Accessors(fluent = true, chain = true)
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class Mod implements Function {
         /*TODO*/
@@ -224,7 +201,6 @@ public class NumericFunction {
     @Getter
     @Setter
     @Accessors(fluent = true, chain = true)
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class Pi implements Function {
         /*TODO*/
@@ -233,7 +209,6 @@ public class NumericFunction {
     @Getter
     @Setter
     @Accessors(fluent = true, chain = true)
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class Power implements Function {
         /*TODO*/
@@ -242,7 +217,6 @@ public class NumericFunction {
     @Getter
     @Setter
     @Accessors(fluent = true, chain = true)
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class Radians implements Function {
         /*TODO*/
@@ -251,7 +225,6 @@ public class NumericFunction {
     @Getter
     @Setter
     @Accessors(fluent = true, chain = true)
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class Rand implements Function {
         /*TODO*/
@@ -260,7 +233,6 @@ public class NumericFunction {
     @Getter
     @Setter
     @Accessors(fluent = true, chain = true)
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class Round implements Function {
         /*TODO*/
@@ -269,7 +241,6 @@ public class NumericFunction {
     @Getter
     @Setter
     @Accessors(fluent = true, chain = true)
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class Sign implements Function {
         /*TODO*/
@@ -278,7 +249,6 @@ public class NumericFunction {
     @Getter
     @Setter
     @Accessors(fluent = true, chain = true)
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class Sin implements Function {
         /*TODO*/
@@ -287,7 +257,6 @@ public class NumericFunction {
     @Getter
     @Setter
     @Accessors(fluent = true, chain = true)
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class SqRt implements Function {
         /*TODO*/
@@ -296,7 +265,6 @@ public class NumericFunction {
     @Getter
     @Setter
     @Accessors(fluent = true, chain = true)
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class Sum implements Function {
         /*TODO*/
@@ -305,7 +273,6 @@ public class NumericFunction {
     @Getter
     @Setter
     @Accessors(fluent = true, chain = true)
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class Tan implements Function {
         /*TODO*/
@@ -314,7 +281,6 @@ public class NumericFunction {
     @Getter
     @Setter
     @Accessors(fluent = true, chain = true)
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class Turncate implements Function {
         /*TODO*/

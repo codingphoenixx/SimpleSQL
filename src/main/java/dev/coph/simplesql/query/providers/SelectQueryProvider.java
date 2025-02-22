@@ -138,7 +138,6 @@ public class SelectQueryProvider implements QueryProvider {
 
         sql.append(";");
 
-        System.out.println(sql.toString());
         return sql.toString();
     }
 

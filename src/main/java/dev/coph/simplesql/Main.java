@@ -107,14 +107,11 @@ public class Main {
             for (int i = 1; i <= columnCount; i++) {
                 header.append(String.format(" %-20s |", metaData.getColumnName(i)));
             }
-            System.out.println(header);
-            System.out.println("-".repeat(header.length()));
             while (resultSet.next()) {
                 StringBuilder row = new StringBuilder("|");
                 for (int i = 1; i <= columnCount; i++) {
                     row.append(String.format(" %-20s |", resultSet.getString(i)));
                 }
-                System.out.println(row);
             }
         } catch (SQLException e) {
             e.printStackTrace();

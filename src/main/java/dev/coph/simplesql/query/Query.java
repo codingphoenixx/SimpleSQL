@@ -172,7 +172,6 @@ public class Query {
         try (Connection connection = databaseAdapter.dataSource().getConnection()) {
             if (queries.size() == 1) {
                 String generateSQLString = queries.get(0).generateSQLString(this);
-                System.out.println("Generated SQL-STRING: " + generateSQLString);
                 if(generateSQLString == null){
                     System.out.println("Generated SQL-String is null. Canceling request.");
                     return;
@@ -187,11 +186,9 @@ public class Query {
                         }
                         succeeded = true;
                     } else if (queries.get(0) instanceof UpdateQueryProvider) {
-                        System.out.println(statement);
                         statement.executeUpdate();
                         succeeded = true;
                     } else {
-                        System.out.println(statement);
                         statement.execute();
                         succeeded = true;
                     }
@@ -204,7 +201,6 @@ public class Query {
                 for (QueryProvider queryProvider : queries) {
                     try {
                         String generateSQLString = queryProvider.generateSQLString(this);
-                        System.out.println("Generated SQL-STRING: " + generateSQLString);
                         if(generateSQLString == null){
                             System.out.println("Generated SQL-String is null. Ignoring request.");
                             continue;

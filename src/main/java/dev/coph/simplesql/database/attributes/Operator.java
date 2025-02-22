@@ -12,7 +12,7 @@ public enum Operator {
      */
     EQUALS("="),
     /**
-     * Represents the "less than" operator ("<"). Commonly used to construct conditions
+     * Represents the "less than" operator. Commonly used to construct conditions
      * where a value is required to be smaller than a specified counterpart.
      */
     SMALLER_THAN("<"),
@@ -23,7 +23,7 @@ public enum Operator {
      */
     GREATER_THAN(">"),
     /**
-     * Represents the "less than or equal to" operator ("<="). Commonly used to construct
+     * Represents the "less than or equal to" operator. Commonly used to construct
      * conditions where a value must be smaller than or equal to a specified counterpart,
      * such as in SQL query generation or logical expressions.
      */
@@ -35,7 +35,7 @@ public enum Operator {
      */
     GREATER_EQUALS_THAN(">="),
     /**
-     * Represents the "not equals" operator ("<>"). Typically used in SQL query generation
+     * Represents the "not equals" operator. Typically used in SQL query generation
      * to specify conditions where values in a column must not match a given value.
      */
     NOT_EQUALS("<>"),

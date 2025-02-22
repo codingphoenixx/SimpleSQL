@@ -11,7 +11,6 @@ public class AdvancedFunction {
     @Getter
     @Setter
     @Accessors(fluent = true, chain = true)
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class Binary implements Function {
         /*TODO*/
@@ -20,7 +19,6 @@ public class AdvancedFunction {
     @Getter
     @Setter
     @Accessors(fluent = true, chain = true)
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class Bin implements Function {
         /*TODO*/
@@ -29,7 +27,6 @@ public class AdvancedFunction {
     @Getter
     @Setter
     @Accessors(fluent = true, chain = true)
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class Case implements Function {
         /*TODO*/
@@ -38,7 +35,6 @@ public class AdvancedFunction {
     @Getter
     @Setter
     @Accessors(fluent = true, chain = true)
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class Cast implements Function {
         /*TODO*/
@@ -47,7 +43,6 @@ public class AdvancedFunction {
     @Getter
     @Setter
     @Accessors(fluent = true, chain = true)
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class Coalesce implements Function {
         /*TODO*/
@@ -56,7 +51,6 @@ public class AdvancedFunction {
     @Getter
     @Setter
     @Accessors(fluent = true, chain = true)
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class Convert implements Function {
         /*TODO*/
@@ -65,7 +59,6 @@ public class AdvancedFunction {
     @Getter
     @Setter
     @Accessors(fluent = true, chain = true)
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class Conv implements Function {
         /*TODO*/
@@ -74,7 +67,6 @@ public class AdvancedFunction {
     @Getter
     @Setter
     @Accessors(fluent = true, chain = true)
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class If implements Function {
         /*TODO*/
@@ -83,7 +75,6 @@ public class AdvancedFunction {
     @Getter
     @Setter
     @Accessors(fluent = true, chain = true)
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class IfNull implements Function {
         /*TODO*/
@@ -92,7 +83,6 @@ public class AdvancedFunction {
     @Getter
     @Setter
     @Accessors(fluent = true, chain = true)
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class IsNull implements Function {
         /*TODO*/
@@ -101,7 +91,6 @@ public class AdvancedFunction {
     @Getter
     @Setter
     @Accessors(fluent = true, chain = true)
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class LastInsertId implements Function {
         /*TODO*/
@@ -110,7 +99,6 @@ public class AdvancedFunction {
     @Getter
     @Setter
     @Accessors(fluent = true, chain = true)
-    @NoArgsConstructor
     @AllArgsConstructor
     public static class NullIf implements Function {
         /*TODO*/
