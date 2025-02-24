@@ -56,7 +56,7 @@ Fügen Sie die folgende Zeile in Ihre `build.gradle` ein:
 ### Grundlegende Konfiguration
 
 ```java
-import de.codingphoenix.phoenixbase.database.DatabaseAdapter;
+import dev.coph.simplesql.database.DatabaseAdapter;
 
 public class Main {
     public static void main(String[] args) {
