@@ -27,7 +27,7 @@ Fügen Sie die folgende Abhängigkeit in Ihre `pom.xml` ein:
         <repository>
             <id>cophrepository-releases</id>
             <name>CoPh Repository</name>
-            <url>https://api.netnode.dev/repo/releases</url>
+            <url>https://repo.coph.dev/releases</url>
         </repository>
 	</repositories>
 
@@ -45,7 +45,7 @@ Fügen Sie die folgende Zeile in Ihre `build.gradle` ein:
 ```groovy
     maven {
         name "cophrepositoryReleases"
-        url "https://api.netnode.dev/repo/releases"
+        url "https://repo.coph.dev/releases"
     }
 
     implementation "dev.coph:simplesql:TAG"
