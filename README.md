@@ -92,3 +92,8 @@ Aktuell existiert keine öffentliche Dokumentation. Dies kommt in Zukunft dazu.
 ## Kontakt
 
 Für Fragen oder Anregungen kontaktieren Sie uns bitte unter: [codingphoenix@atirion.de](mailto:codingphoenix@atirion.de).
+
+### Coming Soon
+    TODO: Add an trigger when an async job is done
+    TODO: Add the ability to join tables
+    TODO: Add cache to select requests but with function to invalid cache
