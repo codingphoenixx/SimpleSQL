@@ -5,8 +5,8 @@ import dev.coph.simplesql.adapter.DatabaseAdapter;
 import dev.coph.simplesql.database.attributes.Condition;
 import dev.coph.simplesql.database.attributes.Group;
 import dev.coph.simplesql.database.attributes.Operator;
-import dev.coph.simplesql.database.attributes.SelectFunction;
 import dev.coph.simplesql.database.functions.numeric.NumericFunction;
+import dev.coph.simplesql.object.Database;
 import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.query.providers.InsertQueryProvider;
 import dev.coph.simplesql.query.providers.SelectQueryProvider;
@@ -67,13 +67,15 @@ public class Main {
 
         /*
         TODO:
+        SQL-Injection FIX
+
         SELECT department_id FROM employees GROUP BY department_id HAVING COUNT (*) > 3
         SELECT * FROM employees WHERE last_name SIMILAR TO '[STU]%' AND salary BETWEEN 1000 AND 10000 ORDER BY last_name
         SELECT first_name, last_name, salary, job_title FROM employees JOIN jobs ON employees.job_id = jobs.job_id ORDER BY salary DESC LIMIT 1
         SELECT first_name, last_name, salary AS netto, salary * 1.3 AS brutto FROM employees
          */
 
-
+        Database database = new Database(databaseAdapter, "test6");
 
         SelectQueryProvider selectQueryProvider = new SelectQueryProvider()
                 .table("test6")
@@ -118,3 +120,5 @@ public class Main {
         }
     }
 }
+
+
