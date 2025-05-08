@@ -31,6 +31,10 @@ dependencies {
     implementation "dev.coph:simpleutilities:2.0.0"
 }
 
+javadoc {
+    options.encoding = 'UTF-8'
+}
+
 
 publishing {
     repositories {
