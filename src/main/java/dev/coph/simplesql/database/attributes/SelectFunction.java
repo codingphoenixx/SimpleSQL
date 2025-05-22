@@ -19,7 +19,11 @@ public enum SelectFunction {
     /**
      * Calculates the sum value of a numerical dataset that returns from the SELECT statement.
      */
-    SUM("SUM");
+    SUM("SUM"),
+    /**
+     * Selects the maximum value of a specific column
+     */
+    MAX("MAX");
 
     /**
      * The sql key for the function
