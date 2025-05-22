@@ -5,37 +5,34 @@ plugins {
 }
 
 group = 'dev.coph'
-version = '1.0.3'
+version = '1.1.3'
 
 repositories {
-
-
     maven {
         url = uri("https://repo.coph.dev/releases")
     }
 
     mavenCentral()
-
 }
 
 dependencies {
-    testImplementation platform('org.junit:junit-bom:5.10.0')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
+    implementation 'com.zaxxer:HikariCP:6.3.0'
 
-    implementation 'com.zaxxer:HikariCP:6.0.0'
+    implementation "org.xerial:sqlite-jdbc:3.49.1.0"
+    implementation 'com.mysql:mysql-connector-j:9.3.0'
+    implementation 'org.mariadb.jdbc:mariadb-java-client:3.5.3'
 
-    implementation "org.xerial:sqlite-jdbc:3.46.0.0"
-    implementation 'com.mysql:mysql-connector-j:9.1.0'
-    implementation 'org.mariadb.jdbc:mariadb-java-client:3.4.1'
+    compileOnly 'org.projectlombok:lombok:1.18.36'
+    annotationProcessor 'org.projectlombok:lombok:1.18.36'
+    testCompileOnly 'org.projectlombok:lombok:1.18.36'
+    testAnnotationProcessor 'org.projectlombok:lombok:1.18.36'
 
-    compileOnly 'org.projectlombok:lombok:1.18.34'
-    annotationProcessor 'org.projectlombok:lombok:1.18.34'
-    testCompileOnly 'org.projectlombok:lombok:1.18.34'
-    testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
+    implementation "dev.coph:simplelogger:1.0.3"
+    implementation "dev.coph:simpleutilities:2.0.2"
+}
 
-    implementation "dev.coph:simplelogger:1.0.2b"
-    implementation "dev.coph:simpleutilities:1.0.5a"
-
+javadoc {
+    options.encoding = 'UTF-8'
 }
 
 
@@ -72,11 +69,6 @@ java {
     withSourcesJar()
     withJavadocJar()
 }
-
-test {
-    useJUnitPlatform()
-}
-
 
 javadoc {
     if(JavaVersion.current().isJava9Compatible()) {
