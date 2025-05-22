@@ -40,7 +40,7 @@ public class SelectQueryProvider implements QueryProvider {
      * The function for the select request. E.g. the amount of rows that will match the conditions.
      */
     @Setter
-    private Function function = null;
+    private SelectFunction function = null;
 
     /**
      * Specifies the type of selection to be used in the SQL query.

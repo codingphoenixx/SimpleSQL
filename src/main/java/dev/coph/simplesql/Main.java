@@ -74,15 +74,15 @@ public class Main {
 
         Database database = new Database(databaseAdapter, "test6");
 
-        SelectQueryProvider selectQueryProvider = new SelectQueryProvider()
-                .table("test6")
-                .function(new NumericFunction.Count("*"))
+        //SelectQueryProvider selectQueryProvider = new SelectQueryProvider()
+        //        .table("test6")
+        //        .function(new NumericFunction.Count("*"))
+//
+        //        .actionAfterQuery(resultSet -> {
+        //            parseResultSet(resultSet);
+        //        });
 
-                .actionAfterQuery(resultSet -> {
-                    parseResultSet(resultSet);
-                });
-
-        new Query(databaseAdapter).executeQuery(selectQueryProvider);
+        //new Query(databaseAdapter).executeQuery(selectQueryProvider);
     }
 
     private static void createDefaultEntries(DatabaseAdapter databaseAdapter) {
