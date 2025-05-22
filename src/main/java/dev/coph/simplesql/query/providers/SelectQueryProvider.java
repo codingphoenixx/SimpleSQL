@@ -123,7 +123,7 @@ public class SelectQueryProvider implements QueryProvider {
             sql.append("DISTINCT ");
 
         if (function != null && !function.equals(SelectFunction.NORMAL)) {
-            sql.append(function);
+            sql.append(function + "(" + columKey.stream().findFirst().get() + ")");
         } else {
             sql.append(parseColumnName());
         }
