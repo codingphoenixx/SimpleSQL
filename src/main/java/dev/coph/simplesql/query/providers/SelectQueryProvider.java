@@ -80,6 +80,12 @@ public class SelectQueryProvider implements QueryProvider {
     private Limit limit;
 
     /**
+     * Sets a query offset for ordered select requests
+     */
+    @Setter
+    private Offset offset;
+
+    /**
      * A {@link Runnable} that will be executed after the query operation completes.
      * This can be used to perform additional processing or cleanup once the query
      * has been executed.
@@ -135,6 +141,9 @@ public class SelectQueryProvider implements QueryProvider {
 
         if (limit != null)
             sql.append(limit);
+
+        if(order != null && offset != null)
+            sql.append(offset.toString());
 
         sql.append(";");
 
