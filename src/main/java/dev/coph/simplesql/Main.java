@@ -2,9 +2,6 @@ package dev.coph.simplesql;
 
 import dev.coph.simplelogger.Logger;
 import dev.coph.simplesql.adapter.DatabaseAdapter;
-import dev.coph.simplesql.database.attributes.Condition;
-import dev.coph.simplesql.database.attributes.Group;
-import dev.coph.simplesql.database.attributes.Operator;
 import dev.coph.simplesql.database.functions.numeric.NumericFunction;
 import dev.coph.simplesql.object.Database;
 import dev.coph.simplesql.query.Query;
@@ -80,7 +77,7 @@ public class Main {
         SelectQueryProvider selectQueryProvider = new SelectQueryProvider()
                 .table("test6")
                 .function(new NumericFunction.Count("*"))
-                .group(new Group().key("number").condition(new Condition("number", Operator.GREATER_THAN, 10)))
+
                 .actionAfterQuery(resultSet -> {
                     parseResultSet(resultSet);
                 });
@@ -88,7 +85,7 @@ public class Main {
         new Query(databaseAdapter).executeQuery(selectQueryProvider);
     }
 
-    private static void createDefaultEntries(DatabaseAdapter databaseAdapter){
+    private static void createDefaultEntries(DatabaseAdapter databaseAdapter) {
         Query insertQuery = new Query(databaseAdapter);
         for (int i = 0; i < 1000; i++) {
             UUID uuid = UUID.randomUUID();
@@ -101,7 +98,8 @@ public class Main {
         }
         insertQuery.execute();
     }
-    private static void parseResultSet(ResultSet resultSet){
+
+    private static void parseResultSet(ResultSet resultSet) {
         try {
             ResultSetMetaData metaData = resultSet.getMetaData();
             int columnCount = metaData.getColumnCount();
