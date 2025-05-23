@@ -12,7 +12,9 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import java.sql.ResultSet;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 /**
@@ -72,7 +74,7 @@ public class SelectQueryProvider implements QueryProvider {
      * or restricting the specific columns to be utilized for data retrieval or manipulation.
      * If no value is present on execution the default value of {@code *} will be used.
      */
-    private Set<String> columKey = new HashSet<>();
+    private List<String> columKey = new ArrayList<>();
 
     /**
      * The maximum of rows deleted by this request.
@@ -123,7 +125,7 @@ public class SelectQueryProvider implements QueryProvider {
             sql.append("DISTINCT ");
 
         if (function != null && !function.equals(SelectFunction.NORMAL)) {
-            sql.append(function + "(" + columKey.stream().findFirst().get() + ")");
+            sql.append(function).append("(").append(columKey.get(0)).append(")");
         } else {
             sql.append(parseColumnName());
         }
@@ -238,7 +240,7 @@ public class SelectQueryProvider implements QueryProvider {
      */
     public SelectQueryProvider columKey(String columKey) {
         if (this.columKey == null) {
-            this.columKey = new HashSet<>();
+            this.columKey = new ArrayList<>();
         }
         this.columKey.add(columKey);
         return this;

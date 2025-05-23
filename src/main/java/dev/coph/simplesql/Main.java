@@ -2,7 +2,7 @@ package dev.coph.simplesql;
 
 import dev.coph.simplelogger.Logger;
 import dev.coph.simplesql.adapter.DatabaseAdapter;
-import dev.coph.simplesql.database.functions.numeric.NumericFunction;
+import dev.coph.simplesql.database.attributes.SelectFunction;
 import dev.coph.simplesql.object.Database;
 import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.query.providers.InsertQueryProvider;
@@ -22,7 +22,7 @@ public class Main {
         System.out.println("--------------------------------------- MARIADB ------------------------------------------");
         startMariaDB();
         System.out.println("--------------------------------------- SQLITE ------------------------------------------");
-        startSQLite();
+        //startSQLite();
         System.out.println("--------------------------------------- FINISHED ------------------------------------------");
     }
 
@@ -72,17 +72,19 @@ public class Main {
         SELECT first_name, last_name, salary AS netto, salary * 1.3 AS brutto FROM employees
          */
 
-        Database database = new Database(databaseAdapter, "test6");
+       // Database database = new Database(databaseAdapter, "test6");
 
-        //SelectQueryProvider selectQueryProvider = new SelectQueryProvider()
-        //        .table("test6")
-        //        .function(new NumericFunction.Count("*"))
-//
-        //        .actionAfterQuery(resultSet -> {
-        //            parseResultSet(resultSet);
-        //        });
+        SelectQueryProvider selectQueryProvider = new SelectQueryProvider()
+                .table("test6")
+                .function(SelectFunction.MAX)
+                .columKey("number")
+                .actionAfterQuery(resultSet -> {
+                    parseResultSet(resultSet);
+                });
 
-        //new Query(databaseAdapter).executeQuery(selectQueryProvider);
+        Query query = new Query(databaseAdapter);
+        System.out.println(selectQueryProvider.generateSQLString(query));
+        query.executeQuery(selectQueryProvider);
     }
 
     private static void createDefaultEntries(DatabaseAdapter databaseAdapter) {
@@ -107,11 +109,13 @@ public class Main {
             for (int i = 1; i <= columnCount; i++) {
                 header.append(String.format(" %-20s |", metaData.getColumnName(i)));
             }
+            System.out.println(header);
             while (resultSet.next()) {
                 StringBuilder row = new StringBuilder("|");
                 for (int i = 1; i <= columnCount; i++) {
                     row.append(String.format(" %-20s |", resultSet.getString(i)));
                 }
+                System.out.println(row);
             }
         } catch (SQLException e) {
             e.printStackTrace();
