@@ -1,8 +1,6 @@
 package dev.coph.simplesql.query.providers;
 
 import dev.coph.simplesql.database.attributes.*;
-import dev.coph.simplesql.database.functions.Function;
-import dev.coph.simplesql.database.functions.date.DateFunction;
 import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.query.QueryProvider;
 import dev.coph.simpleutilities.action.RunnableAction;
