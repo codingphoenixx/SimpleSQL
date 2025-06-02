@@ -7,8 +7,6 @@ import dev.coph.simplesql.database.attributes.Order;
 import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.query.QueryProvider;
 import dev.coph.simpleutilities.check.Check;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import java.util.HashSet;
@@ -19,18 +17,15 @@ import java.util.Set;
  * Provides functionality to generate SQL DELETE queries. This class allows you to specify
  * the table to delete from, apply conditions for deletion, set limits on the number of rows
  * to be deleted, and define the order of rows to be affected.
- *
+ * <p>
  * This class implements the {@link QueryProvider} interface to generate SQL strings
  * for a DELETE query operation.
  */
-@Getter
-@Accessors(fluent = true)
 public class DeleteQueryProvider implements QueryProvider {
 
     /**
      * The name of the table that should be deleted.
      */
-    @Setter
     private String table;
     /**
      * The {@link Order} of the table when the deleting will occur.
@@ -44,7 +39,6 @@ public class DeleteQueryProvider implements QueryProvider {
      * The maximum of rows deleted by this request.
      */
     private Limit limit;
-
 
 
     @Override
@@ -88,7 +82,6 @@ public class DeleteQueryProvider implements QueryProvider {
         }
         return parsedCondition.toString();
     }
-
 
 
     /**
@@ -173,7 +166,7 @@ public class DeleteQueryProvider implements QueryProvider {
     /**
      * Sets the {@link Order} of the table when the selection will occur
      *
-     * @param key       The key of the column the order will be assigned on.
+     * @param key The key of the column the order will be assigned on.
      * @return {@link DeleteQueryProvider} for chaining.
      */
     public DeleteQueryProvider orderBy(String key) {
@@ -194,6 +187,60 @@ public class DeleteQueryProvider implements QueryProvider {
         if (order == null)
             order = new Order();
         order.rule(key, direction);
+        return this;
+    }
+
+    /**
+     * Retrieves the name of the table associated with this query provider.
+     *
+     * @return the name of the table
+     */
+    public String table() {
+        return this.table;
+    }
+
+    /**
+     * Retrieves the {@link Order} object associated with this query provider.
+     * The {@link Order} defines sorting rules for query results, including
+     * the fields to sort by and their respective sorting directions.
+     *
+     * @return the {@link Order} object defining the sorting rules for the query,
+     * or {@code null} if no sorting rules have been set.
+     */
+    public Order order() {
+        return this.order;
+    }
+
+    /**
+     * Retrieves the set of conditions associated with this query provider.
+     * These conditions define the criteria that must be met for a row to be affected
+     * by the query.
+     *
+     * @return a set of {@link Condition} objects representing the query's conditions
+     */
+    public Set<Condition> conditions() {
+        return this.conditions;
+    }
+
+    /**
+     * Retrieves the {@link Limit} object associated with this query provider.
+     * The {@link Limit} object defines the criteria for limiting the number of rows
+     * returned or affected by the query and may include an optional offset value.
+     *
+     * @return the {@link Limit} object representing the limit criteria for the query.
+     */
+    public Limit limit() {
+        return this.limit;
+    }
+
+    /**
+     * Sets the table name for the DELETE query.
+     *
+     * @param table The name of the table to perform the DELETE operation on.
+     * @return {@link DeleteQueryProvider} for chaining, allowing further configuration of the query.
+     */
+    public DeleteQueryProvider table(String table) {
+        this.table = table;
         return this;
     }
 }

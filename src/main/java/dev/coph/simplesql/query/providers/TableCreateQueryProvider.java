@@ -7,8 +7,6 @@ import dev.coph.simplesql.database.attributes.DataType;
 import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.query.QueryProvider;
 import dev.coph.simpleutilities.check.Check;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import java.util.ArrayList;
@@ -20,18 +18,15 @@ import java.util.List;
  * It implements the {@link QueryProvider} interface and provides methods to configure
  * the table name, creation method, and columns. Additionally, it allows the creation of
  * a SQL query string based on the configuration provided.
- *
+ * <p>
  * The {@code TableCreateQueryProvider} supports a fluent API style, enabling method chaining
  * to configure the table schema with columns and other attributes efficiently.
  */
-@Getter
-@Accessors(fluent = true, chain = true)
 public class TableCreateQueryProvider implements QueryProvider {
 
     /**
      * Represents the name of the table that is associated with a specific query operation.
      */
-    @Setter
     private String table;
 
     /**
@@ -41,19 +36,18 @@ public class TableCreateQueryProvider implements QueryProvider {
      * such as a default creation method or conditional creation if the structure
      * does not already exist.
      */
-    @Setter
     private CreateMethode createMethode = CreateMethode.DEFAULT;
 
     /**
      * Represents the collection of columns to be included in the SQL table schema.
      * Each column in the list defines the structure, constraints, and attributes
      * of a specific piece of the database table.
-     *
+     * <p>
      * This list is used during SQL schema generation to accurately define the
      * layout of the table being created. Each column entry in the list is an
      * instance of the {@code Column} class, which provides detailed configuration
      * for the table's structure.
-     *
+     * <p>
      * The order of the columns in this list reflects the order in which they will
      * appear in the table schema definition.
      */
@@ -105,7 +99,7 @@ public class TableCreateQueryProvider implements QueryProvider {
      * been initialized, it is initialized before adding the column. This method
      * supports a fluent API style, allowing method chaining.
      *
-     * @param key the name of the column to be added
+     * @param key      the name of the column to be added
      * @param dataType the data type of the column to be added
      * @return the current instance of TableCreateQueryProvider for method chaining
      */
@@ -120,8 +114,8 @@ public class TableCreateQueryProvider implements QueryProvider {
      * If the list of columns has not been initialized, it is initialized before adding the column.
      * This method supports a fluent API style, allowing method chaining.
      *
-     * @param key the name of the column to be added
-     * @param dataType the data type of the column to be added
+     * @param key                     the name of the column to be added
+     * @param dataType                the data type of the column to be added
      * @param dataTypeParameterObject an additional parameter object associated with the column's data type
      * @return the current instance of TableCreateQueryProvider for method chaining
      */
@@ -136,13 +130,13 @@ public class TableCreateQueryProvider implements QueryProvider {
      * If the list of columns has not been initialized, it is initialized before adding the column.
      * This method supports a fluent API style, allowing method chaining.
      *
-     * @param key the name of the column to be added
+     * @param key      the name of the column to be added
      * @param dataType the data type of the column to be added
-     * @param notNull if the column is allowed to have no value
+     * @param notNull  if the column is allowed to have no value
      * @return the current instance of TableCreateQueryProvider for method chaining
      */
-    public TableCreateQueryProvider column(String key, DataType dataType,  boolean notNull) {
-        columns.add(new Column(key, dataType,  notNull));
+    public TableCreateQueryProvider column(String key, DataType dataType, boolean notNull) {
+        columns.add(new Column(key, dataType, notNull));
         return this;
     }
 
@@ -152,10 +146,10 @@ public class TableCreateQueryProvider implements QueryProvider {
      * If the list of columns has not been initialized, it is initialized before adding the column.
      * This method supports a fluent API style, allowing method chaining.
      *
-     * @param key the name of the column to be added
-     * @param dataType the data type of the column to be added
+     * @param key                     the name of the column to be added
+     * @param dataType                the data type of the column to be added
      * @param dataTypeParameterObject an additional parameter object associated with the column's data type
-     * @param notNull if the column is allowed to have no value
+     * @param notNull                 if the column is allowed to have no value
      * @return the current instance of TableCreateQueryProvider for method chaining
      */
     public TableCreateQueryProvider column(String key, DataType dataType, Object dataTypeParameterObject, boolean notNull) {
@@ -169,11 +163,11 @@ public class TableCreateQueryProvider implements QueryProvider {
      * If the list of columns has not been initialized, it is initialized before adding the column.
      * This method supports a fluent API style, allowing method chaining.
      *
-     * @param key the name of the column to be added
-     * @param dataType the data type of the column to be added
+     * @param key                     the name of the column to be added
+     * @param dataType                the data type of the column to be added
      * @param dataTypeParameterObject an additional parameter object associated
      *                                with the column's data type
-     * @param columnType the type of the column (e.g., primary key, normal column, etc.)
+     * @param columnType              the type of the column (e.g., primary key, normal column, etc.)
      * @return the current instance of TableCreateQueryProvider for method chaining
      */
     public TableCreateQueryProvider column(String key, DataType dataType, Object dataTypeParameterObject, ColumnType columnType) {
@@ -187,12 +181,12 @@ public class TableCreateQueryProvider implements QueryProvider {
      * If the list of columns has not been initialized, it is initialized before adding the column.
      * This method supports a fluent API style, allowing method chaining.
      *
-     * @param key the name of the column to be added
-     * @param dataType the data type of the column to be added
+     * @param key                     the name of the column to be added
+     * @param dataType                the data type of the column to be added
      * @param dataTypeParameterObject an additional parameter object associated
      *                                with the column's data type
-     * @param columnType the type of the column (e.g., primary key, normal column, etc.)
-     * @param notNull if the column is allowed to be null
+     * @param columnType              the type of the column (e.g., primary key, normal column, etc.)
+     * @param notNull                 if the column is allowed to be null
      * @return the current instance of TableCreateQueryProvider for method chaining
      */
     public TableCreateQueryProvider column(String key, DataType dataType, Object dataTypeParameterObject, ColumnType columnType, boolean notNull) {
@@ -207,8 +201,8 @@ public class TableCreateQueryProvider implements QueryProvider {
      * it is initialized before adding the column. This method supports a fluent API style,
      * allowing method chaining.
      *
-     * @param key the name of the column to be added
-     * @param dataType the data type of the column to be added
+     * @param key        the name of the column to be added
+     * @param dataType   the data type of the column to be added
      * @param columnType the type of the column (e.g., primary key, normal column, etc.)
      * @return the current instance of TableCreateQueryProvider for method chaining
      */
@@ -217,6 +211,55 @@ public class TableCreateQueryProvider implements QueryProvider {
         return this;
     }
 
+    /**
+     * Retrieves the name of the table associated with this query provider.
+     *
+     * @return the name of the table as a String
+     */
+    public String table() {
+        return this.table;
+    }
 
+    /**
+     * Retrieves the current {@link CreateMethode} used for the creation of the table.
+     *
+     * @return the current {@code CreateMethode} instance
+     */
+    public CreateMethode createMethode() {
+        return this.createMethode;
+    }
 
+    /**
+     * Retrieves the list of columns associated with the table creation query.
+     *
+     * @return the list of columns as a List
+     */
+    public List<Column> columns() {
+        return this.columns;
+    }
+
+    /**
+     * Sets the table name for the table creation query.
+     * This method supports a fluent API style, allowing method chaining.
+     *
+     * @param table the name of the table to be created
+     * @return the current instance of TableCreateQueryProvider for method chaining
+     */
+    public TableCreateQueryProvider table(String table) {
+        this.table = table;
+        return this;
+    }
+
+    /**
+     * Sets the creation method to be used for generating the table creation query.
+     * This method supports a fluent API style, allowing method chaining.
+     *
+     * @param createMethode the {@link CreateMethode} enumeration value that specifies the strategy
+     *                      to be used during the table creation process
+     * @return the current instance of {@code TableCreateQueryProvider} for method chaining
+     */
+    public TableCreateQueryProvider createMethode(CreateMethode createMethode) {
+        this.createMethode = createMethode;
+        return this;
+    }
 }

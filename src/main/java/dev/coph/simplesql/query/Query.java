@@ -4,8 +4,6 @@ import dev.coph.simplesql.adapter.DatabaseAdapter;
 import dev.coph.simplesql.exception.RequestNotExecutableException;
 import dev.coph.simplesql.query.providers.*;
 import dev.coph.simpleutilities.check.Check;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import java.sql.Connection;
@@ -13,12 +11,30 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 
-@Getter
-@Accessors(fluent = true)
+/**
+ * The {@code Query} class provides a robust framework for constructing, managing, and executing
+ * database operations. It includes methods for handling various SQL-based queries with support
+ * for method chaining and configurable execution modes (synchronous or asynchronous).
+ *
+ * This class interacts with a database adapter, allowing seamless communication with the underlying
+ * database. The {@code Query} class simplifies the management of SQL operations by providing mechanisms
+ * for executing queries directly, creating different query types, and managing execution results.<br>
+ *<br><br>
+ * Fields:<br>
+ * - {@code databaseAdapter}: The adapter responsible for handling interactions with the underlying database.<br>
+ * - {@code async}: A flag indicating whether query execution is performed asynchronously.<br>
+ * - {@code executed}: A boolean flag specifying whether the query has been executed.<br>
+ * - {@code succeeded}: A boolean flag representing whether the query execution was successful.<br>
+ * - {@code queries}: A collection of queries to be executed.<br>
+ */
 public class Query {
+    /**
+     * Constructor for the Query class that initializes it with a given DatabaseAdapter instance.
+     *
+     * @param databaseAdapter the DatabaseAdapter instance to be used for database operations
+     */
     public Query(DatabaseAdapter databaseAdapter) {
         this.databaseAdapter = databaseAdapter;
     }
@@ -48,7 +64,6 @@ public class Query {
      * This flag affects the behavior of the {@code execute} method in the {@code Query} class.
      * By default, the value is set to `false`, meaning synchronous execution.
      */
-    @Setter
     private boolean async = false;
 
     /**
@@ -62,14 +77,13 @@ public class Query {
      * <p>
      * Default value is {@code false}.
      */
-    @Setter
     private boolean executed = false;
 
     /**
      * Represents the success status of the most recent query execution.
      * This variable tracks whether the queries executed in the current or previous
      * operation within the {@code Query} class completed successfully.
-     *
+     * <p>
      * The value is set to {@code false} at the start of each execution and updated
      * upon completion based on the success or failure of the operation.
      * It is primarily used to determine whether subsequent actions or workflows
@@ -97,18 +111,11 @@ public class Query {
 
 
     /**
-     * Executes the given SQL queries associated with this Query instance.
-     * <p>
-     * If the async mode is enabled, the queries are executed asynchronously
-     * using a CompletableFuture. Otherwise, they are executed synchronously.
-     * The execution status is updated upon completion.
-     * <p>
-     * Note: The execution status reset to false at the beginning of this method
-     * signifies a fresh attempt at running the queries.
-     * <p>
-     * Throws:
-     * A {@code RequestNotExecutableException} if an error occurs that prevents
-     * execution of the queries.
+     * Executes the query using the configured database adapter. The execution can be
+     * done synchronously or asynchronously, based on the `async` flag. If executed
+     * asynchronously, the execution will happen in a separate thread.
+     *
+     * @return the current Query instance after execution, allowing for method chaining.
      */
     public Query execute() {
         Check.ifNull(databaseAdapter, "Database Adapter");
@@ -127,13 +134,13 @@ public class Query {
     }
 
     /**
-     * Executes the provided queries by adding them to the internal query collection
-     * and running the execution process.
+     * Executes the provided queries by adding them to the query list and then initiating execution.
      *
-     * @param queries an array of QueryProvider objects to be executed. Cannot be null or empty.
-     * @throws IllegalArgumentException if the queries array is null or empty.
+     * @param queries an array of {@link QueryProvider} objects to be executed.
+     *                Must not be null or empty.
+     * @return the current {@link Query} instance after executing the queries.
      */
-    public Query executeQuery(QueryProvider...queries){
+    public Query executeQuery(QueryProvider... queries) {
         Check.ifNullOrEmptyMap(queries, "Query");
         Arrays.stream(queries).forEach(query -> this.queries.add(query));
         execute();
@@ -141,27 +148,35 @@ public class Query {
     }
 
     /**
-     * Executes the queries contained in the query object directly and synchronously.
-     * <p>
-     * This method performs SQL query execution using a database connection
-     * obtained from the associated {@code databaseAdapter}. The logic is as follows:
-     * <p>
-     * - If no queries are present, the method terminates immediately without action.
-     * - For a single query:
-     * - It prepares the SQL statement for the query.
-     * - Depending on the query type:
-     * - If the query is a {@code SelectQueryProvider}, it executes the query,
-     * retrieves a {@code ResultSet}, and optionally performs a post-execution
-     * action.
-     * - If the query is an {@code UpdateQueryProvider}, it executes the update query.
-     * - For any other query type, it executes the statement directly.
-     * - For multiple queries:
-     * - It creates a batch of SQL statements.
-     * - Executes all the queries in the batch.
-     * - Any SQLExceptions during this process are printed to the error stream.
-     * <p>
-     * If any error occurs that is not a recoverable {@code SQLException}, a
-     * {@code RequestNotExecutableException} is
+     * Executes a list of SQL queries directly against the database.
+     * This method handles both single-query and batch-query execution.
+     * <br>
+     * The method enforces the following:<br>
+     * - Verifies the query list is not empty.<br>
+     * - Ensures an active database connection is established; if not, throws an IllegalStateException.<br>
+     * <br><br>
+     * For single-query execution:<br>
+     * - Prepares the SQL string from the first query in the list.<br>
+     * - Supports different execution flows based on the query type:<br>
+     * - If the query is a select query, it executes and processes the result set with optional
+     * post-query actions provided by the query object.
+     * - If the query is an update query, it executes the update statement.<br>
+     * - For other query types, it executes the query directly.<br>
+     * - Sets whether execution was successful via the `succeeded` flag.<br>
+     * <br><br>
+     * For batch-query execution:<br>
+     * - Iterates through the query list, generating SQL strings for each query and adding them to a batch.<br>
+     * - Executes the batch of queries as a single transaction.<br>
+     * - Handles exceptions and sets the `succeeded` flag accordingly.<br>
+     * <br><br>
+     * Notes:<br>
+     * - SQL strings that cannot be generated or are `null` are ignored for execution.<br>
+     * - Output messages inform about ignored queries or any errors encountered.<br>
+     * - Exceptions during execution result in the `succeeded` flag being set to false,
+     * and in the case of a non-recoverable error, a RequestNotExecutableException is thrown.<br>
+     * <br>
+     * The method operates under the assumption that the provided `databaseAdapter` is properly initialized
+     * and the `queries` list consists of appropriate `QueryProvider` instances.
      */
     private void executeDirectly() {
         if (queries.isEmpty())
@@ -172,7 +187,7 @@ public class Query {
         try (Connection connection = databaseAdapter.dataSource().getConnection()) {
             if (queries.size() == 1) {
                 String generateSQLString = queries.get(0).generateSQLString(this);
-                if(generateSQLString == null){
+                if (generateSQLString == null) {
                     System.out.println("Generated SQL-String is null. Canceling request.");
                     return;
                 }
@@ -201,7 +216,7 @@ public class Query {
                 for (QueryProvider queryProvider : queries) {
                     try {
                         String generateSQLString = queryProvider.generateSQLString(this);
-                        if(generateSQLString == null){
+                        if (generateSQLString == null) {
                             System.out.println("Generated SQL-String is null. Ignoring request.");
                             continue;
                         }
@@ -313,7 +328,7 @@ public class Query {
 
     /**
      * Creates and returns an instance of {@link TableAlterAddAttributeQueryProvider}.
-     *
+     * <p>
      * This method is used to initiate an ALTER TABLE SQL query for adding an attribute
      * (such as UNIQUE or PRIMARY KEY) to an existing column of a table. The returned
      * {@link TableAlterAddAttributeQueryProvider} object can be further configured
@@ -328,7 +343,7 @@ public class Query {
 
     /**
      * Creates and returns a new instance of {@link TableAlterAddColumnQueryProvider}.
-     *
+     * <p>
      * This method is used to initiate an ALTER TABLE SQL query for adding a new column
      * to an existing table. The returned {@link TableAlterAddColumnQueryProvider} object
      * allows further configuration, such as specifying the column name, data type,
@@ -343,7 +358,7 @@ public class Query {
 
     /**
      * Creates and returns a new instance of {@link TableAlterColumnDefaultValueQueryProvider}.
-     *
+     * <p>
      * This method is used to initiate an ALTER TABLE SQL query to set or remove
      * a default value for a specific column in a database table. The returned
      * {@link TableAlterColumnDefaultValueQueryProvider} object allows further
@@ -359,7 +374,7 @@ public class Query {
 
     /**
      * Creates and returns a new instance of {@link TableAlterDropColumnQueryProvider}.
-     *
+     * <p>
      * This method is used to initiate an ALTER TABLE SQL query for dropping a column or constraint from an existing table.
      * The returned {@link TableAlterDropColumnQueryProvider} object allows further configuration
      * to specify the table name, the column or constraint to be dropped, and additional drop options.
@@ -372,7 +387,7 @@ public class Query {
 
     /**
      * Creates and returns a new instance of {@link TableAlterModifyTypeQueryProvider}.
-     *
+     * <p>
      * This method is used to initiate an ALTER TABLE SQL query for modifying the
      * data type of an existing column in a database table. The returned
      * {@link TableAlterModifyTypeQueryProvider} object allows further configuration,
@@ -381,7 +396,7 @@ public class Query {
      * @return A new {@link TableAlterModifyTypeQueryProvider} instance for constructing
      * ALTER TABLE SQL queries to modify column data types.
      */
-    public static TableAlterModifyTypeQueryProvider tableAlterModifyType(){
+    public static TableAlterModifyTypeQueryProvider tableAlterModifyType() {
         return new TableAlterModifyTypeQueryProvider();
     }
 
@@ -392,7 +407,7 @@ public class Query {
      *
      * @return a new instance of TableAlterRenameQueryProvider
      */
-    public static TableAlterRenameQueryProvider tableAlterRename(){
+    public static TableAlterRenameQueryProvider tableAlterRename() {
         return new TableAlterRenameQueryProvider();
     }
 
@@ -427,7 +442,7 @@ public class Query {
 
     /**
      * Creates and returns a new instance of {@link TableTruncateQueryProvider}.
-     *
+     * <p>
      * This method is used to initiate a TRUNCATE TABLE SQL query by providing
      * a {@link TableTruncateQueryProvider} object, which can be further configured
      * to specify the table to be truncated.
@@ -453,5 +468,61 @@ public class Query {
         return new UpdateQueryProvider();
     }
 
+    /**
+     * Provides access to the current instance of the DatabaseAdapter.
+     *
+     * @return the DatabaseAdapter associated with this context.
+     */
+    public DatabaseAdapter databaseAdapter() {
+        return this.databaseAdapter;
+    }
 
+    /**
+     * Indicates whether the operation is asynchronous.
+     *
+     * @return true if the operation is asynchronous, false otherwise
+     */
+    public boolean async() {
+        return this.async;
+    }
+
+    /**
+     * Checks whether the operation has been executed.
+     *
+     * @return true if the operation has been executed, false otherwise.
+     */
+    public boolean executed() {
+        return this.executed;
+    }
+
+    /**
+     * Checks if the operation or process was successful.
+     *
+     * @return true if the operation succeeded, false otherwise
+     */
+    public boolean succeeded() {
+        return this.succeeded;
+    }
+
+    /**
+     * Sets the async mode for the query.
+     *
+     * @param async a boolean value indicating whether the query should be executed asynchronously
+     * @return the current instance of the Query object with the updated async mode
+     */
+    public Query async(boolean async) {
+        this.async = async;
+        return this;
+    }
+
+    /**
+     * Sets the executed status of the query.
+     *
+     * @param executed a boolean value representing whether the query has been executed
+     * @return the current Query instance with the updated executed status
+     */
+    public Query executed(boolean executed) {
+        this.executed = executed;
+        return this;
+    }
 }

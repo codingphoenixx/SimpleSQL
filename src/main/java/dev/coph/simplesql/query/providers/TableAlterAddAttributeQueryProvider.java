@@ -8,14 +8,11 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 /**
- * A class responsible for constructing SQL "ALTER TABLE" queries
- * to add attributes to existing table columns. This class extends
- * {@link TableAlterQueryProvider}, providing specific implementation for
- * adding attributes such as UNIQUE or PRIMARY KEY to a column.
+ * A class that generates SQL "ALTER TABLE" queries for adding attributes to
+ * a specified column. This class extends {@code TableAlterQueryProvider} and
+ * specializes in constructing statements to add attributes such as "UNIQUE" or
+ * "PRIMARY KEY" to existing columns in a database table.
  */
-@Setter
-@Getter
-@Accessors(fluent = true)
 public class TableAlterAddAttributeQueryProvider extends TableAlterQueryProvider {
 
     /**
@@ -29,7 +26,6 @@ public class TableAlterAddAttributeQueryProvider extends TableAlterQueryProvider
     private AttributeType attributeType;
 
 
-
     @Override
     public String getAlterTableString(Query query) {
         Check.ifNullOrEmptyMap(columnName, "columnName");
@@ -38,10 +34,62 @@ public class TableAlterAddAttributeQueryProvider extends TableAlterQueryProvider
     }
 
     /**
+     * Retrieves the name of the column to which the attribute should be added.
+     *
+     * @return the name of the column as a string.
+     */
+    public String columnName() {
+        return this.columnName;
+    }
+
+    /**
+     * Retrieves the type of the attribute to add.
+     *
+     * @return the attribute type, represented as an instance of {@code AttributeType}.
+     */
+    public AttributeType attributeType() {
+        return this.attributeType;
+    }
+
+    /**
+     * Sets the name of the column to which the attribute should be added.
+     *
+     * @param columnName the name of the column as a string
+     * @return the current instance of TableAlterAddAttributeQueryProvider for method chaining
+     */
+    public TableAlterAddAttributeQueryProvider columnName(String columnName) {
+        this.columnName = columnName;
+        return this;
+    }
+
+    /**
+     * Sets the type of the attribute to be added to the column.
+     *
+     * @param attributeType the type of the attribute, represented as an instance of {@code AttributeType}
+     * @return the current instance of {@code TableAlterAddAttributeQueryProvider} for method chaining
+     */
+    public TableAlterAddAttributeQueryProvider attributeType(AttributeType attributeType) {
+        this.attributeType = attributeType;
+        return this;
+    }
+
+    /**
      * The type of attribute to add.
      */
     public enum AttributeType {
-        UNIQUE, PRIMARY_KEY
+        /**
+         * Represents a type of attribute that enforces uniqueness on the values
+         * of the associated column or field in a database context. This constraint
+         * ensures that all values in the column or field are distinct, preventing
+         * duplicate entries.
+         */
+        UNIQUE,
+        /**
+         * Designates an attribute that serves as the primary key in a database context.
+         * A primary key uniquely identifies each record in a table and ensures that
+         * no duplicate values exist in the associated column.
+         */
+        PRIMARY_KEY
     }
 
 

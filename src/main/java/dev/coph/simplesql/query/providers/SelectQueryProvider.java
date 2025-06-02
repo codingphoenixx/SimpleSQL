@@ -5,8 +5,6 @@ import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.query.QueryProvider;
 import dev.coph.simpleutilities.action.RunnableAction;
 import dev.coph.simpleutilities.check.Check;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import java.sql.ResultSet;
@@ -23,8 +21,6 @@ import java.util.Set;
  * the assignment of a {@link RunnableAction} that processes the {@link ResultSet}.
  * It also includes mechanisms to store the retrieved {@link ResultSet}.
  */
-@Getter
-@Accessors(fluent = true, chain = true)
 public class SelectQueryProvider implements QueryProvider {
 
     /**
@@ -32,14 +28,12 @@ public class SelectQueryProvider implements QueryProvider {
      * This field is used to specify the table from which data will be selected
      * in a SQL SELECT query.
      */
-    @Setter
     private String table;
 
 
     /**
      * The function for the select request. E.g. the amount of rows that will match the conditions.
      */
-    @Setter
     private SelectFunction function = null;
 
     /**
@@ -49,7 +43,6 @@ public class SelectQueryProvider implements QueryProvider {
      * <p>
      * The default value is {@code SelectType.NORMAL}.
      */
-    @Setter
     private SelectType selectType = SelectType.NORMAL;
 
     /**
@@ -58,7 +51,6 @@ public class SelectQueryProvider implements QueryProvider {
      * Each {@link Order} object represents a sorting rule with a specific column key and a sorting
      * direction (ascending or descending).
      */
-    @Setter
     private Order order;
 
     /**
@@ -82,7 +74,6 @@ public class SelectQueryProvider implements QueryProvider {
     /**
      * Sets a query offset for ordered select requests
      */
-    @Setter
     private Offset offset;
 
     /**
@@ -90,7 +81,6 @@ public class SelectQueryProvider implements QueryProvider {
      * This can be used to perform additional processing or cleanup once the query
      * has been executed.
      */
-    @Setter
     private RunnableAction<ResultSet> actionAfterQuery;
 
     /**
@@ -100,14 +90,12 @@ public class SelectQueryProvider implements QueryProvider {
      * Additionally, it can include complex conditions to be applied
      * post-grouping using the HAVING clause.
      */
-    @Setter
     private Group group;
 
 
     /**
      * The ResultSet will be stored here after the request is executed.
      */
-    @Setter
     private ResultSet resultSet;
 
     @Override
@@ -142,7 +130,7 @@ public class SelectQueryProvider implements QueryProvider {
         if (limit != null)
             sql.append(limit);
 
-        if(order != null && offset != null)
+        if (order != null && offset != null)
             sql.append(offset.toString());
 
         sql.append(";");
@@ -327,5 +315,216 @@ public class SelectQueryProvider implements QueryProvider {
         return parsedCondition.toString();
     }
 
+    /**
+     * Returns the name of the table associated with the query.
+     *
+     * @return the name of the table as a {@code String}
+     */
+    public String table() {
+        return this.table;
+    }
 
+    /**
+     * Retrieves the current SQL aggregation or selection function applied to the query.
+     *
+     * @return the {@link SelectFunction} representing the SQL function being used in the query.
+     */
+    public SelectFunction function() {
+        return this.function;
+    }
+
+    /**
+     * Retrieves the current {@link SelectType} associated with the query.
+     *
+     * @return the {@link SelectType} indicating whether the query is set to return
+     *         all matching rows (NORMAL) or only unique rows (DISTINCT).
+     */
+    public SelectType selectType() {
+        return this.selectType;
+    }
+
+    /**
+     * Retrieves the current {@link Order} associated with the query,
+     * specifying the sorting configuration applied during selection.
+     *
+     * @return the {@link Order} instance representing the current sorting order.
+     */
+    public Order order() {
+        return this.order;
+    }
+
+    /**
+     * Retrieves the set of conditions currently applied to this query.
+     *
+     * @return a {@link Set} of {@link Condition} instances representing the conditions
+     *         used to filter results in the query.
+     */
+    public Set<Condition> conditions() {
+        return this.conditions;
+    }
+
+    /**
+     * Retrieves the list of column keys currently set for the query.
+     *
+     * @return a {@link List} of {@link String} objects representing the column keys.
+     */
+    public List<String> columKey() {
+        return this.columKey;
+    }
+
+    /**
+     * Retrieves the {@link Limit} instance associated with the current query configuration.
+     * This object represents the SQL LIMIT clause applied to the query, controlling the
+     * maximum number of rows returned and specifying an optional offset.
+     *
+     * @return the {@link Limit} instance that defines the row limit and offset values
+     *         for the query.
+     */
+    public Limit limit() {
+        return this.limit;
+    }
+
+    /**
+     * Retrieves the {@link Offset} object associated with the current query configuration.
+     * The offset represents the number of rows to be skipped in the query's result set,
+     * typically used in conjunction with a LIMIT clause to implement pagination or control
+     * the starting point of the result set.
+     *
+     * @return the {@link Offset} instance representing the number of rows to bypass in the query results.
+     */
+    public Offset offset() {
+        return this.offset;
+    }
+
+
+    /**
+     * Retrieves the {@link RunnableAction} to be executed after the query is completed.
+     * This action is typically used for performing operations on the {@link ResultSet}
+     * returned by the query.
+     *
+     * @return the {@link RunnableAction} instance configured to execute after the query,
+     *         providing access to the resulting {@link ResultSet}.
+     */
+    public RunnableAction<ResultSet> actionAfterQuery() {
+        return this.actionAfterQuery;
+    }
+
+    /**
+     * Retrieves the {@link Group} instance associated with the current query.
+     * The group defines the grouping clause applied to the query, commonly used
+     * to group rows based on specified column values for aggregation or grouping operations.
+     *
+     * @return the {@link Group} instance representing the grouping configuration of the query.
+     */
+    public Group group() {
+        return this.group;
+    }
+
+    /**
+     * Retrieves the {@link ResultSet} associated with the current query execution.
+     * The {@link ResultSet} contains the results of the query, holding the data
+     * returned from the database based on the query configuration.
+     *
+     * @return the {@link ResultSet} representing the outcome of the executed query.
+     */
+    public ResultSet resultSet() {
+        return this.resultSet;
+    }
+
+    /**
+     * Specifies the name of the table to query.
+     *
+     * @param table The name of the table to be used in the query.
+     * @return {@link SelectQueryProvider} for chaining, allowing further query configuration.
+     */
+    public SelectQueryProvider table(String table) {
+        this.table = table;
+        return this;
+    }
+
+    /**
+     * Sets the SQL aggregation or selection function for the query.
+     * The {@link SelectFunction} specifies the function (e.g., MAX, MIN, COUNT)
+     * to be applied during the query execution.
+     *
+     * @param function The {@link SelectFunction} to be applied to the query.
+     * @return {@link SelectQueryProvider} for chaining, allowing further configuration of the query.
+     */
+    public SelectQueryProvider function(SelectFunction function) {
+        this.function = function;
+        return this;
+    }
+
+    /**
+     * Sets the {@link SelectType} for the query, which determines whether the query
+     * will return all matching rows (NORMAL) or only unique rows (DISTINCT).
+     *
+     * @param selectType The {@link SelectType} to apply to the query. Options include:
+     *                   {@code NORMAL} for all matching rows or {@code DISTINCT} for unique rows.
+     * @return {@link SelectQueryProvider} for chaining, allowing further query configuration.
+     */
+    public SelectQueryProvider selectType(SelectType selectType) {
+        this.selectType = selectType;
+        return this;
+    }
+
+    /**
+     * Sets the {@link Order} for the query, which determines the sorting configuration
+     * to be applied during the selection of results.
+     *
+     * @param order The {@link Order} instance specifying the sorting rules for the query.
+     * @return {@link SelectQueryProvider} for chaining, enabling further configuration of the query.
+     */
+    public SelectQueryProvider order(Order order) {
+        this.order = order;
+        return this;
+    }
+
+    /**
+     * Sets the offset value for the query and returns the updated SelectQueryProvider.
+     *
+     * @param offset the Offset object representing the offset value in the query
+     * @return the updated SelectQueryProvider instance with the specified offset applied
+     */
+    public SelectQueryProvider offset(Offset offset) {
+        this.offset = offset;
+        return this;
+    }
+
+    /**
+     * Sets the action to be executed after the query is completed. This action is typically
+     * used for processing the {@link ResultSet} returned by the query execution.
+     *
+     * @param actionAfterQuery the {@link RunnableAction} instance to execute after the query,
+     *                         providing access to the resulting {@link ResultSet}.
+     * @return {@link SelectQueryProvider} for chaining, allowing further query configuration.
+     */
+    public SelectQueryProvider actionAfterQuery(RunnableAction<ResultSet> actionAfterQuery) {
+        this.actionAfterQuery = actionAfterQuery;
+        return this;
+    }
+
+    /**
+     * Sets the {@link Group} instance for the query. The group defines the grouping clause
+     * used for aggregation or grouping operations, which group rows based on specified
+     * column values.
+     *
+     * @param group The {@link Group} instance representing the grouping configuration to be applied.
+     * @return {@link SelectQueryProvider} for chaining, allowing further query customization.
+     */
+    public SelectQueryProvider group(Group group) {
+        this.group = group;
+        return this;
+    }
+
+    /**
+     * Sets the provided ResultSet to the SelectQueryProvider instance.
+     *
+     * @param resultSet the ResultSet to be used in the SelectQueryProvider
+     * @return the current instance of SelectQueryProvider with the specified ResultSet
+     */
+    public SelectQueryProvider resultSet(ResultSet resultSet) {
+        this.resultSet = resultSet;
+        return this;
+    }
 }

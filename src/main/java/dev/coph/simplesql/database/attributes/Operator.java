@@ -1,10 +1,18 @@
 package dev.coph.simplesql.database.attributes;
 
-import lombok.Getter;
 import lombok.experimental.Accessors;
 
-@Getter
-@Accessors(fluent = true)
+/**
+ * Represents a set of predefined operators commonly used in query generation
+ * and logical expressions. This enumeration provides a standardized way
+ * of handling various comparison and matching operations.
+ *
+ * Each operator is associated with a corresponding string representation
+ * that can be used in database queries, logical conditions, or expressions.
+ *
+ * The operators are designed to handle equality checks, comparisons,
+ * and pattern matching with support for case sensitivity variations.
+ */
 public enum Operator {
     /**
      * Represents the equals operator ("="). Typically used in SQL query generation
@@ -62,13 +70,35 @@ public enum Operator {
      * or string while disregarding case sensitivity, such as in SQL query generation
      * or logical expressions.
      */
-    NOT_MATCH_CASE_INSENSITIVE("!~*"),
+    NOT_MATCH_CASE_INSENSITIVE("!~*");
 
-    ;
-
+    /**
+     * Represents the operator used for comparison or logical conditions in a query.
+     * This variable stores the specific operation (e.g., EQUALS, LESS_THAN, GREATER_THAN)
+     * to be applied when evaluating conditions.
+     *
+     * The operator is immutable and must be defined at the time of object construction.
+     */
     private final String operator;
 
+    /**
+     * Constructs an Operator instance with the given operator string.
+     *
+     * @param operator the string representation of the operator, which defines the type
+     *                 of operation to be used in a specific context (e.g., comparisons
+     *                 in queries or conditions).
+     */
     Operator(String operator) {
         this.operator = operator;
+    }
+
+    /**
+     * Retrieves the string representation of the operator.
+     *
+     * @return a string representing the operator, which defines the type of operation to be
+     *         used in a specific context (e.g., comparisons in queries or conditions).
+     */
+    public String operator() {
+        return this.operator;
     }
 }

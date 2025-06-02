@@ -9,8 +9,6 @@ import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.query.QueryEntry;
 import dev.coph.simplesql.query.QueryProvider;
 import dev.coph.simpleutilities.check.Check;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import java.util.ArrayList;
@@ -25,7 +23,7 @@ import java.util.Set;
  * constraints required to construct a valid update query for a database.
  * This class provides a fluent API for chaining method calls to build complex
  * SQL update statements.
- *
+ * <p>
  * The generated SQL update query supports the following:
  * - Defining the target table for the update operation.
  * - Specifying priority levels for the execution of the query.
@@ -33,19 +31,16 @@ import java.util.Set;
  * - Incorporating multiple conditions in the "WHERE" clause for targeted updates.
  * - Setting column-value pairs to modify specific records.
  * - Applying "LIMIT" clauses for constraining the number of affected rows.
- *
+ * <p>
  * This implementation adheres to the QueryProvider interface, ensuring
  * compatibility with a broader query management system.
  */
-@Getter
-@Accessors(fluent = true)
 public class UpdateQueryProvider implements QueryProvider {
     /**
      * Represents the name of the table to be updated in the SQL query.
      * This variable specifies the target table where the update operation
      * will be performed.
      */
-    @Setter
     private String table;
     /**
      * Specifies the priority level for executing update operations.
@@ -59,14 +54,12 @@ public class UpdateQueryProvider implements QueryProvider {
      * This field is mutable and can be modified to suit the specific requirements
      * of the query execution context.
      */
-    @Setter
     private UpdatePriority updatePriority = UpdatePriority.NORMAL;
 
     /**
      * Indicates whether to ignore errors while updating rows in the SQL query.
      * If set to true, the SQL update operation may skip specific rows or conditions when an error occurs.
      */
-    @Setter
     private boolean updateIgnore = false;
 
     /**
@@ -94,7 +87,14 @@ public class UpdateQueryProvider implements QueryProvider {
      */
     private Limit limit;
 
-
+    /**
+     * Sets the maximum number of rows to be affected by the update query using a LIMIT clause.
+     * This method allows chaining to facilitate further modifications to the query.
+     *
+     * @param limit The maximum number of rows to be affected. Must be a non-negative integer.
+     *              A value of 0 or negative may indicate no limitation, depending on the SQL dialect used.
+     * @return {@link UpdateQueryProvider} for chaining, allowing further query modifications.
+     */
     public UpdateQueryProvider limit(int limit) {
         if (this.limit == null) {
             this.limit = new Limit();
@@ -198,10 +198,10 @@ public class UpdateQueryProvider implements QueryProvider {
             if (query.databaseAdapter().driverType() == DatabaseAdapter.DriverType.SQLITE) {
                 try {
                     throw new UnsupportedOperationException("SQLite does not support priorities when updating Databases. Ignoring attribute...");
-                }catch (Exception e){
+                } catch (Exception e) {
                     e.printStackTrace();
                 }
-            }else {
+            } else {
                 sql.append(" LOW_PRIORITY");
             }
         }
@@ -259,5 +259,106 @@ public class UpdateQueryProvider implements QueryProvider {
             parsedCondition.append(condition.type().equals(Condition.Type.AND) ? " AND " : " OR ").append(condition.not() ? " NOT " : "").append(condition);
         }
         return parsedCondition.toString();
+    }
+
+    /**
+     * Retrieves the name of the table targeted by the update query.
+     *
+     * @return The name of the table as a String.
+     */
+    public String table() {
+        return this.table;
+    }
+
+    /**
+     * Retrieves the current update priority of the query.
+     *
+     * @return The {@link UpdatePriority} indicating the priority level for the update operation.
+     */
+    public UpdatePriority updatePriority() {
+        return this.updatePriority;
+    }
+
+    /**
+     * Indicates whether the update operation should ignore duplicate key errors or conflicts.
+     * This flag is typically used to control the behavior of updates when potential violations
+     * of unique constraints or key conflicts occur.
+     *
+     * @return A boolean value. Returns true if the update should ignore conflicts or duplicate key errors;
+     *         false otherwise.
+     */
+    public boolean updateIgnore() {
+        return this.updateIgnore;
+    }
+
+    /**
+     * Retrieves a list of query entries representing the column-value pairs to be updated in the query.
+     *
+     * @return A list of {@link QueryEntry} objects, where each entry represents a column and its corresponding value
+     *         to be updated in the query.
+     */
+    public List<QueryEntry> entries() {
+        return this.entries;
+    }
+
+    /**
+     * Retrieves the set of conditions that define the criteria for the update query.
+     * These conditions specify the rules that rows must satisfy to be included in the update operation.
+     *
+     * @return A Set of {@link Condition} objects representing the conditions for the update query.
+     *         If no conditions are specified, this returns an empty set.
+     */
+    public Set<Condition> conditions() {
+        return this.conditions;
+    }
+
+    /**
+     * Retrieves the {@link Limit} object representing the maximum number
+     * of rows affected by the update query.
+     *
+     * @return The current {@link Limit} associated with the update query. If no limit has been set, it may return null or
+     *         a default {@link Limit}, depending on the implementation.
+     */
+    public Limit limit() {
+        return this.limit;
+    }
+
+    /**
+     * Sets the target table for the update query.
+     * This method allows chaining to facilitate further modifications to the query.
+     *
+     * @param table The name of the table to be updated. Must not be null or empty.
+     * @return {@link UpdateQueryProvider} for chaining, allowing further query modifications.
+     */
+    public UpdateQueryProvider table(String table) {
+        this.table = table;
+        return this;
+    }
+
+    /**
+     * Sets the update priority for the query, which defines the level of priority (e.g., LOW or NORMAL)
+     * to be associated with the update operation. This method allows chaining for further query modifications.
+     *
+     * @param updatePriority The {@link UpdatePriority} representing the desired priority level for the update operation.
+     *                       Must not be null.
+     * @return {@link UpdateQueryProvider} for chaining, enabling further modifications to the query.
+     */
+    public UpdateQueryProvider updatePriority(UpdatePriority updatePriority) {
+        this.updatePriority = updatePriority;
+        return this;
+    }
+
+    /**
+     * Sets whether the update operation should ignore conflicts or duplicate key errors.
+     * This method modifies the update query's behavior when such conflicts occur.
+     *
+     * @param updateIgnore A boolean value. Pass true to enable ignoring conflicts or
+     *                     duplicate key errors; false to disable.
+     * @return {@link UpdateQueryProvider} for chaining, enabling further modifications
+     *         to the update query.
+     */
+    public UpdateQueryProvider updateIgnore(boolean updateIgnore) {
+        this.updateIgnore = updateIgnore;
+        return this;
     }
 }

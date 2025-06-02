@@ -6,8 +6,6 @@ import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.query.QueryEntry;
 import dev.coph.simplesql.query.QueryProvider;
 import dev.coph.simpleutilities.check.Check;
-import lombok.Getter;
-import lombok.Setter;
 import lombok.experimental.Accessors;
 
 import java.util.ArrayList;
@@ -22,14 +20,11 @@ import java.util.List;
  * This class implements the {@link QueryProvider} interface, enabling the generation of
  * SQL query strings for database operations.
  */
-@Getter
-@Accessors(fluent = true, chain = true)
 public class InsertQueryProvider implements QueryProvider {
 
     /**
      * The name of the table that should be deleted.
      */
-    @Setter
     private String table;
 
     /**
@@ -121,6 +116,57 @@ public class InsertQueryProvider implements QueryProvider {
     /**
      * Method which will be used for inserting the value.
      */
-    @Setter
     private InsertMethode insertMethode = InsertMethode.INSERT;
+
+    /**
+     * Retrieves the name of the table associated with the query provider.
+     *
+     * @return the name of the table
+     */
+    public String table() {
+        return this.table;
+    }
+
+    /**
+     * Retrieves the list of entries that represent the column-value pairs
+     * to be included in an SQL insert operation.
+     *
+     * @return a list of {@link QueryEntry} objects representing the entries
+     */
+    public List<QueryEntry> entries() {
+        return this.entries;
+    }
+
+    /**
+     * Retrieves the current {@link InsertMethode} that defines the strategy
+     * for SQL INSERT operations.
+     *
+     * @return the current {@link InsertMethode} used for SQL insert strategies
+     */
+    public InsertMethode insertMethode() {
+        return this.insertMethode;
+    }
+
+    /**
+     * Sets the name of the table to be used in the SQL insert operation.
+     *
+     * @param table the name of the table to which data will be inserted
+     * @return the {@link InsertQueryProvider} instance for method chaining
+     */
+    public InsertQueryProvider table(String table) {
+        this.table = table;
+        return this;
+    }
+
+    /**
+     * Sets the {@link InsertMethode} to define the strategy for SQL INSERT operations
+     * and returns the current {@link InsertQueryProvider} instance for chaining.
+     *
+     * @param insertMethode the {@link InsertMethode} to be used for SQL INSERT operations
+     * @return the {@link InsertQueryProvider} instance for method chaining
+     */
+    public InsertQueryProvider insertMethode(InsertMethode insertMethode) {
+        this.insertMethode = insertMethode;
+        return this;
+    }
 }

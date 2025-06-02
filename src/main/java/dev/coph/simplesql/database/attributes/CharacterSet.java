@@ -1,5 +1,10 @@
 package dev.coph.simplesql.database.attributes;
 
+/**
+ * Represents the Latin7 character set, also known as ISO-8859-13 or Baltic Rim.
+ * It is used for data encoding for Baltic languages such as Lithuanian and Latvian,
+ * as well as other languages in the Baltic region.
+ */
 public enum CharacterSet {
     /**
      * Represents the ARMSCII-8 character set, which is an 8-bit character encoding

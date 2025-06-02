@@ -34,6 +34,14 @@ public enum ColumnType {
     UNIQUE;
 
 
+    /**
+     * Converts the enumeration value to its string representation based on the database context provided.
+     *
+     * @param query the query object that includes information about the database adapter and driver type,
+     *              used to determine the specific string representation of the enumeration value.
+     * @return the string representation of the enumeration, which may vary depending on the database type
+     *         or driver adapter provided in the query.
+     */
     public String toString(Query query) {
         if(query.databaseAdapter() == null)
             return this.name().replaceAll("_", " ");

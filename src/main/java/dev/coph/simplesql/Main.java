@@ -15,7 +15,21 @@ import java.sql.SQLException;
 import java.util.Base64;
 import java.util.UUID;
 
+/**
+ * The Main class serves as the entry point for the application. It initializes and demonstrates
+ * database connections using MariaDB or SQLite and executes predefined queries on those databases.
+ * This class contains static helper methods for various operations such as starting services,
+ * executing queries, and parsing results.
+ * Only for testing.
+ */
 public class Main {
+    /**
+     * The main method serves as the entry point for the application. It initializes the logger,
+     * starts the MariaDB database process, and prints out logging information for different stages
+     * of execution. Currently, the SQLite database process is commented out.
+     *
+     * @param args command-line arguments passed during application execution
+     */
     public static void main(String[] args) {
         Logger.getInstance();
         System.out.println("--------------------------------------- MARIADB ------------------------------------------");
@@ -25,7 +39,22 @@ public class Main {
         System.out.println("--------------------------------------- FINISHED ------------------------------------------");
     }
 
-
+    /**
+     * Initializes and starts a MariaDB database connection.
+     * This method creates a {@code DatabaseAdapter} instance configured for MariaDB,
+     * connects to the specified database, and executes a predefined query.
+     *
+     * The database connection is configured with the following parameters:
+     * - Host: localhost
+     * - Port: 3306
+     * - Database Name: testing
+     * - User: root
+     * - Password: (empty)
+     * - Driver Type: MariaDB
+     *
+     * After establishing the connection, the method delegates query execution
+     * to the {@code runQuery} method using the created {@code DatabaseAdapter} instance.
+     */
     private static void startMariaDB() {
         DatabaseAdapter databaseAdapter = new DatabaseAdapter.Builder()
                 .host("localhost")
@@ -39,6 +68,23 @@ public class Main {
         runQuery(databaseAdapter);
     }
 
+    /**
+     * Initializes and starts an SQLite database connection.
+     *
+     * This method checks for the existence of the SQLite database file (`test.db`).
+     * If the file does not exist, it creates a new file. A {@code DatabaseAdapter} instance is then
+     * configured to connect to this SQLite database, and the connection is established.
+     *
+     * Once the connection is successfully established, the method delegates query execution
+     * to the {@code runQuery} method using the created {@code DatabaseAdapter} instance.
+     *
+     * Exceptions during file creation are caught and logged using {@code e.printStackTrace()}.
+     *
+     * Dependencies:
+     * - {@code java.io.File}
+     * - {@code java.io.IOException}
+     * - {@code DatabaseAdapter}
+     */
     private static void startSQLite() {
         File sqliteFile = new File("test.db");
         if (!sqliteFile.exists()) {
@@ -57,6 +103,15 @@ public class Main {
         runQuery(databaseAdapter);
     }
 
+    /**
+     * Executes a query using the provided database adapter.
+     * This method sets up a query provider for a specified table,
+     * configures the query to use SQL functions, and specifies an action
+     * to execute on the result set after the query is completed.
+     * The query is then executed using the provided database adapter.
+     *
+     * @param databaseAdapter the adapter used to connect and execute queries against the database
+     */
     private static void runQuery(DatabaseAdapter databaseAdapter) {
         //Database database = new Database(databaseAdapter, "testing");
         //database.getTable("testing");
@@ -86,6 +141,14 @@ public class Main {
         query.executeQuery(selectQueryProvider);
     }
 
+    /**
+     * Populates a default set of entries into the database.
+     * This method creates 1000 random entries, each containing a UUID
+     * and a Base64-encoded comment string. The entries are then inserted
+     * into the "test6" table using the provided database adapter.
+     *
+     * @param databaseAdapter the database adapter used to execute the insert queries
+     */
     private static void createDefaultEntries(DatabaseAdapter databaseAdapter) {
         Query insertQuery = new Query(databaseAdapter);
         for (int i = 0; i < 1000; i++) {
@@ -100,6 +163,15 @@ public class Main {
         insertQuery.execute();
     }
 
+    /**
+     * Parses and prints the contents of a {@code ResultSet}.
+     * This method extracts metadata and row data from the given {@code ResultSet},
+     * formats it into a tabular representation, and prints it to the console.
+     * Each column name and its corresponding row values are displayed in a structured format.
+     * If a {@code SQLException} occurs during processing, the exception stack trace is printed.
+     *
+     * @param resultSet the {@code ResultSet} to be parsed and printed
+     */
     private static void parseResultSet(ResultSet resultSet) {
         try {
             ResultSetMetaData metaData = resultSet.getMetaData();
