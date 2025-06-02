@@ -6,11 +6,12 @@ import lombok.Setter;
 import lombok.experimental.Accessors;
 
 /**
- * Sets the negation flag for this condition. When the negation is set to {@code true},
- * it applies a logical NOT operation to the current condition.
- *
- * @param not A boolean flag indicating whether the condition should be negated.
- * @return The current {@code Condition} instance with the updated negation flag.
+ * This class represents a condition used in SQL queries.
+ * It serves to define filter criteria and supports various comparison operators,
+ * logical operators, and special selection functions.
+ * <p>
+ * The class enables the creation of complex conditions with a variety of
+ * configuration options and supports a fluent API style for method chaining.
  */
 public class Condition {
     /**
