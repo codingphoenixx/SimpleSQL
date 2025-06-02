@@ -3,7 +3,6 @@ package dev.coph.simplesql;
 import dev.coph.simplelogger.Logger;
 import dev.coph.simplesql.adapter.DatabaseAdapter;
 import dev.coph.simplesql.database.attributes.SelectFunction;
-import dev.coph.simplesql.object.Database;
 import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.query.providers.InsertQueryProvider;
 import dev.coph.simplesql.query.providers.SelectQueryProvider;
