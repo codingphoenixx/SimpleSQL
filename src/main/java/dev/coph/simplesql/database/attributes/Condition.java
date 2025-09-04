@@ -113,10 +113,8 @@ public class Condition {
             queryKey = selectFunction.function() + "(" + selectKey + ")";
         }
 
-        if (operator == Operator.EQUALS)
-            return queryKey + "='" + value + "'";
-
-        Check.ifNotNumber(value, "value");
+        if (operator.needToBeANumber())
+            Check.ifNotNumber(value, "value");
 
         return queryKey + " " + operator.operator() + " " + value;
     }
