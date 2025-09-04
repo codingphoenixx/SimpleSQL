@@ -63,12 +63,7 @@ public class Condition {
      * aggregate the value associated with the condition.
      */
     private SelectFunction valueSelectFunction;
-    /**
-     * Represents the name of a specific key or field used within a condition or query context.
-     * This variable is primarily used to identify or select a particular element in the
-     * condition logic or query structure.
-     */
-    private String selectKey;
+
 
     /**
      * Constructs a Condition object with a specified key and value.
@@ -109,8 +104,8 @@ public class Condition {
         Check.ifNull(value, "value");
 
         String queryKey = key;
-        if (keySelectFunction != null && !keySelectFunction.equals(SelectFunction.NORMAL) && selectKey != null) {
-            queryKey = keySelectFunction.function() + "(" + selectKey + ")";
+        if (keySelectFunction != null && !keySelectFunction.equals(SelectFunction.NORMAL)) {
+            queryKey = keySelectFunction.function() + "(" + key + ")";
         }
 
         if (operator.needToBeANumber())
@@ -197,16 +192,7 @@ public class Condition {
         return this.valueSelectFunction;
     }
 
-    /**
-     * Retrieves the select key associated with the current condition.
-     * The select key represents an additional key used in the context of
-     * selecting data or applying specific criteria, typically in SQL operations.
-     *
-     * @return a string representing the select key of the condition.
-     */
-    public String selectKey() {
-        return this.selectKey;
-    }
+
 
     /**
      * Sets the key of the condition, representing the column that this condition applies to.
@@ -293,20 +279,6 @@ public class Condition {
      */
     public Condition valueSelectFunction(SelectFunction valueSelectFunction) {
         this.valueSelectFunction = valueSelectFunction;
-        return this;
-    }
-
-    /**
-     * Sets the select key for the current condition.
-     * The select key represents an additional key used in the context of
-     * selecting data or applying specific criteria, commonly in SQL operations.
-     *
-     * @param selectKey The select key to be applied to this condition.
-     *                  It assists in defining selection-specific attributes or behavior.
-     * @return The current {@code Condition} instance with the updated select key.
-     */
-    public Condition selectKey(String selectKey) {
-        this.selectKey = selectKey;
         return this;
     }
 

@@ -1,5 +1,6 @@
 package dev.coph.simplesql.query;
 
+import dev.coph.simplelogger.Logger;
 import dev.coph.simplesql.adapter.DatabaseAdapter;
 import dev.coph.simplesql.exception.RequestNotExecutableException;
 import dev.coph.simplesql.query.providers.*;
@@ -192,6 +193,7 @@ public class Query {
                     return;
                 }
                 var statement = connection.prepareStatement(generateSQLString);
+                Logger.getInstance().log(Logger.LogLevel.DEBUG, "Executing query: " + generateSQLString);
                 try {
                     if (queries.get(0) instanceof SelectQueryProvider selectRequest) {
                         ResultSet resultSet = statement.executeQuery();
@@ -220,6 +222,7 @@ public class Query {
                             System.out.println("Generated SQL-String is null. Ignoring request.");
                             continue;
                         }
+                        Logger.getInstance().log(Logger.LogLevel.DEBUG, "Executing query: " + generateSQLString);
                         statement.addBatch(generateSQLString);
                     } catch (Exception e) {
                         e.printStackTrace();
