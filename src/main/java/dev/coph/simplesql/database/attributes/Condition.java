@@ -57,7 +57,7 @@ public class Condition {
      * Represents the {@code SelectFunction} that is applied specifically to the value
      * in the condition. This function determines the SQL aggregation or selection
      * operation that should be performed on the value during query processing.
-     *
+     * <p>
      * The {@code valueSelectFunction} can be used to specify functions such as
      * {@code COUNT}, {@code SUM}, {@code AVERAGE}, or others to manipulate or
      * aggregate the value associated with the condition.
@@ -108,10 +108,12 @@ public class Condition {
             queryKey = keySelectFunction.function() + "(" + key + ")";
         }
 
-        if (operator.needToBeANumber())
+        String queryValue;
+        if (operator.needToBeANumber()) {
+            queryValue = value.toString();
             Check.ifNotNumber(value, "value");
-
-        String queryValue = value.toString();
+        } else
+            queryValue = "'" + value + "'";
 
         if (valueSelectFunction != null && !valueSelectFunction.equals(SelectFunction.NORMAL) && queryValue != null) {
             queryValue = valueSelectFunction.function() + "(" + queryValue + ")";
@@ -191,7 +193,6 @@ public class Condition {
     public SelectFunction valueSelectFunction() {
         return this.valueSelectFunction;
     }
-
 
 
     /**
