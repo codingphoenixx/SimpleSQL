@@ -29,7 +29,27 @@ public enum SelectFunction {
     /**
      * Selects the maximum value of a specific column
      */
-    MAX("MAX");
+    MAX("MAX"),
+    /**
+     * Converts the characters in a string column to lowercase.
+     * When used in a database query, this function will modify the
+     * output of the specified column by changing all uppercase letters
+     * to their corresponding lowercase equivalents.
+     *
+     * This function is particularly useful for case-insensitive comparisons
+     * or for standardizing text data in query results.
+     */
+    LOWER("LOWER"),
+    /**
+     * Converts the characters in a string column to uppercase.
+     * When applied in a database query, this function alters the
+     * output of the specified column by changing all lowercase letters
+     * to their corresponding uppercase equivalents.
+     *
+     * This function is particularly useful for case-insensitive comparisons,
+     * standardizing text data in query results, or formatting data for presentation purposes.
+     */
+    UPPER("UPPER");
 
     /**
      * Represents the SQL aggregation or selection function associated with a

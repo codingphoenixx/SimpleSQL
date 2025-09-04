@@ -44,31 +44,9 @@ public enum Operator {
      * Represents the "not equals" operator. Typically used in SQL query generation
      * to specify conditions where values in a column must not match a given value.
      */
-    NOT_EQUALS("<>", false),
-    /**
-     * Represents a case-sensitive match operator ("~"). Typically used to construct
-     * conditions where the comparison between values must consider case sensitivity.
-     */
-    MATCH_CASE_SENSITIVE("~", false),
-    /**
-     * Represents a case-insensitive match operator ("~*"). Typically used to construct
-     * conditions where value comparisons should disregard case sensitivity, such as
-     * in SQL query generation or logical expressions.
-     */
-    MATCH_CASE_INSENSITIVE("~*", false),
-    /**
-     * Represents a case-sensitive "not match" operator ("!~").
-     * Typically used to construct conditions where a value does not match a given pattern
-     * or string while considering case sensitivity, such as in SQL query generation or logical expressions.
-     */
-    NOT_MATCH_CASE_SENSITIVE("!~", false),
-    /**
-     * Represents a case-insensitive "not match" operator ("!~*").
-     * Typically used to construct conditions where a value does not match a given pattern
-     * or string while disregarding case sensitivity, such as in SQL query generation
-     * or logical expressions.
-     */
-    NOT_MATCH_CASE_INSENSITIVE("!~*", false);
+    NOT_EQUALS("!=", false),
+
+    ;
 
     /**
      * Represents the operator used for comparison or logical conditions in a query.

@@ -1,9 +1,6 @@
 package dev.coph.simplesql.database.attributes;
 
 import dev.coph.simpleutilities.check.Check;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 
 /**
  * This class represents a condition used in SQL queries.
@@ -51,18 +48,21 @@ public class Condition {
     /**
      * Represents the function to be applied during the selection of data
      * in a query. This can modify how data is processed or aggregated.
-     * <br><br>
-     * Available functions include:<br>
-     * - NORMAL: Return results directly without modification.<br>
-     * - COUNT: Count the number of rows.<br>
-     * - AVERAGE: Compute the average value of a numerical dataset.<br>
-     * - SUM: Compute the total sum of a numerical dataset.<br>
-     * - MAX: Select the maximum value in a specific column.<br>
      * <br>
      * This variable, when used, specifies the type of aggregation or
      * processing to be performed on a query result.
      */
-    private SelectFunction selectFunction;
+    private SelectFunction keySelectFunction;
+    /**
+     * Represents the {@code SelectFunction} that is applied specifically to the value
+     * in the condition. This function determines the SQL aggregation or selection
+     * operation that should be performed on the value during query processing.
+     *
+     * The {@code valueSelectFunction} can be used to specify functions such as
+     * {@code COUNT}, {@code SUM}, {@code AVERAGE}, or others to manipulate or
+     * aggregate the value associated with the condition.
+     */
+    private SelectFunction valueSelectFunction;
     /**
      * Represents the name of a specific key or field used within a condition or query context.
      * This variable is primarily used to identify or select a particular element in the
@@ -109,14 +109,20 @@ public class Condition {
         Check.ifNull(value, "value");
 
         String queryKey = key;
-        if (selectFunction != null && !selectFunction.equals(SelectFunction.NORMAL) && selectKey != null) {
-            queryKey = selectFunction.function() + "(" + selectKey + ")";
+        if (keySelectFunction != null && !keySelectFunction.equals(SelectFunction.NORMAL) && selectKey != null) {
+            queryKey = keySelectFunction.function() + "(" + selectKey + ")";
         }
 
         if (operator.needToBeANumber())
             Check.ifNotNumber(value, "value");
 
-        return queryKey + " " + operator.operator() + " " + value;
+        String queryValue = value.toString();
+
+        if (valueSelectFunction != null && !valueSelectFunction.equals(SelectFunction.NORMAL) && queryValue != null) {
+            queryValue = valueSelectFunction.function() + "(" + queryValue + ")";
+        }
+
+        return queryKey + " " + operator.operator() + " " + queryValue;
     }
 
     /**
@@ -177,7 +183,18 @@ public class Condition {
      * @return the {@code SelectFunction} associated with this condition.
      */
     public SelectFunction selectFunction() {
-        return this.selectFunction;
+        return this.keySelectFunction;
+    }
+
+    /**
+     * Retrieves the {@code SelectFunction} associated with the {@code value} of this condition.
+     * The {@code SelectFunction} defines the SQL aggregation or selection function
+     * applied specifically to the value of this condition, such as COUNT, SUM, or AVERAGE.
+     *
+     * @return the {@code SelectFunction} applied to the value of this condition.
+     */
+    public SelectFunction valueSelectFunction() {
+        return this.valueSelectFunction;
     }
 
     /**
@@ -261,7 +278,21 @@ public class Condition {
      * @return the current {@code Condition} instance with the updated {@code SelectFunction}.
      */
     public Condition selectFunction(SelectFunction selectFunction) {
-        this.selectFunction = selectFunction;
+        this.keySelectFunction = selectFunction;
+        return this;
+    }
+
+    /**
+     * Sets the {@code SelectFunction} to be applied to the value of the current {@code Condition}.
+     * The {@code SelectFunction} defines the SQL aggregation or selection function
+     * applied specifically to the value, such as COUNT, SUM, or AVERAGE.
+     *
+     * @param valueSelectFunction the {@code SelectFunction} to be applied to the value of this condition.
+     *                            This determines how the value will be aggregated or manipulated in a query.
+     * @return the current {@code Condition} instance with the updated {@code valueSelectFunction}.
+     */
+    public Condition valueSelectFunction(SelectFunction valueSelectFunction) {
+        this.valueSelectFunction = valueSelectFunction;
         return this;
     }
 
