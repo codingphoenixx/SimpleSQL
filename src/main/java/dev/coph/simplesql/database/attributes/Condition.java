@@ -182,7 +182,7 @@ public class Condition {
      *
      * @return the {@code SelectFunction} associated with this condition.
      */
-    public SelectFunction selectFunction() {
+    public SelectFunction keySelectFunction() {
         return this.keySelectFunction;
     }
 
@@ -277,7 +277,7 @@ public class Condition {
      *                       This function is used to manipulate or aggregate data.
      * @return the current {@code Condition} instance with the updated {@code SelectFunction}.
      */
-    public Condition selectFunction(SelectFunction selectFunction) {
+    public Condition keySelectFunction(SelectFunction selectFunction) {
         this.keySelectFunction = selectFunction;
         return this;
     }
