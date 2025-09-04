@@ -1,5 +1,6 @@
 package dev.coph.simplesql.database.attributes;
 
+import dev.coph.simplesql.utils.StringEscapeUtils;
 import dev.coph.simpleutilities.check.Check;
 
 /**
@@ -113,7 +114,7 @@ public class Condition {
             queryValue = value.toString();
             Check.ifNotNumber(value, "value");
         } else
-            queryValue = "'" + value + "'";
+            queryValue = "'" + StringEscapeUtils.escapeSql(value.toString()) + "'";
 
         if (valueSelectFunction != null && !valueSelectFunction.equals(SelectFunction.NORMAL) && queryValue != null) {
             queryValue = valueSelectFunction.function() + "(" + queryValue + ")";
