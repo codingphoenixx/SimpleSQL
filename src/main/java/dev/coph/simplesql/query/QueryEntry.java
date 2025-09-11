@@ -57,6 +57,7 @@ public class QueryEntry {
      *
      * @param value the value to be parsed into a SQL-compatible string.
      *              Supported types include Boolean, Number, and other generic objects.
+     * @param rawValue if the value should be treated as a finished parsed value.
      * @return a SQL-safe string representation of the provided value. For Boolean values,
      *         it returns '1' for true and '0' for false. For Number values, it returns
      *         the number as a string. For other objects, it returns the string wrapped
