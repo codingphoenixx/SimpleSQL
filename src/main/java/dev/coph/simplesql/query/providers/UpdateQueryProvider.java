@@ -186,6 +186,20 @@ public class UpdateQueryProvider implements QueryProvider {
         entries.add(new QueryEntry(column, value));
         return this;
     }
+    /**
+     * Adds a new entry to the update query. The entry specifies a column
+     * and its corresponding value to be updated in the target table.
+     *
+     * @param entry The finished generated entry
+     * @return {@link UpdateQueryProvider} for chaining, enabling further modifications to the query.
+     */
+    public UpdateQueryProvider entry(QueryEntry entry) {
+        if (entries == null) {
+            entries = new ArrayList<>();
+        }
+        entries.add(entry);
+        return this;
+    }
 
 
     @Override
