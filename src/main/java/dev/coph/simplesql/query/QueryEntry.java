@@ -18,6 +18,8 @@ public class QueryEntry {
      */
     private Object value;
 
+    private boolean rawValue = false;
+
     /**
      * Constructs a QueryEntry with the specified column name and value.
      *
@@ -45,7 +47,7 @@ public class QueryEntry {
      * @return a SQL-safe string representation of the stored value
      */
     public String sqlValue() {
-        return parseSQLValue(value);
+        return parseSQLValue(value, rawValue());
     }
 
     /**
@@ -60,7 +62,7 @@ public class QueryEntry {
      *         the number as a string. For other objects, it returns the string wrapped
      *         in single quotes.
      */
-    public static String parseSQLValue(Object value) {
+    public static String parseSQLValue(Object value, boolean rawValue) {
         if (value != null && value instanceof Boolean bool) {
             if (bool) {
                 return "'1'";
@@ -71,7 +73,32 @@ public class QueryEntry {
         if (value != null && value instanceof Number number) {
             return number.toString();
         }
+
+        if(rawValue)
+            return value.toString();
+
         return "'%s'".formatted(value);
+    }
+
+
+    /**
+     * Indicates whether the raw value is used for this QueryEntry.
+     *
+     * @return true if the raw value is used, false otherwise
+     */
+    public boolean rawValue() {
+        return rawValue;
+    }
+
+    /**
+     * Sets whether the raw value should be used for this QueryEntry.
+     * This influences how the value is interpreted and formatted in SQL operations.
+     *
+     * @param rawValue a boolean indicating whether the raw value should be used (true)
+     *                 or if the value should be processed (false)
+     */
+    public void rawValue(boolean rawValue) {
+        this.rawValue = rawValue;
     }
 
     /**

@@ -46,6 +46,8 @@ public class Condition {
      */
     private boolean not = false;
 
+    private boolean rawValue = false;
+
     /**
      * Represents the function to be applied during the selection of data
      * in a query. This can modify how data is processed or aggregated.
@@ -113,8 +115,12 @@ public class Condition {
         if (operator.needToBeANumber()) {
             queryValue = value.toString();
             Check.ifNotNumber(value, "value");
-        } else
-            queryValue = "'" + StringEscapeUtils.escapeSql(value.toString()) + "'";
+        } else {
+            if (rawValue)
+                queryValue = value.toString();
+            else
+                queryValue = "'" + StringEscapeUtils.escapeSql(value.toString()) + "'";
+        }
 
         if (valueSelectFunction != null && !valueSelectFunction.equals(SelectFunction.NORMAL) && queryValue != null) {
             queryValue = valueSelectFunction.function() + "(" + queryValue + ")";
@@ -171,6 +177,30 @@ public class Condition {
      */
     public boolean not() {
         return this.not;
+    }
+
+    /**
+     * Sets whether the value associated with this condition should be treated as raw.
+     * When set to true, the value is expected to be used directly in its raw form
+     * without additional formatting or escaping.
+     *
+     * @param rawValue a boolean indicating whether the value should be treated as raw.
+     *                 If true, the value is handled as is; otherwise, it may undergo
+     *                 additional processing before being applied.
+     */
+    public void rawValue(boolean rawValue) {
+        this.rawValue = rawValue;
+    }
+
+    /**
+     * Retrieves the raw value flag for this condition.
+     * The raw value flag indicates whether the value associated with this condition
+     * should be treated as raw, meaning it is directly used without additional formatting or escaping.
+     *
+     * @return {@code true} if the value is treated as raw; {@code false} otherwise.
+     */
+    public boolean rawValue() {
+        return rawValue;
     }
 
     /**
