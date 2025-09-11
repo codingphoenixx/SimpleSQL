@@ -92,14 +92,15 @@ public class QueryEntry {
     }
 
     /**
-     * Sets whether the raw value should be used for this QueryEntry.
-     * This influences how the value is interpreted and formatted in SQL operations.
+     * Sets the raw value flag for this QueryEntry and returns the updated instance.
      *
-     * @param rawValue a boolean indicating whether the raw value should be used (true)
-     *                 or if the value should be processed (false)
+     * @param rawValue a boolean indicating whether the value should be treated as raw
+     *                 (pre-parsed or in its native SQL-compatible format).
+     * @return the updated QueryEntry instance with the raw value flag set to the specified value
      */
-    public void rawValue(boolean rawValue) {
+    public QueryEntry rawValue(boolean rawValue) {
         this.rawValue = rawValue;
+        return this;
     }
 
     /**
