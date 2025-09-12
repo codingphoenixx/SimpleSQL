@@ -70,6 +70,9 @@ public class QueryEntry {
      * in single quotes.
      */
     public static String parseSQLValue(Object value, boolean rawValue) {
+        if(value == null)
+            return "NULL";
+
         if (value != null && value instanceof Boolean bool) {
             if (bool)
                 return "'1'";
