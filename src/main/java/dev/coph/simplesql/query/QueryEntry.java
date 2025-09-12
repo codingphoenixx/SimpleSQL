@@ -80,7 +80,7 @@ public class QueryEntry {
             return number.toString();
 
         if (value != null && value instanceof Date date)
-            return DATE_TIME_CONVERTER.format(date);
+            return "'%s'".formatted(DATE_TIME_CONVERTER.format(date));
 
         if (rawValue)
             return value.toString();
