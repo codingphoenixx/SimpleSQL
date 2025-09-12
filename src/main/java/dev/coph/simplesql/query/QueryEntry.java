@@ -1,11 +1,17 @@
 package dev.coph.simplesql.query;
 
 
+import java.text.SimpleDateFormat;
+import java.util.Date;
+
 /**
  * Represents a query entry for a SQL operation, consisting of a column name and a value.
  * Provides functionality to parse the value into a SQL-friendly format.
  */
 public class QueryEntry {
+    private static SimpleDateFormat DATE_TIME_CONVERTER = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static SimpleDateFormat DATE_CONVERTER = new SimpleDateFormat("yyyy-MM-dd");
+
     /**
      * The name of the database column associated with this query entry.
      * Used to specify the target column for the provided value in SQL operations.
@@ -24,7 +30,7 @@ public class QueryEntry {
      * Constructs a QueryEntry with the specified column name and value.
      *
      * @param columName the name of the database column associated with this query entry
-     * @param value the value to be associated with the specified column in a SQL operation
+     * @param value     the value to be associated with the specified column in a SQL operation
      */
     public QueryEntry(String columName, Object value) {
         this.columName = columName;
@@ -55,27 +61,28 @@ public class QueryEntry {
      * The method handles different data types such as Boolean, Number, and others,
      * and converts them into appropriate formats for safe inclusion in SQL queries.
      *
-     * @param value the value to be parsed into a SQL-compatible string.
-     *              Supported types include Boolean, Number, and other generic objects.
+     * @param value    the value to be parsed into a SQL-compatible string.
+     *                 Supported types include Boolean, Number, and other generic objects.
      * @param rawValue if the value should be treated as a finished parsed value.
      * @return a SQL-safe string representation of the provided value. For Boolean values,
-     *         it returns '1' for true and '0' for false. For Number values, it returns
-     *         the number as a string. For other objects, it returns the string wrapped
-     *         in single quotes.
+     * it returns '1' for true and '0' for false. For Number values, it returns
+     * the number as a string. For other objects, it returns the string wrapped
+     * in single quotes.
      */
     public static String parseSQLValue(Object value, boolean rawValue) {
         if (value != null && value instanceof Boolean bool) {
-            if (bool) {
+            if (bool)
                 return "'1'";
-            } else {
+            else
                 return "'0'";
-            }
         }
-        if (value != null && value instanceof Number number) {
+        if (value != null && value instanceof Number number)
             return number.toString();
-        }
 
-        if(rawValue)
+        if (value != null && value instanceof Date date)
+            return DATE_TIME_CONVERTER.format(date);
+
+        if (rawValue)
             return value.toString();
 
         return "'%s'".formatted(value);
