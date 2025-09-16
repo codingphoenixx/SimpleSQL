@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'dev.coph'
-version = '2.6.4'
+version = '2.6.6'
 
 repositories {
     maven {
@@ -16,7 +16,7 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.zaxxer:HikariCP:6.3.0'
+    implementation 'com.zaxxer:HikariCP:6.3.3'
 
     implementation "org.xerial:sqlite-jdbc:3.50.3.0"
     implementation 'com.mysql:mysql-connector-j:9.4.0'
