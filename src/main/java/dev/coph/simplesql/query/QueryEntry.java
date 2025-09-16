@@ -93,7 +93,7 @@ public class QueryEntry {
             return "'%s'".formatted(DATE_TIME_CONVERTER.format(date));
 
         if(value != null && value instanceof OffsetDateTime odt)
-            return "'%s'".formatted(DATE_TIME_CONVERTER.format(odt.atZoneSameInstant(ZoneOffset.UTC).toLocalDate()));
+            return "'%s'".formatted(odt.atZoneSameInstant(ZoneOffset.UTC).toLocalDate().format(DateTimeFormatter.ofPattern(DATE_TIME_CONVERTER.toPattern())));
 
         if (rawValue)
             return value.toString();
