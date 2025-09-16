@@ -2,6 +2,10 @@ package dev.coph.simplesql.query;
 
 
 import java.text.SimpleDateFormat;
+import java.time.OffsetDateTime;
+import java.time.ZoneId;
+import java.time.ZoneOffset;
+import java.time.format.DateTimeFormatter;
 import java.util.Date;
 
 /**
@@ -82,8 +86,14 @@ public class QueryEntry {
         if (value != null && value instanceof Number number)
             return number.toString();
 
+        if(value != null && value instanceof Enum<?> enumValue)
+            return "'%s'".formatted(enumValue.name());
+
         if (value != null && value instanceof Date date)
             return "'%s'".formatted(DATE_TIME_CONVERTER.format(date));
+
+        if(value != null && value instanceof OffsetDateTime odt)
+            return "'%s'".formatted(DATE_TIME_CONVERTER.format(odt.atZoneSameInstant(ZoneOffset.UTC).toLocalDate()));
 
         if (rawValue)
             return value.toString();
