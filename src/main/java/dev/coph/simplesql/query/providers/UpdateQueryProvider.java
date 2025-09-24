@@ -1,15 +1,16 @@
 package dev.coph.simplesql.query.providers;
 
-import dev.coph.simplesql.adapter.DatabaseAdapter;
 import dev.coph.simplesql.database.attributes.Condition;
 import dev.coph.simplesql.database.attributes.Limit;
 import dev.coph.simplesql.database.attributes.Operator;
 import dev.coph.simplesql.database.attributes.UpdatePriority;
+import dev.coph.simplesql.driver.DriverCompatibility;
+import dev.coph.simplesql.driver.DriverType;
 import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.query.QueryEntry;
 import dev.coph.simplesql.query.QueryProvider;
+import dev.coph.simpleutilities.action.RunnableAction;
 import dev.coph.simpleutilities.check.Check;
-import lombok.experimental.Accessors;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -86,6 +87,7 @@ public class UpdateQueryProvider implements QueryProvider {
      * with an optional offset to specify a starting point.
      */
     private Limit limit;
+    private RunnableAction<Boolean> actionAfterQuery;
 
     /**
      * Sets the maximum number of rows to be affected by the update query using a LIMIT clause.
@@ -103,7 +105,6 @@ public class UpdateQueryProvider implements QueryProvider {
         return this;
     }
 
-
     /**
      * Sets the limit and offset for the update query, restricting the number of rows to be affected
      * and specifying the starting point for the operation.
@@ -120,7 +121,6 @@ public class UpdateQueryProvider implements QueryProvider {
         this.limit.offset(offset);
         return this;
     }
-
 
     /**
      * Adds a condition that must be satisfied for the update operation to apply.
@@ -186,6 +186,7 @@ public class UpdateQueryProvider implements QueryProvider {
         entries.add(new QueryEntry(column, value));
         return this;
     }
+
     /**
      * Adds a new entry to the update query. The entry specifies a column
      * and its corresponding value to be updated in the target table.
@@ -201,6 +202,10 @@ public class UpdateQueryProvider implements QueryProvider {
         return this;
     }
 
+    @Override
+    public DriverCompatibility compatibility() {
+        return driverType -> true;
+    }
 
     @Override
     public String generateSQLString(Query query) {
@@ -209,7 +214,7 @@ public class UpdateQueryProvider implements QueryProvider {
         StringBuilder sql = new StringBuilder("UPDATE");
 
         if (updatePriority == UpdatePriority.LOW) {
-            if (query.databaseAdapter().driverType() == DatabaseAdapter.DriverType.SQLITE) {
+            if (query.databaseAdapter().driverType() == DriverType.SQLITE) {
                 try {
                     throw new UnsupportedOperationException("SQLite does not support priorities when updating Databases. Ignoring attribute...");
                 } catch (Exception e) {
@@ -299,7 +304,7 @@ public class UpdateQueryProvider implements QueryProvider {
      * of unique constraints or key conflicts occur.
      *
      * @return A boolean value. Returns true if the update should ignore conflicts or duplicate key errors;
-     *         false otherwise.
+     * false otherwise.
      */
     public boolean updateIgnore() {
         return this.updateIgnore;
@@ -309,7 +314,7 @@ public class UpdateQueryProvider implements QueryProvider {
      * Retrieves a list of query entries representing the column-value pairs to be updated in the query.
      *
      * @return A list of {@link QueryEntry} objects, where each entry represents a column and its corresponding value
-     *         to be updated in the query.
+     * to be updated in the query.
      */
     public List<QueryEntry> entries() {
         return this.entries;
@@ -320,7 +325,7 @@ public class UpdateQueryProvider implements QueryProvider {
      * These conditions specify the rules that rows must satisfy to be included in the update operation.
      *
      * @return A Set of {@link Condition} objects representing the conditions for the update query.
-     *         If no conditions are specified, this returns an empty set.
+     * If no conditions are specified, this returns an empty set.
      */
     public Set<Condition> conditions() {
         return this.conditions;
@@ -331,7 +336,7 @@ public class UpdateQueryProvider implements QueryProvider {
      * of rows affected by the update query.
      *
      * @return The current {@link Limit} associated with the update query. If no limit has been set, it may return null or
-     *         a default {@link Limit}, depending on the implementation.
+     * a default {@link Limit}, depending on the implementation.
      */
     public Limit limit() {
         return this.limit;
@@ -369,10 +374,20 @@ public class UpdateQueryProvider implements QueryProvider {
      * @param updateIgnore A boolean value. Pass true to enable ignoring conflicts or
      *                     duplicate key errors; false to disable.
      * @return {@link UpdateQueryProvider} for chaining, enabling further modifications
-     *         to the update query.
+     * to the update query.
      */
     public UpdateQueryProvider updateIgnore(boolean updateIgnore) {
         this.updateIgnore = updateIgnore;
         return this;
+    }
+
+    public UpdateQueryProvider actionAfterQuery(RunnableAction<Boolean> actionAfterQuery) {
+        this.actionAfterQuery = actionAfterQuery;
+        return this;
+    }
+
+    @Override
+    public RunnableAction<Boolean> actionAfterQuery() {
+        return actionAfterQuery;
     }
 }

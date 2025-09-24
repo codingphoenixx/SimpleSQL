@@ -1,10 +1,11 @@
 package dev.coph.simplesql.query.providers;
 
-import dev.coph.simplesql.adapter.DatabaseAdapter;
+import dev.coph.simplesql.driver.DriverCompatibility;
+import dev.coph.simplesql.driver.DriverType;
 import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.query.QueryProvider;
+import dev.coph.simpleutilities.action.RunnableAction;
 import dev.coph.simpleutilities.check.Check;
-import lombok.experimental.Accessors;
 
 
 /**
@@ -14,23 +15,21 @@ import lombok.experimental.Accessors;
  * The {@code TRUNCATE TABLE} command quickly deletes all rows from a table, resets auto-increment values, and retains the table structure.
  * Not working with {@code DriverType.SQLITE}
  */
-public class TableTruncateQueryProvider implements QueryProvider {
+public class TruncateQueryProvider implements QueryProvider {
     /**
      * The name of the database table to be truncated.
      * This property is expected to be set before executing the SQL query generation.
      */
     private String table;
+    private RunnableAction<Boolean> actionAfterQuery;
+
+    @Override
+    public DriverCompatibility compatibility() {
+        return driverType -> driverType != DriverType.SQLITE;
+    }
 
     @Override
     public String generateSQLString(Query query) {
-        if (query.databaseAdapter() != null && query.databaseAdapter().driverType() == DatabaseAdapter.DriverType.SQLITE) {
-            try {
-                throw new UnsupportedOperationException("SQLite does not support truncate. Ignoring attribute...");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
         Check.ifNull(table, "table name");
         return "TRUNCATE TABLE %s;".formatted(table);
     }
@@ -48,10 +47,20 @@ public class TableTruncateQueryProvider implements QueryProvider {
      * Sets the name of the database table to be truncated.
      *
      * @param table the name of the table to be truncated
-     * @return the current instance of {@code TableTruncateQueryProvider} for method chaining
+     * @return the current instance of {@code TruncateQueryProvider} for method chaining
      */
-    public TableTruncateQueryProvider table(String table) {
+    public TruncateQueryProvider table(String table) {
         this.table = table;
         return this;
+    }
+
+    public TruncateQueryProvider actionAfterQuery(RunnableAction<Boolean> actionAfterQuery) {
+        this.actionAfterQuery = actionAfterQuery;
+        return this;
+    }
+
+    @Override
+    public RunnableAction<Boolean> actionAfterQuery() {
+        return actionAfterQuery;
     }
 }

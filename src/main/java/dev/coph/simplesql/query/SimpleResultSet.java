@@ -95,4 +95,8 @@ public class SimpleResultSet {
     public interface ResultSetConsumer {
         void accept(ResultSet resultSet) throws SQLException;
     }
+
+    public ResultSet resultSet() {
+        return resultSet;
+    }
 }

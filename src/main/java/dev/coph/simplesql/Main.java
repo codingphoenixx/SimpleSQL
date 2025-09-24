@@ -3,6 +3,7 @@ package dev.coph.simplesql;
 import dev.coph.simplelogger.Logger;
 import dev.coph.simplesql.adapter.DatabaseAdapter;
 import dev.coph.simplesql.database.attributes.SelectFunction;
+import dev.coph.simplesql.driver.DriverType;
 import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.query.providers.InsertQueryProvider;
 import dev.coph.simplesql.query.providers.SelectQueryProvider;
@@ -43,7 +44,7 @@ public class Main {
      * Initializes and starts a MariaDB database connection.
      * This method creates a {@code DatabaseAdapter} instance configured for MariaDB,
      * connects to the specified database, and executes a predefined query.
-     *
+     * <p>
      * The database connection is configured with the following parameters:
      * - Host: localhost
      * - Port: 3306
@@ -51,7 +52,7 @@ public class Main {
      * - User: root
      * - Password: (empty)
      * - Driver Type: MariaDB
-     *
+     * <p>
      * After establishing the connection, the method delegates query execution
      * to the {@code runQuery} method using the created {@code DatabaseAdapter} instance.
      */
@@ -62,7 +63,7 @@ public class Main {
                 .database("testing")
                 .user("root")
                 .password("")
-                .driverType(DatabaseAdapter.DriverType.MARIADB)
+                .driverType(DriverType.MARIADB)
                 .build();
         databaseAdapter.connect();
         runQuery(databaseAdapter);
@@ -70,16 +71,16 @@ public class Main {
 
     /**
      * Initializes and starts an SQLite database connection.
-     *
+     * <p>
      * This method checks for the existence of the SQLite database file (`test.db`).
      * If the file does not exist, it creates a new file. A {@code DatabaseAdapter} instance is then
      * configured to connect to this SQLite database, and the connection is established.
-     *
+     * <p>
      * Once the connection is successfully established, the method delegates query execution
      * to the {@code runQuery} method using the created {@code DatabaseAdapter} instance.
-     *
+     * <p>
      * Exceptions during file creation are caught and logged using {@code e.printStackTrace()}.
-     *
+     * <p>
      * Dependencies:
      * - {@code java.io.File}
      * - {@code java.io.IOException}
@@ -95,7 +96,7 @@ public class Main {
             }
         }
         DatabaseAdapter databaseAdapter = new DatabaseAdapter.Builder()
-                .driverType(DatabaseAdapter.DriverType.SQLITE)
+                .driverType(DriverType.SQLITE)
                 .sqliteFile(sqliteFile)
                 .build();
         databaseAdapter.connect();
@@ -126,16 +127,19 @@ public class Main {
         SELECT first_name, last_name, salary AS netto, salary * 1.3 AS brutto FROM employees
          */
 
-       // Database database = new Database(databaseAdapter, "test6");
+        // Database database = new Database(databaseAdapter, "test6");
+
 
         SelectQueryProvider selectQueryProvider = new SelectQueryProvider()
                 .table("test6")
                 .function(SelectFunction.MAX)
                 .columKey("number")
-                .actionAfterQuery(resultSet -> {
-                    parseResultSet(resultSet);
-                });
+                .resultActionAfterQuery(srs -> {
+                    parseResultSet(srs.resultSet());
+                })
+                .actionAfterQuery(success -> {
 
+                });
         Query query = new Query(databaseAdapter);
         System.out.println(selectQueryProvider.generateSQLString(query));
         query.executeQuery(selectQueryProvider);
@@ -194,18 +198,14 @@ public class Main {
     }
 }
 
-//TODO:
-//      Add indexes
-//      Add db-engine
-//      DELETE Where in
-//      JOIN
-//      Transaktionsmanagement (BEGIN TRANSACTION / START TRANSACTION | COMMIT | ROLLBACK)
-//      Add an trigger when an async job is done
-//      Iterator über resultsets
-//      Metadata -> Table/Column Name/Amount/DATATYPE
-//      FOREIGN KEY
-//      TRUNCATE TABLE
-//      SQL-Operators: WHERE, GROUP BY, HAVING, OFFSET, UNION/UNION ALL, LIKE, BETWEEN, IN
-//      User administration: CREATE USER, GRANT, REVOKE
-//      CREATE TRIGGER
-//      CREATE TEMPORARY TABLE
+//TODO:  Add indexes
+//TODO:  Add db-engine
+//TODO:  DELETE Where in
+//TODO:  JOIN
+//TODO:  Transaktionsmanagement (BEGIN TRANSACTION / START TRANSACTION | COMMIT | ROLLBACK)
+//TODO:  Metadata -> Table/Column Name/Amount/DATATYPE
+//TODO:  FOREIGN KEY
+//TODO:  SQL-Operators: WHERE, GROUP BY, HAVING, OFFSET, UNION/UNION ALL, LIKE, BETWEEN, IN
+//TODO:  User administration: CREATE USER, GRANT, REVOKE
+//TODO:  CREATE TRIGGER
+//TODO:  CREATE TEMPORARY TABLE

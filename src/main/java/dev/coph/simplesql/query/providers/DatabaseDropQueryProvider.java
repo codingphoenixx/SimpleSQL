@@ -1,11 +1,12 @@
 package dev.coph.simplesql.query.providers;
 
-import dev.coph.simplesql.adapter.DatabaseAdapter;
 import dev.coph.simplesql.database.attributes.DeleteMethode;
+import dev.coph.simplesql.driver.DriverCompatibility;
+import dev.coph.simplesql.driver.DriverType;
 import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.query.QueryProvider;
+import dev.coph.simpleutilities.action.RunnableAction;
 import dev.coph.simpleutilities.check.Check;
-import lombok.experimental.Accessors;
 
 /**
  * The DatabaseDropQueryProvider class is responsible for generating SQL strings for
@@ -42,20 +43,22 @@ public class DatabaseDropQueryProvider implements QueryProvider {
      */
     private DeleteMethode deleteMethode = DeleteMethode.DEFAULT;
 
+    private RunnableAction<Boolean> actionAfterQuery;
+
+    @Override
+    public DriverCompatibility compatibility() {
+        return driverType -> driverType != DriverType.SQLITE;
+    }
 
     @Override
     public String generateSQLString(Query query) {
-        if (query.databaseAdapter() != null && query.databaseAdapter().driverType() == DatabaseAdapter.DriverType.SQLITE) {
-            try {
-                throw new UnsupportedOperationException("SQLite does not support different Databases. Ignoring attribute...");
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-            return null;
-        }
-
         Check.ifNull(database, "database name");
         return "DROP DATABASE %s%s".formatted((deleteMethode == DeleteMethode.IF_EXISTS ? "IF EXISTS " : ""), database);
+    }
+
+    @Override
+    public RunnableAction<Boolean> actionAfterQuery() {
+        return actionAfterQuery;
     }
 
     /**
@@ -77,6 +80,12 @@ public class DatabaseDropQueryProvider implements QueryProvider {
      */
     public DeleteMethode deleteMethode() {
         return this.deleteMethode;
+    }
+
+
+    public DatabaseDropQueryProvider actionAfterQuery(RunnableAction<Boolean> actionAfterQuery) {
+        this.actionAfterQuery = actionAfterQuery;
+        return this;
     }
 
     /**

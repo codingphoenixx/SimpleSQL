@@ -91,12 +91,12 @@ public class Column {
                 if (query.databaseAdapter() == null) {
                     return null;
                 }
-                if (query.databaseAdapter().driverType().equals(DatabaseAdapter.DriverType.MYSQL) || query.databaseAdapter().driverType().equals(DatabaseAdapter.DriverType.MARIADB)) {
+                if (query.databaseAdapter().driverType().equals(DriverType.MYSQL) || query.databaseAdapter().driverType().equals(DriverType.MARIADB)) {
                     if (!dataType.equals(DataType.TINYTEXT) && !dataType.equals(DataType.INTEGER) && !dataType.equals(DataType.BIGINT)) {
                         System.out.println("ERROR: You cannot set an autoincrement to a non int value. Setting it to default primary key.");
                         columnType = ColumnType.PRIMARY_KEY;
                     }
-                } else if (query.databaseAdapter().driverType().equals(DatabaseAdapter.DriverType.SQLITE)) {
+                } else if (query.databaseAdapter().driverType().equals(DriverType.SQLITE)) {
                     if (!dataType.equals(DataType.INTEGER)) {
                         System.out.println("ERROR: You cannot set an autoincrement to a non integer. Setting it to default primary key.");
                         columnType = ColumnType.PRIMARY_KEY;

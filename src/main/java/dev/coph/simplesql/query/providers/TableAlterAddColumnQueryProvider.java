@@ -5,9 +5,10 @@ import dev.coph.simplesql.database.attributes.ColumnPosition;
 import dev.coph.simplesql.database.attributes.ColumnType;
 import dev.coph.simplesql.database.attributes.CreateMethode;
 import dev.coph.simplesql.database.attributes.DataType;
+import dev.coph.simplesql.driver.DriverCompatibility;
 import dev.coph.simplesql.query.Query;
+import dev.coph.simpleutilities.action.RunnableAction;
 import dev.coph.simpleutilities.check.Check;
-import lombok.experimental.Accessors;
 
 /**
  * A query provider class for generating SQL "ALTER TABLE" statements to add a new column to a table.
@@ -24,6 +25,7 @@ public class TableAlterAddColumnQueryProvider extends TableAlterQueryProvider {
      * If {@link ColumnPosition} is set to {@code  ColumnPosition.AFTER} the name of the column the new will be added after.
      */
     private String afterColumnName;
+    private RunnableAction<Boolean> actionAfterQuery;
 
 
     /**
@@ -42,6 +44,11 @@ public class TableAlterAddColumnQueryProvider extends TableAlterQueryProvider {
      * such as name, data type, and constraints.
      */
     private Column column;
+
+    @Override
+    public DriverCompatibility compatibility() {
+        return driverType -> true;
+    }
 
     @Override
     public String getAlterTableString(Query query) {
@@ -196,7 +203,7 @@ public class TableAlterAddColumnQueryProvider extends TableAlterQueryProvider {
      * Retrieves the position of the column within the table schema or query structure.
      *
      * @return the position of the column, represented as an instance of the ColumnPosition enum
-     *         (e.g., DEFAULT, FIRST, AFTER).
+     * (e.g., DEFAULT, FIRST, AFTER).
      */
     public ColumnPosition postion() {
         return this.postion;
@@ -215,7 +222,7 @@ public class TableAlterAddColumnQueryProvider extends TableAlterQueryProvider {
      * Retrieves the create method used for altering or creating the table schema.
      *
      * @return the current instance of {@code CreateMethode}, representing the strategy
-     *         for database structure creation (e.g., DEFAULT, IF_NOT_EXISTS).
+     * for database structure creation (e.g., DEFAULT, IF_NOT_EXISTS).
      */
     public CreateMethode createMethode() {
         return this.createMethode;
@@ -265,5 +272,15 @@ public class TableAlterAddColumnQueryProvider extends TableAlterQueryProvider {
     public TableAlterAddColumnQueryProvider createMethode(CreateMethode createMethode) {
         this.createMethode = createMethode;
         return this;
+    }
+
+    public TableAlterAddColumnQueryProvider actionAfterQuery(RunnableAction<Boolean> actionAfterQuery) {
+        this.actionAfterQuery = actionAfterQuery;
+        return this;
+    }
+
+    @Override
+    public RunnableAction<Boolean> actionAfterQuery() {
+        return actionAfterQuery;
     }
 }

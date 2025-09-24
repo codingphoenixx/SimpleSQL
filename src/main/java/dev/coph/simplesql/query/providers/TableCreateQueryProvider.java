@@ -4,10 +4,11 @@ import dev.coph.simplesql.database.Column;
 import dev.coph.simplesql.database.attributes.ColumnType;
 import dev.coph.simplesql.database.attributes.CreateMethode;
 import dev.coph.simplesql.database.attributes.DataType;
+import dev.coph.simplesql.driver.DriverCompatibility;
 import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.query.QueryProvider;
+import dev.coph.simpleutilities.action.RunnableAction;
 import dev.coph.simpleutilities.check.Check;
-import lombok.experimental.Accessors;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -25,20 +26,6 @@ import java.util.List;
 public class TableCreateQueryProvider implements QueryProvider {
 
     /**
-     * Represents the name of the table that is associated with a specific query operation.
-     */
-    private String table;
-
-    /**
-     * Represents the method used to create a database structure, such as a table.
-     * This variable is of type {@link CreateMethode}, an enumeration that defines
-     * the specific strategies for creating database structures, including options
-     * such as a default creation method or conditional creation if the structure
-     * does not already exist.
-     */
-    private CreateMethode createMethode = CreateMethode.DEFAULT;
-
-    /**
      * Represents the collection of columns to be included in the SQL table schema.
      * Each column in the list defines the structure, constraints, and attributes
      * of a specific piece of the database table.
@@ -52,7 +39,24 @@ public class TableCreateQueryProvider implements QueryProvider {
      * appear in the table schema definition.
      */
     private final List<Column> columns = new ArrayList<>();
+    /**
+     * Represents the name of the table that is associated with a specific query operation.
+     */
+    private String table;
+    /**
+     * Represents the method used to create a database structure, such as a table.
+     * This variable is of type {@link CreateMethode}, an enumeration that defines
+     * the specific strategies for creating database structures, including options
+     * such as a default creation method or conditional creation if the structure
+     * does not already exist.
+     */
+    private CreateMethode createMethode = CreateMethode.DEFAULT;
+    private RunnableAction<Boolean> actionAfterQuery;
 
+    @Override
+    public DriverCompatibility compatibility() {
+        return driverType -> true;
+    }
 
     @Override
     public String generateSQLString(Query query) {
@@ -74,11 +78,11 @@ public class TableCreateQueryProvider implements QueryProvider {
                 columnString.append(", ").append(column.toString(query));
             }
         }
+        Check.ifNull(columnString, "columnString");
         columnString.append(")");
         sql.append(columnString).append(";");
         return sql.toString();
     }
-
 
     /**
      * Adds a column to the list of columns to be included in the table creation query.
@@ -194,7 +198,6 @@ public class TableCreateQueryProvider implements QueryProvider {
         return this;
     }
 
-
     /**
      * Adds a column with the specified key, data type, and column type to the list of columns
      * to be included in the table creation query. If the list of columns has not been initialized,
@@ -261,5 +264,15 @@ public class TableCreateQueryProvider implements QueryProvider {
     public TableCreateQueryProvider createMethode(CreateMethode createMethode) {
         this.createMethode = createMethode;
         return this;
+    }
+
+    public TableCreateQueryProvider actionAfterQuery(RunnableAction<Boolean> actionAfterQuery) {
+        this.actionAfterQuery = actionAfterQuery;
+        return this;
+    }
+
+    @Override
+    public RunnableAction<Boolean> actionAfterQuery() {
+        return actionAfterQuery;
     }
 }

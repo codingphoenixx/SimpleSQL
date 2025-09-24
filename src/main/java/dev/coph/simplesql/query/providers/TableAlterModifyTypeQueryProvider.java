@@ -1,9 +1,10 @@
 package dev.coph.simplesql.query.providers;
 
 import dev.coph.simplesql.database.attributes.DataType;
+import dev.coph.simplesql.driver.DriverCompatibility;
 import dev.coph.simplesql.query.Query;
+import dev.coph.simpleutilities.action.RunnableAction;
 import dev.coph.simpleutilities.check.Check;
-import lombok.experimental.Accessors;
 
 /**
  * TableAlterModifyTypeQueryProvider is a specific implementation of the TableAlterQueryProvider
@@ -40,13 +41,19 @@ public class TableAlterModifyTypeQueryProvider extends TableAlterQueryProvider {
      * The name of the column with will be modified.
      */
     private String columnName;
+    private RunnableAction<Boolean> actionAfterQuery;
+
+    @Override
+    public DriverCompatibility compatibility() {
+        return driverType -> true;
+    }
 
     @Override
     public String getAlterTableString(Query query) {
         Check.ifNullOrEmptyMap(dataType, "dataType");
         Check.ifNullOrEmptyMap(columnName, "columnName");
 
-        return new StringBuilder("MODIFY COLUMN ").append(columnName).append(" ").append(dataType.toSQL(dataTypeParameter)).toString();
+        return "MODIFY COLUMN " + columnName + " " + dataType.toSQL(dataTypeParameter);
     }
 
     /**
@@ -109,5 +116,15 @@ public class TableAlterModifyTypeQueryProvider extends TableAlterQueryProvider {
     public TableAlterModifyTypeQueryProvider columnName(String columnName) {
         this.columnName = columnName;
         return this;
+    }
+
+    public TableAlterModifyTypeQueryProvider actionAfterQuery(RunnableAction<Boolean> actionAfterQuery) {
+        this.actionAfterQuery = actionAfterQuery;
+        return this;
+    }
+
+    @Override
+    public RunnableAction<Boolean> actionAfterQuery() {
+        return actionAfterQuery;
     }
 }

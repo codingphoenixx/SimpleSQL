@@ -46,11 +46,11 @@ public enum ColumnType {
         if(query.databaseAdapter() == null)
             return this.name().replaceAll("_", " ");
 
-        if(query.databaseAdapter().driverType().equals(DatabaseAdapter.DriverType.MYSQL) || query.databaseAdapter().driverType().equals(DatabaseAdapter.DriverType.MARIADB)){
+        if(query.databaseAdapter().driverType().equals(DriverType.MYSQL) || query.databaseAdapter().driverType().equals(DriverType.MARIADB)){
             if(this == PRIMARY_KEY_AUTOINCREMENT){
                 return "PRIMARY KEY AUTO_INCREMENT";
             }
-        }else if(query.databaseAdapter().driverType().equals(DatabaseAdapter.DriverType.SQLITE)){
+        }else if(query.databaseAdapter().driverType().equals(DriverType.SQLITE)){
             if(this == PRIMARY_KEY_AUTOINCREMENT){
                 return "PRIMARY KEY AUTOINCREMENT";
             }

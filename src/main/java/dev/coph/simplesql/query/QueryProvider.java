@@ -1,5 +1,8 @@
 package dev.coph.simplesql.query;
 
+import dev.coph.simplesql.driver.DriverCompatibility;
+import dev.coph.simpleutilities.action.RunnableAction;
+
 /**
  * Represents a provider for generating SQL query strings. Classes implementing
  * this interface should define how to construct and provide specific types of
@@ -7,6 +10,7 @@ package dev.coph.simplesql.query;
  */
 public interface QueryProvider {
 
+    DriverCompatibility compatibility();
     /**
      * Constructs and returns a SQL query string based on the provided Query object.
      * This method is responsible for converting the query's parameters,
@@ -17,4 +21,6 @@ public interface QueryProvider {
      */
     String generateSQLString(Query query);
 
+
+    RunnableAction<Boolean> actionAfterQuery();
 }

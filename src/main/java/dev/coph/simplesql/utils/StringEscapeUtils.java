@@ -16,6 +16,7 @@ public class StringEscapeUtils {
      * @return the SQL-escaped string, or null if the input string is null
      */
     public static String escapeSql(String str) {
+        //TODO: FIX THAT F***ING MESS HERE. CHANGE TO PREPARED STATEMENTS
         if (str == null) {
             return null;
         }

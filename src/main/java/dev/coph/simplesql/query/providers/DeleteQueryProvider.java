@@ -4,10 +4,11 @@ import dev.coph.simplesql.database.attributes.Condition;
 import dev.coph.simplesql.database.attributes.Limit;
 import dev.coph.simplesql.database.attributes.Operator;
 import dev.coph.simplesql.database.attributes.Order;
+import dev.coph.simplesql.driver.DriverCompatibility;
 import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.query.QueryProvider;
+import dev.coph.simpleutilities.action.RunnableAction;
 import dev.coph.simpleutilities.check.Check;
-import lombok.experimental.Accessors;
 
 import java.util.HashSet;
 import java.util.Set;
@@ -40,6 +41,12 @@ public class DeleteQueryProvider implements QueryProvider {
      */
     private Limit limit;
 
+    private RunnableAction<Boolean> actionAfterQuery;
+
+    @Override
+    public DriverCompatibility compatibility() {
+        return driverType -> true;
+    }
 
     @Override
     public String generateSQLString(Query query) {
@@ -59,6 +66,11 @@ public class DeleteQueryProvider implements QueryProvider {
         sql.append(";");
 
         return sql.toString();
+    }
+
+    @Override
+    public RunnableAction<Boolean> actionAfterQuery() {
+        return actionAfterQuery;
     }
 
 
@@ -83,6 +95,11 @@ public class DeleteQueryProvider implements QueryProvider {
         return parsedCondition.toString();
     }
 
+
+    public DeleteQueryProvider actionAfterQuery(RunnableAction<Boolean> actionAfterQuery) {
+        this.actionAfterQuery = actionAfterQuery;
+        return this;
+    }
 
     /**
      * Sets the limit of rows that should be selected by this request.

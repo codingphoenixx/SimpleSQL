@@ -5,7 +5,6 @@ import dev.coph.simplesql.adapter.DatabaseAdapter;
 import dev.coph.simplesql.exception.RequestNotExecutableException;
 import dev.coph.simplesql.query.providers.*;
 import dev.coph.simpleutilities.check.Check;
-import lombok.experimental.Accessors;
 
 import java.sql.Connection;
 import java.sql.ResultSet;
@@ -18,11 +17,11 @@ import java.util.concurrent.CompletableFuture;
  * The {@code Query} class provides a robust framework for constructing, managing, and executing
  * database operations. It includes methods for handling various SQL-based queries with support
  * for method chaining and configurable execution modes (synchronous or asynchronous).
- *
+ * <p>
  * This class interacts with a database adapter, allowing seamless communication with the underlying
  * database. The {@code Query} class simplifies the management of SQL operations by providing mechanisms
  * for executing queries directly, creating different query types, and managing execution results.<br>
- *<br><br>
+ * <br><br>
  * Fields:<br>
  * - {@code databaseAdapter}: The adapter responsible for handling interactions with the underlying database.<br>
  * - {@code async}: A flag indicating whether query execution is performed asynchronously.<br>
@@ -187,7 +186,10 @@ public class Query {
 
         try (Connection connection = databaseAdapter.dataSource().getConnection()) {
             if (queries.size() == 1) {
-                String generateSQLString = queries.get(0).generateSQLString(this);
+                QueryProvider queryProvider = queries.get(0);
+                if (!queryProvider.compatibility().isCompatible(databaseAdapter.driverType())) {
+                    throw new UnsupportedOperationException("The current request is not supported by the database driver. Failing request. Please check the documentation for supported database operations and try again with a compatible request.");                }
+                String generateSQLString = queryProvider.generateSQLString(this);
                 if (generateSQLString == null) {
                     System.out.println("Generated SQL-String is null. Canceling request.");
                     return;
@@ -195,14 +197,14 @@ public class Query {
                 var statement = connection.prepareStatement(generateSQLString);
                 Logger.getInstance().log(Logger.LogLevel.DEBUG, "Executing query: " + generateSQLString);
                 try {
-                    if (queries.get(0) instanceof SelectQueryProvider selectRequest) {
+                    if (queryProvider instanceof SelectQueryProvider selectRequest) {
                         ResultSet resultSet = statement.executeQuery();
                         selectRequest.resultSet(resultSet);
-                        if (selectRequest.actionAfterQuery() != null) {
-                            selectRequest.actionAfterQuery().run(resultSet);
-                        }
                         succeeded = true;
-                    } else if (queries.get(0) instanceof UpdateQueryProvider) {
+                        if (selectRequest.resultActionAfterQuery() != null) {
+                            selectRequest.resultActionAfterQuery().run(new SimpleResultSet(resultSet));
+                        }
+                    } else if (queryProvider instanceof UpdateQueryProvider) {
                         statement.executeUpdate();
                         succeeded = true;
                     } else {
@@ -213,10 +215,17 @@ public class Query {
                     e.printStackTrace();
                     succeeded = false;
                 }
+                for (QueryProvider query : queries) {
+                    if (query.actionAfterQuery() != null)
+                        query.actionAfterQuery().run(succeeded);
+                }
             } else {
                 var statement = connection.createStatement();
                 for (QueryProvider queryProvider : queries) {
                     try {
+                        if (!queryProvider.compatibility().isCompatible(databaseAdapter.driverType())) {
+                            throw new UnsupportedOperationException("The current request is not supported by the database driver. Failing request. Please check the documentation for supported database operations and try again with a compatible request.");
+                        }
                         String generateSQLString = queryProvider.generateSQLString(this);
                         if (generateSQLString == null) {
                             System.out.println("Generated SQL-String is null. Ignoring request.");
@@ -444,17 +453,17 @@ public class Query {
 
 
     /**
-     * Creates and returns a new instance of {@link TableTruncateQueryProvider}.
+     * Creates and returns a new instance of {@link TruncateQueryProvider}.
      * <p>
      * This method is used to initiate a TRUNCATE TABLE SQL query by providing
-     * a {@link TableTruncateQueryProvider} object, which can be further configured
+     * a {@link TruncateQueryProvider} object, which can be further configured
      * to specify the table to be truncated.
      *
-     * @return A new {@link TableTruncateQueryProvider} instance for constructing
+     * @return A new {@link TruncateQueryProvider} instance for constructing
      * TRUNCATE TABLE SQL queries.
      */
-    public static TableTruncateQueryProvider tableTruncate() {
-        return new TableTruncateQueryProvider();
+    public static TruncateQueryProvider truncate() {
+        return new TruncateQueryProvider();
     }
 
     /**

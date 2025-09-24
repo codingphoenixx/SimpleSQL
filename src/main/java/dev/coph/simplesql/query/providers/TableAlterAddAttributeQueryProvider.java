@@ -1,11 +1,10 @@
 package dev.coph.simplesql.query.providers;
 
 
+import dev.coph.simplesql.driver.DriverCompatibility;
 import dev.coph.simplesql.query.Query;
+import dev.coph.simpleutilities.action.RunnableAction;
 import dev.coph.simpleutilities.check.Check;
-import lombok.Getter;
-import lombok.Setter;
-import lombok.experimental.Accessors;
 
 /**
  * A class that generates SQL "ALTER TABLE" queries for adding attributes to
@@ -24,13 +23,18 @@ public class TableAlterAddAttributeQueryProvider extends TableAlterQueryProvider
      * The Type of the new column.
      */
     private AttributeType attributeType;
+    private RunnableAction<Boolean> actionAfterQuery;
 
+    @Override
+    public DriverCompatibility compatibility() {
+        return driverType -> true;
+    }
 
     @Override
     public String getAlterTableString(Query query) {
         Check.ifNullOrEmptyMap(columnName, "columnName");
         Check.ifNullOrEmptyMap(attributeType, "attributeType");
-        return new StringBuilder("ADD ").append(attributeType.name().replaceAll("_", " ")).append(" (").append(columnName).append(")").toString();
+        return "ADD " + attributeType.name().replaceAll("_", " ") + " (" + columnName + ")";
     }
 
     /**
@@ -62,6 +66,11 @@ public class TableAlterAddAttributeQueryProvider extends TableAlterQueryProvider
         return this;
     }
 
+    public TableAlterAddAttributeQueryProvider actionAfterQuery(RunnableAction<Boolean> actionAfterQuery) {
+        this.actionAfterQuery = actionAfterQuery;
+        return this;
+    }
+
     /**
      * Sets the type of the attribute to be added to the column.
      *
@@ -71,6 +80,11 @@ public class TableAlterAddAttributeQueryProvider extends TableAlterQueryProvider
     public TableAlterAddAttributeQueryProvider attributeType(AttributeType attributeType) {
         this.attributeType = attributeType;
         return this;
+    }
+
+    @Override
+    public RunnableAction<Boolean> actionAfterQuery() {
+        return actionAfterQuery;
     }
 
     /**

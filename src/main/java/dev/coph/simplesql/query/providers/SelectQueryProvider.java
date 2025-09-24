@@ -1,12 +1,12 @@
 package dev.coph.simplesql.query.providers;
 
 import dev.coph.simplesql.database.attributes.*;
+import dev.coph.simplesql.driver.DriverCompatibility;
 import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.query.QueryProvider;
 import dev.coph.simplesql.query.SimpleResultSet;
 import dev.coph.simpleutilities.action.RunnableAction;
 import dev.coph.simpleutilities.check.Check;
-import lombok.experimental.Accessors;
 
 import java.sql.ResultSet;
 import java.util.ArrayList;
@@ -82,7 +82,8 @@ public class SelectQueryProvider implements QueryProvider {
      * This can be used to perform additional processing or cleanup once the query
      * has been executed.
      */
-    private RunnableAction<ResultSet> actionAfterQuery;
+    private RunnableAction<SimpleResultSet> resultActionAfterQuery;
+    private RunnableAction<Boolean> actionAfterQuery;
 
     /**
      * Represents the grouping configuration for the SQL query.
@@ -98,6 +99,11 @@ public class SelectQueryProvider implements QueryProvider {
      * The ResultSet will be stored here after the request is executed.
      */
     private ResultSet resultSet;
+
+    @Override
+    public DriverCompatibility compatibility() {
+        return driverType -> true;
+    }
 
     @Override
     public String generateSQLString(Query query) {
@@ -132,13 +138,23 @@ public class SelectQueryProvider implements QueryProvider {
             sql.append(limit);
 
         if (order != null && offset != null)
-            sql.append(offset.toString());
+            sql.append(offset);
 
         sql.append(";");
 
         return sql.toString();
     }
 
+
+    @Override
+    public RunnableAction<Boolean> actionAfterQuery() {
+        return actionAfterQuery;
+    }
+
+    public SelectQueryProvider actionAfterQuery(RunnableAction<Boolean> actionAfterQuery) {
+        this.actionAfterQuery = actionAfterQuery;
+        return this;
+    }
 
     /**
      * Sets the limit of rows that should be selected by this request.
@@ -338,7 +354,7 @@ public class SelectQueryProvider implements QueryProvider {
      * Retrieves the current {@link SelectType} associated with the query.
      *
      * @return the {@link SelectType} indicating whether the query is set to return
-     *         all matching rows (NORMAL) or only unique rows (DISTINCT).
+     * all matching rows (NORMAL) or only unique rows (DISTINCT).
      */
     public SelectType selectType() {
         return this.selectType;
@@ -358,7 +374,7 @@ public class SelectQueryProvider implements QueryProvider {
      * Retrieves the set of conditions currently applied to this query.
      *
      * @return a {@link Set} of {@link Condition} instances representing the conditions
-     *         used to filter results in the query.
+     * used to filter results in the query.
      */
     public Set<Condition> conditions() {
         return this.conditions;
@@ -379,7 +395,7 @@ public class SelectQueryProvider implements QueryProvider {
      * maximum number of rows returned and specifying an optional offset.
      *
      * @return the {@link Limit} instance that defines the row limit and offset values
-     *         for the query.
+     * for the query.
      */
     public Limit limit() {
         return this.limit;
@@ -404,10 +420,10 @@ public class SelectQueryProvider implements QueryProvider {
      * returned by the query.
      *
      * @return the {@link RunnableAction} instance configured to execute after the query,
-     *         providing access to the resulting {@link ResultSet}.
+     * providing access to the resulting {@link ResultSet}.
      */
-    public RunnableAction<ResultSet> actionAfterQuery() {
-        return this.actionAfterQuery;
+    public RunnableAction<SimpleResultSet> resultActionAfterQuery() {
+        return this.resultActionAfterQuery;
     }
 
     /**
@@ -433,7 +449,7 @@ public class SelectQueryProvider implements QueryProvider {
     }
 
     public SimpleResultSet simpleResultSet() {
-        if(resultSet == null)
+        if (resultSet == null)
             throw new NullPointerException("ResultSet is null");
         return new SimpleResultSet(resultSet());
     }
@@ -502,12 +518,12 @@ public class SelectQueryProvider implements QueryProvider {
      * Sets the action to be executed after the query is completed. This action is typically
      * used for processing the {@link ResultSet} returned by the query execution.
      *
-     * @param actionAfterQuery the {@link RunnableAction} instance to execute after the query,
-     *                         providing access to the resulting {@link ResultSet}.
+     * @param resultActionAfterQuery the {@link RunnableAction} instance to execute after the query,
+     *                               providing access to the resulting {@link ResultSet}.
      * @return {@link SelectQueryProvider} for chaining, allowing further query configuration.
      */
-    public SelectQueryProvider actionAfterQuery(RunnableAction<ResultSet> actionAfterQuery) {
-        this.actionAfterQuery = actionAfterQuery;
+    public SelectQueryProvider resultActionAfterQuery(RunnableAction<SimpleResultSet> resultActionAfterQuery) {
+        this.resultActionAfterQuery = resultActionAfterQuery;
         return this;
     }
 

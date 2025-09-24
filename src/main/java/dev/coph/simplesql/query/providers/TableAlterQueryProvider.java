@@ -3,7 +3,6 @@ package dev.coph.simplesql.query.providers;
 import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.query.QueryProvider;
 import dev.coph.simpleutilities.check.Check;
-import lombok.experimental.Accessors;
 
 /**
  * Abstract class representing a provider for generating SQL "ALTER TABLE" queries.
@@ -17,7 +16,7 @@ public abstract class TableAlterQueryProvider implements QueryProvider {
      * This variable is shared across the class and its subclasses, providing the base
      * target for SQL table alteration operations, such as adding columns, renaming tables,
      * or modifying attributes.
-     *
+     * <p>
      * Subclasses must set this variable before generating the SQL string to ensure that
      * the correct table is targeted during the execution of the query.
      */

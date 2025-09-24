@@ -1,8 +1,9 @@
 package dev.coph.simplesql.query.providers;
 
+import dev.coph.simplesql.driver.DriverCompatibility;
 import dev.coph.simplesql.query.Query;
+import dev.coph.simpleutilities.action.RunnableAction;
 import dev.coph.simpleutilities.check.Check;
-import lombok.experimental.Accessors;
 
 /**
  * Provides functionality to generate SQL "ALTER TABLE" queries for dropping columns, indexes, or primary keys
@@ -13,42 +14,6 @@ import lombok.experimental.Accessors;
  * be provided.
  */
 public class TableAlterDropColumnQueryProvider extends TableAlterQueryProvider {
-
-    /**
-     * Represents the type of drop operation to be performed in an "ALTER TABLE" SQL query.
-     * The value of this variable determines whether the operation involves dropping a column,
-     * an index, or a primary key. It is used to construct the appropriate SQL statement based
-     * on the specified action.
-     *
-     * Valid values for this variable are:
-     * - {@link #COLUMN_DROP_TYPE} (1): Indicates the action will drop a column.
-     * - {@link #INDEX_DROP_TYPE} (2): Indicates the action will drop an index.
-     * - {@link #PRIMARY_KEY_DROP_TYPE} (3): Indicates the action will drop the primary key.
-     *
-     * The variable must be set to one of the predefined valid constants before query execution.
-     * If it is not set or holds an invalid value, the query construction may fail or throw
-     * an appropriate exception.
-     *
-     * Default value is {@link Integer#MIN_VALUE}, which signifies that no drop type
-     * has been specified.
-     */
-    private int dropType = Integer.MIN_VALUE;
-
-    /**
-     * Represents the name of the database object (e.g., column or index) to be dropped during
-     * the execution of an "ALTER TABLE" SQL query. The value of this variable is expected
-     * to be set when the operation involves dropping a column or index, as determined
-     * by the configured drop type.
-     *
-     * This variable works alongside {@code dropType} to determine the context of the drop
-     * operation, specifying the exact object to be removed when the drop type is either
-     * {@link #COLUMN_DROP_TYPE} or {@link #INDEX_DROP_TYPE}.
-     *
-     * It must be provided and not left empty or null for valid execution of the SQL query
-     * in such cases.
-     */
-    private String dropObjectName;
-
 
     /**
      * Action will drop the named column.
@@ -62,6 +27,45 @@ public class TableAlterDropColumnQueryProvider extends TableAlterQueryProvider {
      * Action will drop the primary key attribute and its provided features.
      */
     public static final int PRIMARY_KEY_DROP_TYPE = 3;
+    /**
+     * Represents the type of drop operation to be performed in an "ALTER TABLE" SQL query.
+     * The value of this variable determines whether the operation involves dropping a column,
+     * an index, or a primary key. It is used to construct the appropriate SQL statement based
+     * on the specified action.
+     * <p>
+     * Valid values for this variable are:
+     * - {@link #COLUMN_DROP_TYPE} (1): Indicates the action will drop a column.
+     * - {@link #INDEX_DROP_TYPE} (2): Indicates the action will drop an index.
+     * - {@link #PRIMARY_KEY_DROP_TYPE} (3): Indicates the action will drop the primary key.
+     * <p>
+     * The variable must be set to one of the predefined valid constants before query execution.
+     * If it is not set or holds an invalid value, the query construction may fail or throw
+     * an appropriate exception.
+     * <p>
+     * Default value is {@link Integer#MIN_VALUE}, which signifies that no drop type
+     * has been specified.
+     */
+    private int dropType = Integer.MIN_VALUE;
+    /**
+     * Represents the name of the database object (e.g., column or index) to be dropped during
+     * the execution of an "ALTER TABLE" SQL query. The value of this variable is expected
+     * to be set when the operation involves dropping a column or index, as determined
+     * by the configured drop type.
+     * <p>
+     * This variable works alongside {@code dropType} to determine the context of the drop
+     * operation, specifying the exact object to be removed when the drop type is either
+     * {@link #COLUMN_DROP_TYPE} or {@link #INDEX_DROP_TYPE}.
+     * <p>
+     * It must be provided and not left empty or null for valid execution of the SQL query
+     * in such cases.
+     */
+    private String dropObjectName;
+    private RunnableAction<Boolean> actionAfterQuery;
+
+    @Override
+    public DriverCompatibility compatibility() {
+        return driverType -> true;
+    }
 
     @Override
     public String getAlterTableString(Query query) {
@@ -73,7 +77,7 @@ public class TableAlterDropColumnQueryProvider extends TableAlterQueryProvider {
         if (dropType != 1 && dropType != 2) {
             throw new IllegalArgumentException("Drop type not found.");
         }
-        return new StringBuilder("DROP ").append((dropType == COLUMN_DROP_TYPE ? "COLUMN " : "INDEX ")).append(dropObjectName).toString();
+        return "DROP " + (dropType == COLUMN_DROP_TYPE ? "COLUMN " : "INDEX ") + dropObjectName;
     }
 
     /**
@@ -118,5 +122,15 @@ public class TableAlterDropColumnQueryProvider extends TableAlterQueryProvider {
     public TableAlterDropColumnQueryProvider dropObjectName(String dropObjectName) {
         this.dropObjectName = dropObjectName;
         return this;
+    }
+
+    public TableAlterDropColumnQueryProvider actionAfterQuery(RunnableAction<Boolean> actionAfterQuery) {
+        this.actionAfterQuery = actionAfterQuery;
+        return this;
+    }
+
+    @Override
+    public RunnableAction<Boolean> actionAfterQuery() {
+        return actionAfterQuery;
     }
 }

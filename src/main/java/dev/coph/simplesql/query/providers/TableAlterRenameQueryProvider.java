@@ -1,8 +1,9 @@
 package dev.coph.simplesql.query.providers;
 
+import dev.coph.simplesql.driver.DriverCompatibility;
 import dev.coph.simplesql.query.Query;
+import dev.coph.simpleutilities.action.RunnableAction;
 import dev.coph.simpleutilities.check.Check;
-import lombok.experimental.Accessors;
 
 
 /**
@@ -15,12 +16,17 @@ public class TableAlterRenameQueryProvider extends TableAlterQueryProvider {
      * The new name for the table
      */
     private String newTableName;
+    private RunnableAction<Boolean> actionAfterQuery;
 
+    @Override
+    public DriverCompatibility compatibility() {
+        return driverType -> true;
+    }
 
     @Override
     public String getAlterTableString(Query query) {
         Check.ifNullOrEmptyMap(newTableName, "newTableName");
-        return new StringBuilder("RENAME TO ").append(newTableName).toString();
+        return "RENAME TO " + newTableName;
     }
 
     /**
@@ -42,5 +48,15 @@ public class TableAlterRenameQueryProvider extends TableAlterQueryProvider {
     public TableAlterRenameQueryProvider newTableName(String newTableName) {
         this.newTableName = newTableName;
         return this;
+    }
+
+    public TableAlterRenameQueryProvider actionAfterQuery(RunnableAction<Boolean> actionAfterQuery) {
+        this.actionAfterQuery = actionAfterQuery;
+        return this;
+    }
+
+    @Override
+    public RunnableAction<Boolean> actionAfterQuery() {
+        return actionAfterQuery;
     }
 }

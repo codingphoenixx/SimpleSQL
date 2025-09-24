@@ -1,9 +1,10 @@
 package dev.coph.simplesql.query.providers;
 
 import dev.coph.simplesql.database.attributes.ActionType;
+import dev.coph.simplesql.driver.DriverCompatibility;
 import dev.coph.simplesql.query.Query;
+import dev.coph.simpleutilities.action.RunnableAction;
 import dev.coph.simpleutilities.check.Check;
-import lombok.experimental.Accessors;
 
 /**
  * Provides functionality for generating SQL queries to alter a column's default value
@@ -48,7 +49,12 @@ public class TableAlterColumnDefaultValueQueryProvider extends TableAlterQueryPr
      * objects, depending on the database column's allowed default value type.
      */
     private Object defaultValue;
+    private RunnableAction<Boolean> actionAfterQuery;
 
+    @Override
+    public DriverCompatibility compatibility() {
+        return driverType -> true;
+    }
 
     @Override
     public String getAlterTableString(Query query) {
@@ -57,9 +63,9 @@ public class TableAlterColumnDefaultValueQueryProvider extends TableAlterQueryPr
 
         if (action == ActionType.ADD) {
             Check.ifNullOrEmptyMap(defaultValue, "defaultValue");
-            return new StringBuilder("ALTER COLUMN ").append(columnName).append(" SET DEFAULT '").append(defaultValue).append("'").toString();
+            return "ALTER COLUMN " + columnName + " SET DEFAULT '" + defaultValue + "'";
         } else if (action == ActionType.DROP) {
-            return new StringBuilder("ALTER COLUMN ").append(columnName).append(" DROP DEFAULT '").toString();
+            return "ALTER COLUMN " + columnName + " DROP DEFAULT '";
         }
         throw new UnsupportedOperationException("Action not found.");
     }
@@ -125,5 +131,15 @@ public class TableAlterColumnDefaultValueQueryProvider extends TableAlterQueryPr
     public TableAlterColumnDefaultValueQueryProvider defaultValue(Object defaultValue) {
         this.defaultValue = defaultValue;
         return this;
+    }
+
+    public TableAlterColumnDefaultValueQueryProvider actionAfterQuery(RunnableAction<Boolean> actionAfterQuery) {
+        this.actionAfterQuery = actionAfterQuery;
+        return this;
+    }
+
+    @Override
+    public RunnableAction<Boolean> actionAfterQuery() {
+        return actionAfterQuery;
     }
 }

@@ -1,12 +1,13 @@
 package dev.coph.simplesql.query.providers;
 
-import dev.coph.simplesql.adapter.DatabaseAdapter;
 import dev.coph.simplesql.database.attributes.InsertMethode;
+import dev.coph.simplesql.driver.DriverCompatibility;
+import dev.coph.simplesql.driver.DriverType;
 import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.query.QueryEntry;
 import dev.coph.simplesql.query.QueryProvider;
+import dev.coph.simpleutilities.action.RunnableAction;
 import dev.coph.simpleutilities.check.Check;
-import lombok.experimental.Accessors;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -32,6 +33,12 @@ public class InsertQueryProvider implements QueryProvider {
      */
     private List<QueryEntry> entries;
 
+    private RunnableAction<Boolean> actionAfterQuery;
+    /**
+     * Method which will be used for inserting the value.
+     */
+    private InsertMethode insertMethode = InsertMethode.INSERT;
+
     /**
      * Adds an entry which will be written to the Database.
      *
@@ -47,6 +54,15 @@ public class InsertQueryProvider implements QueryProvider {
         return this;
     }
 
+    public InsertQueryProvider actionAfterQuery(RunnableAction<Boolean> actionAfterQuery) {
+        this.actionAfterQuery = actionAfterQuery;
+        return this;
+    }
+
+    @Override
+    public DriverCompatibility compatibility() {
+        return driverType -> true;
+    }
 
     @Override
     public String generateSQLString(Query query) {
@@ -59,9 +75,9 @@ public class InsertQueryProvider implements QueryProvider {
             if (query.databaseAdapter() == null) {
                 return null;
             }
-            if (query.databaseAdapter().driverType().equals(DatabaseAdapter.DriverType.MYSQL) || query.databaseAdapter().driverType().equals(DatabaseAdapter.DriverType.MARIADB)) {
+            if (query.databaseAdapter().driverType().equals(DriverType.MYSQL) || query.databaseAdapter().driverType().equals(DriverType.MARIADB)) {
                 sql.append("IGNORE ");
-            } else if (query.databaseAdapter().driverType().equals(DatabaseAdapter.DriverType.SQLITE)) {
+            } else if (query.databaseAdapter().driverType().equals(DriverType.SQLITE)) {
                 sql.append("OR IGNORE ");
             }
         }
@@ -93,6 +109,11 @@ public class InsertQueryProvider implements QueryProvider {
         return sql.toString();
     }
 
+    @Override
+    public RunnableAction<Boolean> actionAfterQuery() {
+        return actionAfterQuery;
+    }
+
     /**
      * Generates the sql string for insert with duplicated key for executing
      *
@@ -111,12 +132,6 @@ public class InsertQueryProvider implements QueryProvider {
         }
         return sql.append(insertString);
     }
-
-
-    /**
-     * Method which will be used for inserting the value.
-     */
-    private InsertMethode insertMethode = InsertMethode.INSERT;
 
     /**
      * Retrieves the name of the table associated with the query provider.

@@ -62,7 +62,7 @@ public class Main {
     public static void main(String[] args) {
        //Create DatabaseAdapter and connect
        DatabaseAdapter databaseAdapter = new DatabaseAdapter.Builder()
-                .driverType(DatabaseAdapter.DriverType.MARIADB)
+                .driverType(DriverType.MARIADB)
                 .host(HOST)
                 .port(PORT)
                 .database(DATABASE)
@@ -87,12 +87,4 @@ public class Main {
 
 ## Dokumentation
 
-Aktuell existiert keine öffentliche Dokumentation. Dies kommt in Zukunft dazu. 
-
-## Kontakt
-
-Für Fragen oder Anregungen kontaktieren Sie uns bitte unter: [codingphoenix@atirion.de](mailto:codingphoenix@atirion.de).
-
-### Coming Soon
-    TODO: Add an trigger when an async job is done
-    TODO: Add the ability to join tables
+Aktuell existiert keine öffentliche Dokumentation. Dies kommt in Zukunft dazu.
