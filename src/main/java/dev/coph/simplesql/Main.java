@@ -197,6 +197,7 @@ public class Main {
         }
     }
 }
+//TODO: FIX THAT F***ING MESS HERE (escaping, etc). CHANGE TO PREPARED STATEMENTS
 
 //TODO:  Add indexes
 //TODO:  Add db-engine
