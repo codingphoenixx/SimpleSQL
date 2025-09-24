@@ -3,6 +3,7 @@ package dev.coph.simplesql.query.providers;
 import dev.coph.simplesql.database.attributes.*;
 import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.query.QueryProvider;
+import dev.coph.simplesql.query.SimpleResultSet;
 import dev.coph.simpleutilities.action.RunnableAction;
 import dev.coph.simpleutilities.check.Check;
 import lombok.experimental.Accessors;
@@ -429,6 +430,12 @@ public class SelectQueryProvider implements QueryProvider {
      */
     public ResultSet resultSet() {
         return this.resultSet;
+    }
+
+    public SimpleResultSet simpleResultSet() {
+        if(resultSet == null)
+            throw new NullPointerException("ResultSet is null");
+        return new SimpleResultSet(resultSet());
     }
 
     /**

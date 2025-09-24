@@ -194,4 +194,18 @@ public class Main {
     }
 }
 
-
+//TODO:
+//      Add indexes
+//      Add db-engine
+//      DELETE Where in
+//      JOIN
+//      Transaktionsmanagement (BEGIN TRANSACTION / START TRANSACTION | COMMIT | ROLLBACK)
+//      Add an trigger when an async job is done
+//      Iterator über resultsets
+//      Metadata -> Table/Column Name/Amount/DATATYPE
+//      FOREIGN KEY
+//      TRUNCATE TABLE
+//      SQL-Operators: WHERE, GROUP BY, HAVING, OFFSET, UNION/UNION ALL, LIKE, BETWEEN, IN
+//      User administration: CREATE USER, GRANT, REVOKE
+//      CREATE TRIGGER
+//      CREATE TEMPORARY TABLE
