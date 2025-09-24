@@ -3,6 +3,7 @@ package dev.coph.simplesql.database;
 import dev.coph.simplesql.adapter.DatabaseAdapter;
 import dev.coph.simplesql.database.attributes.ColumnType;
 import dev.coph.simplesql.database.attributes.DataType;
+import dev.coph.simplesql.driver.DriverType;
 import dev.coph.simplesql.query.Query;
 import dev.coph.simpleutilities.check.Check;
 import lombok.experimental.Accessors;

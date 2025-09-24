@@ -1,6 +1,7 @@
 package dev.coph.simplesql.database.attributes;
 
 import dev.coph.simplesql.adapter.DatabaseAdapter;
+import dev.coph.simplesql.driver.DriverType;
 import dev.coph.simplesql.query.Query;
 
 /**
