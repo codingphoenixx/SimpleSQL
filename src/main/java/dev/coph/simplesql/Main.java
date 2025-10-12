@@ -2,11 +2,14 @@ package dev.coph.simplesql;
 
 import dev.coph.simplelogger.Logger;
 import dev.coph.simplesql.adapter.DatabaseAdapter;
+import dev.coph.simplesql.database.attributes.CreateMethode;
+import dev.coph.simplesql.database.attributes.DataType;
 import dev.coph.simplesql.database.attributes.SelectFunction;
 import dev.coph.simplesql.driver.DriverType;
 import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.query.providers.InsertQueryProvider;
 import dev.coph.simplesql.query.providers.SelectQueryProvider;
+import dev.coph.simplesql.query.providers.TableCreateQueryProvider;
 
 import java.io.File;
 import java.io.IOException;
@@ -36,7 +39,7 @@ public class Main {
         System.out.println("--------------------------------------- MARIADB ------------------------------------------");
         startMariaDB();
         System.out.println("--------------------------------------- SQLITE ------------------------------------------");
-        //startSQLite();
+        startSQLite();
         System.out.println("--------------------------------------- FINISHED ------------------------------------------");
     }
 
@@ -114,8 +117,6 @@ public class Main {
      * @param databaseAdapter the adapter used to connect and execute queries against the database
      */
     private static void runQuery(DatabaseAdapter databaseAdapter) {
-        //Database database = new Database(databaseAdapter, "testing");
-        //database.getTable("testing");
 
         /*
         TODO:
@@ -127,7 +128,20 @@ public class Main {
         SELECT first_name, last_name, salary AS netto, salary * 1.3 AS brutto FROM employees
          */
 
-        // Database database = new Database(databaseAdapter, "test6");
+        Query query = new Query(databaseAdapter);
+
+
+        TableCreateQueryProvider tableCreateQueryProvider = new TableCreateQueryProvider()
+                .table("test6")
+                .createMethode(CreateMethode.IF_NOT_EXISTS)
+                .column("uuid", DataType.VARCHAR, 36, true)
+                .column("number", DataType.INTEGER);
+        TableCreateQueryProvider tableCreateQueryProvider2 = new TableCreateQueryProvider()
+                .table("test7")
+                .createMethode(CreateMethode.IF_NOT_EXISTS)
+                .column("uuid", DataType.VARCHAR, 36, true)
+                .column("number", DataType.INTEGER);
+        query.executeQuery(tableCreateQueryProvider, tableCreateQueryProvider2);
 
 
         SelectQueryProvider selectQueryProvider = new SelectQueryProvider()
@@ -140,9 +154,18 @@ public class Main {
                 .actionAfterQuery(success -> {
 
                 });
-        Query query = new Query(databaseAdapter);
-        System.out.println(selectQueryProvider.generateSQLString(query));
-        query.executeQuery(selectQueryProvider);
+        SelectQueryProvider selectQueryProvider2 = new SelectQueryProvider()
+                .table("test7")
+                .function(SelectFunction.MAX)
+                .columKey("number")
+                .resultActionAfterQuery(srs -> {
+                    parseResultSet(srs.resultSet());
+                })
+                .actionAfterQuery(success -> {
+
+                });
+
+        query.executeQuery(selectQueryProvider, selectQueryProvider2);
     }
 
     /**

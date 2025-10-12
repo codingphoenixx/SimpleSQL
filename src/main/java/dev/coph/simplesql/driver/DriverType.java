@@ -19,6 +19,11 @@ public enum DriverType {
      */
     MARIADB("org.mariadb.jdbc.Driver"),
     /**
+     * Represents the Postgresql database driver.
+     * This constant holds the class name of the Postgresql JDBC driver.
+     */
+    POSTGRESQL("org.postgresql.Driver"),
+    /**
      * Represents the SQLite database driver.
      * This constant holds the class name of the SQLite JDBC driver.
      */

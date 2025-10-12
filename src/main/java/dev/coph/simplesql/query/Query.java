@@ -7,10 +7,10 @@ import dev.coph.simplesql.query.providers.*;
 import dev.coph.simpleutilities.check.Check;
 
 import java.sql.Connection;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -91,6 +91,9 @@ public class Query {
      */
     private boolean succeeded = false;
 
+    private boolean preserveQueriesAfterExecution = false;
+    private boolean useTransaction = true;
+
 
     /**
      * A list containing all the SQL queries associated with the current Query instance.
@@ -130,6 +133,7 @@ public class Query {
             executeDirectly();
             executed = true;
         }
+        if (!preserveQueriesAfterExecution) queries.clear();
         return this;
     }
 
@@ -179,74 +183,188 @@ public class Query {
      * and the `queries` list consists of appropriate `QueryProvider` instances.
      */
     private void executeDirectly() {
-        if (queries.isEmpty())
-            return;
-        if (!databaseAdapter.connected())
+        if (queries.isEmpty()) return;
+        if (!databaseAdapter.connected()) {
             throw new IllegalStateException("The connection to the database was not established");
+        }
 
         try (Connection connection = databaseAdapter.dataSource().getConnection()) {
-            if (queries.size() == 1) {
-                QueryProvider queryProvider = queries.get(0);
-                if (!queryProvider.compatibility().isCompatible(databaseAdapter.driverType())) {
-                    throw new UnsupportedOperationException("The current request is not supported by the database driver. Failing request. Please check the documentation for supported database operations and try again with a compatible request.");                }
-                String generateSQLString = queryProvider.generateSQLString(this);
-                if (generateSQLString == null) {
-                    System.out.println("Generated SQL-String is null. Canceling request.");
-                    return;
-                }
-                var statement = connection.prepareStatement(generateSQLString);
-                Logger.getInstance().log(Logger.LogLevel.DEBUG, "Executing query: " + generateSQLString);
-                try {
-                    if (queryProvider instanceof SelectQueryProvider selectRequest) {
-                        ResultSet resultSet = statement.executeQuery();
-                        selectRequest.resultSet(resultSet);
-                        succeeded = true;
-                        if (selectRequest.resultActionAfterQuery() != null) {
-                            selectRequest.resultActionAfterQuery().run(new SimpleResultSet(resultSet));
-                        }
-                    } else if (queryProvider instanceof UpdateQueryProvider) {
-                        statement.executeUpdate();
-                        succeeded = true;
-                    } else {
-                        statement.execute();
-                        succeeded = true;
+            boolean originalAutoCommit = connection.getAutoCommit();
+            if (useTransaction)
+                connection.setAutoCommit(false);
+            succeeded = false;
+
+            try {
+                if (queries.size() == 1) {
+                    QueryProvider queryProvider = queries.get(0);
+                    if (!queryProvider.compatibility().isCompatible(databaseAdapter.driverType())) {
+                        throw new UnsupportedOperationException(
+                                "The current request is not supported by the database driver. Failing request. " +
+                                        "Please check the documentation for supported database operations and try again with a compatible request."
+                        );
                     }
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                    succeeded = false;
-                }
-                for (QueryProvider query : queries) {
-                    if (query.actionAfterQuery() != null)
-                        query.actionAfterQuery().run(succeeded);
-                }
-            } else {
-                var statement = connection.createStatement();
-                for (QueryProvider queryProvider : queries) {
-                    try {
-                        if (!queryProvider.compatibility().isCompatible(databaseAdapter.driverType())) {
-                            throw new UnsupportedOperationException("The current request is not supported by the database driver. Failing request. Please check the documentation for supported database operations and try again with a compatible request.");
+
+                    String sql = queryProvider.generateSQLString(this);
+                    if (sql == null) {
+                        System.out.println("Generated SQL-String is null. Canceling request.");
+                        if (useTransaction)
+                            connection.rollback();
+                        return;
+                    }
+
+                    try (var ps = connection.prepareStatement(sql)) {
+                        queryProvider.bindParameters(ps);
+                        Logger.getInstance().log(Logger.LogLevel.DEBUG, "Executing query: " + sql);
+
+                        if (queryProvider instanceof SelectQueryProvider selectRequest) {
+                            try (ResultSet rs = ps.executeQuery()) {
+                                selectRequest.resultSet(rs);
+                                succeeded = true;
+                                if (selectRequest.resultActionAfterQuery() != null) {
+                                    selectRequest.resultActionAfterQuery().run(new SimpleResultSet(rs));
+                                }
+                            }
+                        } else if (queryProvider instanceof UpdateQueryProvider) {
+                            ps.executeUpdate();
+                            succeeded = true;
+                        } else {
+                            ps.execute();
+                            succeeded = true;
                         }
-                        String generateSQLString = queryProvider.generateSQLString(this);
-                        if (generateSQLString == null) {
+                    }
+
+                    if (queryProvider.actionAfterQuery() != null) {
+                        queryProvider.actionAfterQuery().run(succeeded);
+                    }
+
+                } else {
+                    class Bucket {
+                        final String sql;
+                        final List<QueryProvider> providers = new ArrayList<>();
+
+                        Bucket(String sql) {
+                            this.sql = sql;
+                        }
+                    }
+
+                    Map<String, Bucket> batchBuckets = new LinkedHashMap<>();
+                    List<QueryProvider> selectProviders = new ArrayList<>();
+
+                    for (QueryProvider qp : queries) {
+                        try {
+                            if (!qp.compatibility().isCompatible(databaseAdapter.driverType())) {
+                                throw new UnsupportedOperationException(
+                                        "The current request is not supported by the database driver. Failing request. " +
+                                                "Please check the documentation for supported database operations and try again with a compatible request."
+                                );
+                            }
+                            String sql = qp.generateSQLString(this);
+                            if (sql == null) {
+                                System.out.println("Generated SQL-String is null. Ignoring request.");
+                                if (qp.actionAfterQuery() != null) qp.actionAfterQuery().run(false);
+                                continue;
+                            }
+
+                            if (qp instanceof SelectQueryProvider) {
+                                selectProviders.add(qp);
+                            } else {
+                                batchBuckets.computeIfAbsent(sql, Bucket::new).providers.add(qp);
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            if (qp.actionAfterQuery() != null) {
+                                qp.actionAfterQuery().run(false);
+                            }
+                        }
+                    }
+
+                    boolean allOk = true;
+
+                    for (Bucket bucket : batchBuckets.values()) {
+                        String sql = bucket.sql;
+                        Logger.getInstance().log(Logger.LogLevel.DEBUG,
+                                "Executing batch for SQL: " + sql + " with size " + bucket.providers.size());
+                        try (var ps = connection.prepareStatement(sql)) {
+                            for (QueryProvider qp : bucket.providers) {
+                                try {
+                                    qp.bindParameters(ps);
+                                    ps.addBatch();
+                                } catch (Exception e) {
+                                    e.printStackTrace();
+                                    allOk = false;
+                                    if (qp.actionAfterQuery() != null) qp.actionAfterQuery().run(false);
+                                }
+                            }
+                            try {
+                                ps.executeBatch();
+                                for (QueryProvider qp : bucket.providers) {
+                                    if (qp.actionAfterQuery() != null) qp.actionAfterQuery().run(true);
+                                }
+                            } catch (SQLException e) {
+                                e.printStackTrace();
+                                allOk = false;
+                                for (QueryProvider qp : bucket.providers) {
+                                    if (qp.actionAfterQuery() != null) qp.actionAfterQuery().run(false);
+                                }
+                            }
+                        } catch (SQLException e) {
+                            e.printStackTrace();
+                            allOk = false;
+                            for (QueryProvider qp : bucket.providers) {
+                                if (qp.actionAfterQuery() != null) qp.actionAfterQuery().run(false);
+                            }
+                        }
+                    }
+
+                    for (QueryProvider qp : selectProviders) {
+                        String sql = qp.generateSQLString(this);
+                        if (sql == null) {
                             System.out.println("Generated SQL-String is null. Ignoring request.");
+                            if (qp.actionAfterQuery() != null) qp.actionAfterQuery().run(false);
+                            allOk = false;
                             continue;
                         }
-                        Logger.getInstance().log(Logger.LogLevel.DEBUG, "Executing query: " + generateSQLString);
-                        statement.addBatch(generateSQLString);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        succeeded = false;
+                        Logger.getInstance().log(Logger.LogLevel.DEBUG, "Executing query: " + sql);
+                        try (var ps = connection.prepareStatement(sql)) {
+                            qp.bindParameters(ps);
+                            SelectQueryProvider select = (SelectQueryProvider) qp;
+                            try (ResultSet rs = ps.executeQuery()) {
+                                select.resultSet(rs);
+                                if (select.resultActionAfterQuery() != null) {
+                                    select.resultActionAfterQuery().run(new SimpleResultSet(rs));
+                                }
+                                if (qp.actionAfterQuery() != null) qp.actionAfterQuery().run(true);
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                            allOk = false;
+                            if (qp.actionAfterQuery() != null) qp.actionAfterQuery().run(false);
+                        }
                     }
+
+                    succeeded = allOk;
                 }
+                if (useTransaction) {
+                    if (succeeded)
+                        connection.commit();
+                    else
+                        connection.rollback();
+                }
+            } catch (Exception e) {
                 try {
-                    statement.executeBatch();
-                    succeeded = true;
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                    succeeded = false;
+                    if (useTransaction)
+                        connection.rollback();
+                } catch (Exception ignore) {
+                }
+                succeeded = false;
+                throw new RequestNotExecutableException(e);
+            } finally {
+                try {
+                    if (useTransaction)
+                        connection.setAutoCommit(originalAutoCommit);
+                } catch (Exception ignore) {
                 }
             }
-
 
         } catch (Exception e) {
             succeeded = false;
@@ -269,6 +387,24 @@ public class Query {
         return this;
     }
 
+
+    public Query useTransaction(boolean use) {
+        this.useTransaction = use;
+        return this;
+    }
+
+    public boolean useTransaction() {
+        return useTransaction;
+    }
+
+    public Query preserveQueriesAfterExecution(boolean preserve) {
+        this.preserveQueriesAfterExecution = preserve;
+        return this;
+    }
+
+    public boolean preserveQueriesAfterExecution() {
+        return preserveQueriesAfterExecution;
+    }
 
     /**
      * Creates and returns a new instance of {@link DatabaseCreateQueryProvider}.
