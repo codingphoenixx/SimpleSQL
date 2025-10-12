@@ -2,14 +2,11 @@ package dev.coph.simplesql;
 
 import dev.coph.simplelogger.Logger;
 import dev.coph.simplesql.adapter.DatabaseAdapter;
-import dev.coph.simplesql.database.attributes.CreateMethode;
-import dev.coph.simplesql.database.attributes.DataType;
-import dev.coph.simplesql.database.attributes.SelectFunction;
+import dev.coph.simplesql.database.attributes.*;
 import dev.coph.simplesql.driver.DriverType;
 import dev.coph.simplesql.query.Query;
-import dev.coph.simplesql.query.providers.InsertQueryProvider;
-import dev.coph.simplesql.query.providers.SelectQueryProvider;
-import dev.coph.simplesql.query.providers.TableCreateQueryProvider;
+import dev.coph.simplesql.query.providers.*;
+import dev.coph.simplesql.utils.test.Tester;
 
 import java.io.File;
 import java.io.IOException;
@@ -17,6 +14,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Base64;
+import java.util.List;
 import java.util.Random;
 import java.util.UUID;
 
@@ -36,7 +34,7 @@ public class Main {
      * @param args command-line arguments passed during application execution
      */
     public static void main(String[] args) {
-        Logger.getInstance();
+        Logger.getInstance().logLevel(Logger.LogLevel.DEBUG);
         System.out.println("--------------------------------------- MARIADB ------------------------------------------");
         startMariaDB();
         System.out.println("--------------------------------------- SQLITE ------------------------------------------");
@@ -118,60 +116,8 @@ public class Main {
      * @param databaseAdapter the adapter used to connect and execute queries against the database
      */
     private static void runQuery(DatabaseAdapter databaseAdapter) {
-
-        /*
-        TODO:
-        SQL-Injection FIX
-
-        SELECT department_id FROM employees GROUP BY department_id HAVING COUNT (*) > 3
-        SELECT * FROM employees WHERE last_name SIMILAR TO '[STU]%' AND salary BETWEEN 1000 AND 10000 ORDER BY last_name
-        SELECT first_name, last_name, salary, job_title FROM employees JOIN jobs ON employees.job_id = jobs.job_id ORDER BY salary DESC LIMIT 1
-        SELECT first_name, last_name, salary AS netto, salary * 1.3 AS brutto FROM employees
-         */
-
-        Query query = new Query(databaseAdapter);
-
-
-        TableCreateQueryProvider tableCreateQueryProvider = new TableCreateQueryProvider()
-                .table("test6")
-                .createMethode(CreateMethode.IF_NOT_EXISTS)
-                .column("uuid", DataType.VARCHAR, 36, true)
-                .column("number", DataType.INTEGER)
-                .column("comment", DataType.TINYTEXT);
-
-        TableCreateQueryProvider tableCreateQueryProvider2 = new TableCreateQueryProvider()
-                .table("test7")
-                .createMethode(CreateMethode.IF_NOT_EXISTS)
-                .column("uuid", DataType.VARCHAR, 36, true)
-                .column("number", DataType.INTEGER)
-                .column("comment", DataType.TINYTEXT);
-        query.executeQuery(tableCreateQueryProvider, tableCreateQueryProvider2);
-
-        createDefaultEntries(databaseAdapter);
-
-
-        SelectQueryProvider selectQueryProvider = new SelectQueryProvider()
-                .table("test6")
-                .function(SelectFunction.MAX)
-                .columKey("number")
-                .resultActionAfterQuery(srs -> {
-                    parseResultSet(srs.resultSet());
-                })
-                .actionAfterQuery(success -> {
-
-                });
-        SelectQueryProvider selectQueryProvider2 = new SelectQueryProvider()
-                .table("test7")
-                .function(SelectFunction.MAX)
-                .columKey("number")
-                .resultActionAfterQuery(srs -> {
-                    parseResultSet(srs.resultSet());
-                })
-                .actionAfterQuery(success -> {
-
-                });
-
-        query.executeQuery(selectQueryProvider, selectQueryProvider2);
+        Tester tester = new Tester(databaseAdapter);
+        tester.runTests();
     }
 
     /**
@@ -184,19 +130,24 @@ public class Main {
      */
     private static void createDefaultEntries(DatabaseAdapter databaseAdapter) {
         Query insertQuery = new Query(databaseAdapter);
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 10000; i++) {
             UUID uuid = UUID.randomUUID();
             String comment = Base64.getEncoder().encodeToString(uuid.toString().getBytes());
+            int number = i + new Random().nextInt();
             InsertQueryProvider insertQueryProvider = new InsertQueryProvider()
                     .table("test6")
+                    .insertMethode(InsertMethode.INSERT_OR_UPDATE)
+                    .conflictColumns(List.of("uuid"))
                     .entry("uuid", uuid.toString())
-                    .entry("number", i + new Random().nextInt())
+                    .entry("number", number)
                     .entry("comment", comment);
 
             InsertQueryProvider insertQueryProvider2 = new InsertQueryProvider()
                     .table("test7")
+                    .insertMethode(InsertMethode.INSERT_OR_UPDATE)
+                    .conflictColumns(List.of("uuid"))
                     .entry("uuid", uuid.toString())
-                    .entry("number", i+ new Random().nextInt())
+                    .entry("number", number)
                     .entry("comment", comment);
             insertQuery.queries(insertQueryProvider, insertQueryProvider2);
         }

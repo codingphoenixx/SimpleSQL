@@ -51,7 +51,7 @@ public class TableDropQueryProvider implements QueryProvider {
 
         StringBuilder sql = new StringBuilder("DROP TABLE");
 
-        if (deleteMethode.equals(DeleteMethode.IF_EXISTS))
+        if (deleteMethode != null && deleteMethode.equals(DeleteMethode.IF_EXISTS))
             sql.append(" IF EXISTS");
 
         for (String table : tables) {
