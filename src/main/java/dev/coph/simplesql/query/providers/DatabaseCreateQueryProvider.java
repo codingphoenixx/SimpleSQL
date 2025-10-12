@@ -23,7 +23,6 @@ public class DatabaseCreateQueryProvider implements QueryProvider {
     private String lcCollate;
     private String lcCtype;
 
-    private boolean quoteIdentifiers;
 
     private RunnableAction<Boolean> actionAfterQuery;
 
@@ -71,11 +70,9 @@ public class DatabaseCreateQueryProvider implements QueryProvider {
                 if (characterSet != null) {
 
                     String enc = characterSet.toPostgresEncodingOrThrow();
-                    if (enc != null) {
-                        sql.append(hasWith ? " " : " WITH ");
-                        hasWith = true;
-                        sql.append("ENCODING '").append(enc).append("'");
-                    }
+                    sql.append(" WITH ");
+                    hasWith = true;
+                    sql.append("ENCODING '").append(enc).append("'");
                 }
 
                 if (lcCollate != null && !lcCollate.isBlank()) {
@@ -132,10 +129,6 @@ public class DatabaseCreateQueryProvider implements QueryProvider {
         return this;
     }
 
-    public DatabaseCreateQueryProvider quoteIdentifiers(boolean enable) {
-        this.quoteIdentifiers = enable;
-        return this;
-    }
 
     public DatabaseCreateQueryProvider actionAfterQuery(RunnableAction<Boolean> actionAfterQuery) {
         this.actionAfterQuery = actionAfterQuery;
@@ -170,9 +163,5 @@ public class DatabaseCreateQueryProvider implements QueryProvider {
 
     public String lcCtype() {
         return this.lcCtype;
-    }
-
-    public boolean quoteIdentifiers() {
-        return this.quoteIdentifiers;
     }
 }

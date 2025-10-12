@@ -65,8 +65,6 @@ public class Main {
 
 //TODO:
 //      REWORK-CLASSES:
-//      - DatabaseCreateQueryProvider
-//      - DatabaseDropQueryProvider
 //      - TableDropQueryProvider
 
 //      - TableAlterQueryProviders
