@@ -2,11 +2,11 @@ package dev.coph.simplesql.exception;
 
 /**
  * Thrown to indicate that the database driver could not be loaded.
- *
+ * <p>
  * This exception typically occurs when the JDBC driver class specified
  * by the {@code DriverType} enumeration cannot be found or loaded during an
  * attempt to establish a connection to the database.
- *
+ * <p>
  * This is a runtime exception and is usually caused by misconfiguration, such as
  * the JDBC driver not being present in the classpath.
  */

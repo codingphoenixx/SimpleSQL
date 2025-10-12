@@ -1,9 +1,10 @@
 package dev.coph.simplesql.driver;
+
 /**
  * The {@code DriverType} enum represents different types of database drivers supported
  * for establishing database connections. Each enum constant is associated with the
  * fully qualified class name of the JDBC driver.
- *
+ * <p>
  * This enum provides a way to manage available driver types and retrieve the
  * corresponding JDBC driver class names dynamically for connection configurations.
  */

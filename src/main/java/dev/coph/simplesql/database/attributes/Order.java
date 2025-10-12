@@ -1,7 +1,6 @@
 package dev.coph.simplesql.database.attributes;
 
 import dev.coph.simplesql.query.Query;
-import lombok.experimental.Accessors;
 
 import java.util.HashMap;
 

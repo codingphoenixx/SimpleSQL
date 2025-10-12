@@ -174,11 +174,19 @@ public class DeleteQueryProvider implements QueryProvider {
     }
 
 
-    public String table() { return this.table; }
+    public String table() {
+        return this.table;
+    }
 
-    public Order order() { return this.order; }
+    public Order order() {
+        return this.order;
+    }
 
-    public Set<Condition> conditions() { return this.conditions; }
+    public Set<Condition> conditions() {
+        return this.conditions;
+    }
 
-    public Limit limit() { return this.limit; }
+    public Limit limit() {
+        return this.limit;
+    }
 }

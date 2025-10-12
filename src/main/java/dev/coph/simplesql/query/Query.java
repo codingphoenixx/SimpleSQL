@@ -7,7 +7,6 @@ import dev.coph.simplesql.query.providers.*;
 import dev.coph.simpleutilities.check.Check;
 
 import java.sql.Connection;
-import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
@@ -31,15 +30,6 @@ import java.util.concurrent.CompletableFuture;
  */
 public class Query {
     /**
-     * Constructor for the Query class that initializes it with a given DatabaseAdapter instance.
-     *
-     * @param databaseAdapter the DatabaseAdapter instance to be used for database operations
-     */
-    public Query(DatabaseAdapter databaseAdapter) {
-        this.databaseAdapter = databaseAdapter;
-    }
-
-    /**
      * The {@code databaseAdapter} field provides access to the underlying database connection
      * and configuration through the {@link DatabaseAdapter} class.
      * <p>
@@ -53,7 +43,6 @@ public class Query {
      * provides the necessary resources (e.g., data source) for executing SQL operations.
      */
     private final DatabaseAdapter databaseAdapter;
-
     /**
      * Indicates whether the query execution should be performed asynchronously.
      * <p>
@@ -65,7 +54,6 @@ public class Query {
      * By default, the value is set to `false`, meaning synchronous execution.
      */
     private boolean async = false;
-
     /**
      * Indicates whether the execution of the queries associated with this Query
      * instance was successful. This value is set to {@code false} before an
@@ -78,7 +66,6 @@ public class Query {
      * Default value is {@code false}.
      */
     private boolean executed = false;
-
     /**
      * Represents the success status of the most recent query execution.
      * This variable tracks whether the queries executed in the current or previous
@@ -90,11 +77,8 @@ public class Query {
      * should proceed depending on the result of the SQL query execution.
      */
     private boolean succeeded = false;
-
     private boolean preserveQueriesAfterExecution = false;
     private boolean useTransaction = true;
-
-
     /**
      * A list containing all the SQL queries associated with the current Query instance.
      * Each entry in the list implements the {@link QueryProvider} interface, which
@@ -110,8 +94,226 @@ public class Query {
      * This field plays a primary role in SQL command preparation and submission
      * to the underlying database system.
      */
-    private ArrayList<QueryProvider> queries = new ArrayList<>();
+    private final ArrayList<QueryProvider> queries = new ArrayList<>();
 
+
+    /**
+     * Constructor for the Query class that initializes it with a given DatabaseAdapter instance.
+     *
+     * @param databaseAdapter the DatabaseAdapter instance to be used for database operations
+     */
+    public Query(DatabaseAdapter databaseAdapter) {
+        this.databaseAdapter = databaseAdapter;
+    }
+
+    /**
+     * Creates and returns a new instance of {@link DatabaseCreateQueryProvider}.
+     * <p>
+     * This method is used to initiate a CREATE DATABASE SQL query by providing a
+     * {@link DatabaseCreateQueryProvider} object, which can be further configured
+     * to construct SQL CREATE DATABASE statements.
+     *
+     * @return A new {@link DatabaseCreateQueryProvider} instance for constructing
+     * CREATE DATABASE SQL queries.
+     */
+    public static DatabaseCreateQueryProvider databaseCreate() {
+        return new DatabaseCreateQueryProvider();
+    }
+
+    /**
+     * Creates and returns an instance of DatabaseDropQueryProvider, which can be used to handle
+     * database drop operations or generate queries related to dropping database structures.
+     *
+     * @return an instance of DatabaseDropQueryProvider to manage database drop functionalities
+     */
+    public static DatabaseDropQueryProvider databaseDrop() {
+        return new DatabaseDropQueryProvider();
+    }
+
+    /**
+     * Creates and returns a new instance of {@link DeleteQueryProvider}.
+     * <p>
+     * This method is used to initiate a DELETE SQL query by providing a
+     * {@link DeleteQueryProvider} object, which can be further configured
+     * to construct SQL DELETE statements.
+     *
+     * @return A new {@link DeleteQueryProvider} instance for constructing
+     * DELETE SQL queries.
+     */
+    public static DeleteQueryProvider delete() {
+        return new DeleteQueryProvider();
+    }
+
+    /**
+     * Creates and returns a new instance of {@link InsertQueryProvider}.
+     * <p>
+     * This method is used to initiate an INSERT SQL query by providing
+     * an {@link InsertQueryProvider} object, which can be further configured
+     * to construct SQL INSERT statements. The returned object allows
+     * customization of the table name, insertion method, and specific entries
+     * to be added to the database.
+     *
+     * @return A new {@link InsertQueryProvider} instance for constructing
+     * INSERT SQL queries.
+     */
+    public static InsertQueryProvider insert() {
+        return new InsertQueryProvider();
+    }
+
+    /**
+     * Creates and returns a new instance of {@link SelectQueryProvider}.
+     * <p>
+     * This method is used to initiate a SELECT SQL query by providing a
+     * {@link SelectQueryProvider} object, which can be further configured
+     * to construct SQL SELECT statements.
+     *
+     * @return A new {@link SelectQueryProvider} instance for constructing
+     * SELECT SQL queries.
+     */
+    public static SelectQueryProvider select() {
+        return new SelectQueryProvider();
+    }
+
+    /**
+     * Creates and returns an instance of {@link TableAlterAddAttributeQueryProvider}.
+     * <p>
+     * This method is used to initiate an ALTER TABLE SQL query for adding an attribute
+     * (such as UNIQUE or PRIMARY KEY) to an existing column of a table. The returned
+     * {@link TableAlterAddAttributeQueryProvider} object can be further configured
+     * to specify the column name and the type of attribute to be added.
+     *
+     * @return A new {@link TableAlterAddAttributeQueryProvider} instance for constructing
+     * ALTER TABLE SQL queries to add attributes to a column.
+     */
+    public static TableAlterAddAttributeQueryProvider tableAlterAddAttribute() {
+        return new TableAlterAddAttributeQueryProvider();
+    }
+
+    /**
+     * Creates and returns a new instance of {@link TableAlterAddColumnQueryProvider}.
+     * <p>
+     * This method is used to initiate an ALTER TABLE SQL query for adding a new column
+     * to an existing table. The returned {@link TableAlterAddColumnQueryProvider} object
+     * allows further configuration, such as specifying the column name, data type,
+     * position, default value, and whether the column should only be added if it does not already exist.
+     *
+     * @return A new {@link TableAlterAddColumnQueryProvider} instance for constructing
+     * ALTER TABLE SQL queries to add columns.
+     */
+    public static TableAlterAddColumnQueryProvider tableAlterAddColumn() {
+        return new TableAlterAddColumnQueryProvider();
+    }
+
+    /**
+     * Creates and returns a new instance of {@link TableAlterColumnDefaultValueQueryProvider}.
+     * <p>
+     * This method is used to initiate an ALTER TABLE SQL query to set or remove
+     * a default value for a specific column in a database table. The returned
+     * {@link TableAlterColumnDefaultValueQueryProvider} object allows further
+     * configuration, such as specifying the column name, the default value to
+     * set, or whether to drop an existing default value.
+     *
+     * @return A new {@link TableAlterColumnDefaultValueQueryProvider} instance for constructing
+     * ALTER TABLE SQL queries to modify the default value of a column.
+     */
+    public static TableAlterColumnDefaultValueQueryProvider tableAlterColumnDefaultValue() {
+        return new TableAlterColumnDefaultValueQueryProvider();
+    }
+
+    /**
+     * Creates and returns a new instance of {@link TableAlterDropColumnQueryProvider}.
+     * <p>
+     * This method is used to initiate an ALTER TABLE SQL query for dropping a column or constraint from an existing table.
+     * The returned {@link TableAlterDropColumnQueryProvider} object allows further configuration
+     * to specify the table name, the column or constraint to be dropped, and additional drop options.
+     *
+     * @return A new {@link TableAlterDropColumnQueryProvider} instance for constructing ALTER TABLE SQL queries to drop columns or constraints.
+     */
+    public static TableAlterDropColumnQueryProvider tableAlterDropColumn() {
+        return new TableAlterDropColumnQueryProvider();
+    }
+
+    /**
+     * Creates and returns a new instance of {@link TableAlterModifyTypeQueryProvider}.
+     * <p>
+     * This method is used to initiate an ALTER TABLE SQL query for modifying the
+     * data type of an existing column in a database table. The returned
+     * {@link TableAlterModifyTypeQueryProvider} object allows further configuration,
+     * such as specifying the table name, column name, and the new data type to be applied.
+     *
+     * @return A new {@link TableAlterModifyTypeQueryProvider} instance for constructing
+     * ALTER TABLE SQL queries to modify column data types.
+     */
+    public static TableAlterModifyTypeQueryProvider tableAlterModifyType() {
+        return new TableAlterModifyTypeQueryProvider();
+    }
+
+    /**
+     * Creates and returns a new instance of TableAlterRenameQueryProvider.
+     * This method is used to initialize and retrieve an object for
+     * handling table alteration and renaming queries.
+     *
+     * @return a new instance of TableAlterRenameQueryProvider
+     */
+    public static TableAlterRenameQueryProvider tableAlterRename() {
+        return new TableAlterRenameQueryProvider();
+    }
+
+    /**
+     * Creates and returns a new instance of {@link TableCreateQueryProvider}.
+     * <p>
+     * This method is used to initiate a CREATE TABLE SQL query by providing
+     * a {@link TableCreateQueryProvider} object, which can be further configured
+     * to construct SQL CREATE TABLE statements.
+     *
+     * @return A new {@link TableCreateQueryProvider} instance for constructing
+     * CREATE TABLE SQL queries.
+     */
+    public static TableCreateQueryProvider tableCreate() {
+        return new TableCreateQueryProvider();
+    }
+
+    /**
+     * Creates and returns a new instance of {@link TableDropQueryProvider}.
+     * <p>
+     * This method is used to initiate a DROP TABLE SQL query by providing a
+     * {@link TableDropQueryProvider} object, which can be further configured
+     * to construct SQL DROP TABLE statements.
+     *
+     * @return A new {@link TableDropQueryProvider} instance for constructing
+     * DROP TABLE SQL queries.
+     */
+    public static TableDropQueryProvider tableDrop() {
+        return new TableDropQueryProvider();
+    }
+
+    /**
+     * Creates and returns a new instance of {@link TruncateQueryProvider}.
+     * <p>
+     * This method is used to initiate a TRUNCATE TABLE SQL query by providing
+     * a {@link TruncateQueryProvider} object, which can be further configured
+     * to specify the table to be truncated.
+     *
+     * @return A new {@link TruncateQueryProvider} instance for constructing
+     * TRUNCATE TABLE SQL queries.
+     */
+    public static TruncateQueryProvider truncate() {
+        return new TruncateQueryProvider();
+    }
+
+    /**
+     * Creates and returns a new instance of {@link UpdateQueryProvider}.
+     * <p>
+     * This method is used to initiate an UPDATE SQL query by providing an
+     * {@link UpdateQueryProvider} object, which can be further configured
+     * to construct SQL UPDATE statements.
+     *
+     * @return A new {@link UpdateQueryProvider} instance for constructing
+     * UPDATE SQL queries.
+     */
+    public static UpdateQueryProvider update() {
+        return new UpdateQueryProvider();
+    }
 
     /**
      * Executes the query using the configured database adapter. The execution can be
@@ -372,7 +574,6 @@ public class Query {
         }
     }
 
-
     /**
      * Adds one or more {@code QueryProvider} objects to this {@code Query} instance.
      * <p>
@@ -386,7 +587,6 @@ public class Query {
         this.queries.addAll(Arrays.asList(queries));
         return this;
     }
-
 
     public Query useTransaction(boolean use) {
         this.useTransaction = use;
@@ -404,216 +604,6 @@ public class Query {
 
     public boolean preserveQueriesAfterExecution() {
         return preserveQueriesAfterExecution;
-    }
-
-    /**
-     * Creates and returns a new instance of {@link DatabaseCreateQueryProvider}.
-     * <p>
-     * This method is used to initiate a CREATE DATABASE SQL query by providing a
-     * {@link DatabaseCreateQueryProvider} object, which can be further configured
-     * to construct SQL CREATE DATABASE statements.
-     *
-     * @return A new {@link DatabaseCreateQueryProvider} instance for constructing
-     * CREATE DATABASE SQL queries.
-     */
-    public static DatabaseCreateQueryProvider databaseCreate() {
-        return new DatabaseCreateQueryProvider();
-    }
-
-    /**
-     * Creates and returns an instance of DatabaseDropQueryProvider, which can be used to handle
-     * database drop operations or generate queries related to dropping database structures.
-     *
-     * @return an instance of DatabaseDropQueryProvider to manage database drop functionalities
-     */
-    public static DatabaseDropQueryProvider databaseDrop() {
-        return new DatabaseDropQueryProvider();
-    }
-
-    /**
-     * Creates and returns a new instance of {@link DeleteQueryProvider}.
-     * <p>
-     * This method is used to initiate a DELETE SQL query by providing a
-     * {@link DeleteQueryProvider} object, which can be further configured
-     * to construct SQL DELETE statements.
-     *
-     * @return A new {@link DeleteQueryProvider} instance for constructing
-     * DELETE SQL queries.
-     */
-    public static DeleteQueryProvider delete() {
-        return new DeleteQueryProvider();
-    }
-
-    /**
-     * Creates and returns a new instance of {@link InsertQueryProvider}.
-     * <p>
-     * This method is used to initiate an INSERT SQL query by providing
-     * an {@link InsertQueryProvider} object, which can be further configured
-     * to construct SQL INSERT statements. The returned object allows
-     * customization of the table name, insertion method, and specific entries
-     * to be added to the database.
-     *
-     * @return A new {@link InsertQueryProvider} instance for constructing
-     * INSERT SQL queries.
-     */
-    public static InsertQueryProvider insert() {
-        return new InsertQueryProvider();
-    }
-
-    /**
-     * Creates and returns a new instance of {@link SelectQueryProvider}.
-     * <p>
-     * This method is used to initiate a SELECT SQL query by providing a
-     * {@link SelectQueryProvider} object, which can be further configured
-     * to construct SQL SELECT statements.
-     *
-     * @return A new {@link SelectQueryProvider} instance for constructing
-     * SELECT SQL queries.
-     */
-    public static SelectQueryProvider select() {
-        return new SelectQueryProvider();
-    }
-
-    /**
-     * Creates and returns an instance of {@link TableAlterAddAttributeQueryProvider}.
-     * <p>
-     * This method is used to initiate an ALTER TABLE SQL query for adding an attribute
-     * (such as UNIQUE or PRIMARY KEY) to an existing column of a table. The returned
-     * {@link TableAlterAddAttributeQueryProvider} object can be further configured
-     * to specify the column name and the type of attribute to be added.
-     *
-     * @return A new {@link TableAlterAddAttributeQueryProvider} instance for constructing
-     * ALTER TABLE SQL queries to add attributes to a column.
-     */
-    public static TableAlterAddAttributeQueryProvider tableAlterAddAttribute() {
-        return new TableAlterAddAttributeQueryProvider();
-    }
-
-    /**
-     * Creates and returns a new instance of {@link TableAlterAddColumnQueryProvider}.
-     * <p>
-     * This method is used to initiate an ALTER TABLE SQL query for adding a new column
-     * to an existing table. The returned {@link TableAlterAddColumnQueryProvider} object
-     * allows further configuration, such as specifying the column name, data type,
-     * position, default value, and whether the column should only be added if it does not already exist.
-     *
-     * @return A new {@link TableAlterAddColumnQueryProvider} instance for constructing
-     * ALTER TABLE SQL queries to add columns.
-     */
-    public static TableAlterAddColumnQueryProvider tableAlterAddColumn() {
-        return new TableAlterAddColumnQueryProvider();
-    }
-
-    /**
-     * Creates and returns a new instance of {@link TableAlterColumnDefaultValueQueryProvider}.
-     * <p>
-     * This method is used to initiate an ALTER TABLE SQL query to set or remove
-     * a default value for a specific column in a database table. The returned
-     * {@link TableAlterColumnDefaultValueQueryProvider} object allows further
-     * configuration, such as specifying the column name, the default value to
-     * set, or whether to drop an existing default value.
-     *
-     * @return A new {@link TableAlterColumnDefaultValueQueryProvider} instance for constructing
-     * ALTER TABLE SQL queries to modify the default value of a column.
-     */
-    public static TableAlterColumnDefaultValueQueryProvider tableAlterColumnDefaultValue() {
-        return new TableAlterColumnDefaultValueQueryProvider();
-    }
-
-    /**
-     * Creates and returns a new instance of {@link TableAlterDropColumnQueryProvider}.
-     * <p>
-     * This method is used to initiate an ALTER TABLE SQL query for dropping a column or constraint from an existing table.
-     * The returned {@link TableAlterDropColumnQueryProvider} object allows further configuration
-     * to specify the table name, the column or constraint to be dropped, and additional drop options.
-     *
-     * @return A new {@link TableAlterDropColumnQueryProvider} instance for constructing ALTER TABLE SQL queries to drop columns or constraints.
-     */
-    public static TableAlterDropColumnQueryProvider tableAlterDropColumn() {
-        return new TableAlterDropColumnQueryProvider();
-    }
-
-    /**
-     * Creates and returns a new instance of {@link TableAlterModifyTypeQueryProvider}.
-     * <p>
-     * This method is used to initiate an ALTER TABLE SQL query for modifying the
-     * data type of an existing column in a database table. The returned
-     * {@link TableAlterModifyTypeQueryProvider} object allows further configuration,
-     * such as specifying the table name, column name, and the new data type to be applied.
-     *
-     * @return A new {@link TableAlterModifyTypeQueryProvider} instance for constructing
-     * ALTER TABLE SQL queries to modify column data types.
-     */
-    public static TableAlterModifyTypeQueryProvider tableAlterModifyType() {
-        return new TableAlterModifyTypeQueryProvider();
-    }
-
-    /**
-     * Creates and returns a new instance of TableAlterRenameQueryProvider.
-     * This method is used to initialize and retrieve an object for
-     * handling table alteration and renaming queries.
-     *
-     * @return a new instance of TableAlterRenameQueryProvider
-     */
-    public static TableAlterRenameQueryProvider tableAlterRename() {
-        return new TableAlterRenameQueryProvider();
-    }
-
-    /**
-     * Creates and returns a new instance of {@link TableCreateQueryProvider}.
-     * <p>
-     * This method is used to initiate a CREATE TABLE SQL query by providing
-     * a {@link TableCreateQueryProvider} object, which can be further configured
-     * to construct SQL CREATE TABLE statements.
-     *
-     * @return A new {@link TableCreateQueryProvider} instance for constructing
-     * CREATE TABLE SQL queries.
-     */
-    public static TableCreateQueryProvider tableCreate() {
-        return new TableCreateQueryProvider();
-    }
-
-    /**
-     * Creates and returns a new instance of {@link TableDropQueryProvider}.
-     * <p>
-     * This method is used to initiate a DROP TABLE SQL query by providing a
-     * {@link TableDropQueryProvider} object, which can be further configured
-     * to construct SQL DROP TABLE statements.
-     *
-     * @return A new {@link TableDropQueryProvider} instance for constructing
-     * DROP TABLE SQL queries.
-     */
-    public static TableDropQueryProvider tableDrop() {
-        return new TableDropQueryProvider();
-    }
-
-
-    /**
-     * Creates and returns a new instance of {@link TruncateQueryProvider}.
-     * <p>
-     * This method is used to initiate a TRUNCATE TABLE SQL query by providing
-     * a {@link TruncateQueryProvider} object, which can be further configured
-     * to specify the table to be truncated.
-     *
-     * @return A new {@link TruncateQueryProvider} instance for constructing
-     * TRUNCATE TABLE SQL queries.
-     */
-    public static TruncateQueryProvider truncate() {
-        return new TruncateQueryProvider();
-    }
-
-    /**
-     * Creates and returns a new instance of {@link UpdateQueryProvider}.
-     * <p>
-     * This method is used to initiate an UPDATE SQL query by providing an
-     * {@link UpdateQueryProvider} object, which can be further configured
-     * to construct SQL UPDATE statements.
-     *
-     * @return A new {@link UpdateQueryProvider} instance for constructing
-     * UPDATE SQL queries.
-     */
-    public static UpdateQueryProvider update() {
-        return new UpdateQueryProvider();
     }
 
     /**

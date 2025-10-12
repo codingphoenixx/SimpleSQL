@@ -3,7 +3,7 @@ package dev.coph.simplesql.database.attributes;
 /**
  * Specifies the position of a column when constructing or altering a database table or query.
  * This enumeration defines the relative placement of a column in the context of other columns.
- *<br><br>
+ * <br><br>
  * The available positions are:<br>
  * - DEFAULT: Represents the default behavior or unspecified column position.<br>
  * - FIRST: Places the column as the first column in the table or query.<br>

@@ -14,35 +14,25 @@ import dev.coph.simpleutilities.check.Check;
 import java.sql.ResultSet;
 import java.util.*;
 
-
 public class SelectQueryProvider implements QueryProvider {
 
+    private final List<Join> joins = new ArrayList<>();
     private String table;
-
     private SelectFunction function = SelectFunction.NORMAL;
     private SelectType selectType = SelectType.NORMAL;
     private String columnAlias;
     private Order order;
-
-    private LinkedHashSet<Condition> whereConditions = new LinkedHashSet<>();
-
+    private final LinkedHashSet<Condition> whereConditions = new LinkedHashSet<>();
     private List<String> columnKeys = new ArrayList<>();
-
     private Limit limit;
-
-    public enum LockMode { FOR_UPDATE, FOR_SHARE, FOR_NO_KEY_UPDATE, FOR_KEY_SHARE }
     private LockMode lockMode;
     private boolean skipLocked;
     private boolean noWait;
 
     private Group group;
-
-    private final List<Join> joins = new ArrayList<>();
     private RunnableAction<SimpleResultSet> resultActionAfterQuery;
     private RunnableAction<Boolean> actionAfterQuery;
-
     private ResultSet resultSet;
-
     private List<Object> boundParams = List.of();
 
     @Override
@@ -196,8 +186,6 @@ public class SelectQueryProvider implements QueryProvider {
         }
     }
 
-
-
     private void appendLimitOffset(StringBuilder sql, DriverType driver, int limit, int offset) {
         if (limit > 0) {
             sql.append(" LIMIT ").append(limit);
@@ -244,12 +232,12 @@ public class SelectQueryProvider implements QueryProvider {
         }
     }
 
-    // QueryProvider
-
     @Override
     public List<Object> parameters() {
         return boundParams != null ? boundParams : List.of();
     }
+
+    // QueryProvider
 
     @Override
     public RunnableAction<Boolean> actionAfterQuery() {
@@ -261,12 +249,12 @@ public class SelectQueryProvider implements QueryProvider {
         return this;
     }
 
-    // Fluent API
-
     public SelectQueryProvider table(String table) {
         this.table = table;
         return this;
     }
+
+    // Fluent API
 
     public SelectQueryProvider function(SelectFunction function) {
         this.function = (function != null) ? function : SelectFunction.NORMAL;
@@ -340,6 +328,11 @@ public class SelectQueryProvider implements QueryProvider {
         return this;
     }
 
+    public SelectQueryProvider columnAlias(String columnAlias) {
+        this.columnAlias = columnAlias;
+        return this;
+    }
+
     // Locking options
     public SelectQueryProvider lock(LockMode mode) {
         this.lockMode = mode;
@@ -356,21 +349,53 @@ public class SelectQueryProvider implements QueryProvider {
         return this;
     }
 
+    public String table() {
+        return this.table;
+    }
+
     // Getters
 
-    public String table() { return this.table; }
-    public SelectFunction function() { return this.function; }
-    public SelectType selectType() { return this.selectType; }
-    public Order order() { return this.order; }
-    public Set<Condition> conditions() { return this.whereConditions; }
-    public List<String> columnKey() { return this.columnKeys; }
-    public Limit limit() { return this.limit; }
-    public RunnableAction<SimpleResultSet> resultActionAfterQuery() { return this.resultActionAfterQuery; }
-    public Group group() { return this.group; }
-    public ResultSet resultSet() { return this.resultSet; }
+    public SelectFunction function() {
+        return this.function;
+    }
+
+    public SelectType selectType() {
+        return this.selectType;
+    }
+
+    public Order order() {
+        return this.order;
+    }
+
+    public Set<Condition> conditions() {
+        return this.whereConditions;
+    }
+
+    public List<String> columnKey() {
+        return this.columnKeys;
+    }
+
+    public Limit limit() {
+        return this.limit;
+    }
+
+    public RunnableAction<SimpleResultSet> resultActionAfterQuery() {
+        return this.resultActionAfterQuery;
+    }
+
+    public Group group() {
+        return this.group;
+    }
+
+    public ResultSet resultSet() {
+        return this.resultSet;
+    }
 
     public SimpleResultSet simpleResultSet() {
         if (resultSet == null) throw new NullPointerException("ResultSet is null");
         return new SimpleResultSet(resultSet());
     }
+
+    public enum LockMode {FOR_UPDATE, FOR_SHARE, FOR_NO_KEY_UPDATE, FOR_KEY_SHARE}
 }
+

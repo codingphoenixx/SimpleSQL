@@ -3,12 +3,7 @@ package dev.coph.simplesql.query;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 
-public class SimpleResultSet {
-    private final ResultSet resultSet;
-
-    public SimpleResultSet(ResultSet resultSet) {
-        this.resultSet = resultSet;
-    }
+public record SimpleResultSet(ResultSet resultSet) {
 
     public SimpleResultSet next(ResultSetConsumer consumer) throws SQLException {
         if (resultSet.next())
@@ -94,9 +89,5 @@ public class SimpleResultSet {
 
     public interface ResultSetConsumer {
         void accept(ResultSet resultSet) throws SQLException;
-    }
-
-    public ResultSet resultSet() {
-        return resultSet;
     }
 }

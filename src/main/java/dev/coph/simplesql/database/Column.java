@@ -1,12 +1,10 @@
 package dev.coph.simplesql.database;
 
-import dev.coph.simplesql.adapter.DatabaseAdapter;
 import dev.coph.simplesql.database.attributes.ColumnType;
 import dev.coph.simplesql.database.attributes.DataType;
 import dev.coph.simplesql.driver.DriverType;
 import dev.coph.simplesql.query.Query;
 import dev.coph.simpleutilities.check.Check;
-import lombok.experimental.Accessors;
 
 
 /**
@@ -66,59 +64,6 @@ public class Column {
      * If set to true, the column cannot contain null values.
      */
     private boolean notNull;
-
-    /**
-     * Generates a string representation of the column definition using the provided query context.
-     * The generated string outlines the column attributes such as key, data type, constraints,
-     * and default value, based on the column's configuration and the supported database features.
-     *
-     * @param query the query context providing database-specific details and configurations for the column
-     * @return a string representation of the column definition in SQL format, or null in case of unsupported configurations
-     */
-    public String toString(Query query) {
-        Check.ifNull(key, "column-key");
-        Check.ifNull(dataType, "datatype");
-        if (dataType.requireObject()) {
-            Check.ifNull(dataTypeParamenterObject, "dataTypeParameterObject");
-        }
-        StringBuilder column = new StringBuilder(key).append(" ").append(dataType.toSQL(dataTypeParamenterObject));
-
-        if (notNull) {
-            column.append(" NOT NULL");
-        }
-
-        if (columnType != null && columnType != ColumnType.DEFAULT) {
-            if (columnType.equals(ColumnType.PRIMARY_KEY_AUTOINCREMENT)) {
-                if (query.databaseAdapter() == null) {
-                    return null;
-                }
-                if (query.databaseAdapter().driverType().equals(DriverType.MYSQL) || query.databaseAdapter().driverType().equals(DriverType.MARIADB)) {
-                    if (!dataType.equals(DataType.TINYTEXT) && !dataType.equals(DataType.INTEGER) && !dataType.equals(DataType.BIGINT)) {
-                        System.out.println("ERROR: You cannot set an autoincrement to a non int value. Setting it to default primary key.");
-                        columnType = ColumnType.PRIMARY_KEY;
-                    }
-                } else if (query.databaseAdapter().driverType().equals(DriverType.SQLITE)) {
-                    if (!dataType.equals(DataType.INTEGER)) {
-                        System.out.println("ERROR: You cannot set an autoincrement to a non integer. Setting it to default primary key.");
-                        columnType = ColumnType.PRIMARY_KEY;
-                    }
-                }
-            }
-            column.append(" ").append(columnType.toString(query));
-        }
-
-        if (defaultValue != null) {
-            column.append(" DEFAULT '").append((defaultValue instanceof Boolean bool ? (bool ? 1 : 0) : defaultValue)).append("'");
-
-        }
-
-        return column.toString();
-    }
-
-    @Override
-    public String toString() {
-        return null;
-    }
 
     /**
      * Default constructor for the Column class.
@@ -250,6 +195,59 @@ public class Column {
     }
 
     /**
+     * Generates a string representation of the column definition using the provided query context.
+     * The generated string outlines the column attributes such as key, data type, constraints,
+     * and default value, based on the column's configuration and the supported database features.
+     *
+     * @param query the query context providing database-specific details and configurations for the column
+     * @return a string representation of the column definition in SQL format, or null in case of unsupported configurations
+     */
+    public String toString(Query query) {
+        Check.ifNull(key, "column-key");
+        Check.ifNull(dataType, "datatype");
+        if (dataType.requireObject()) {
+            Check.ifNull(dataTypeParamenterObject, "dataTypeParameterObject");
+        }
+        StringBuilder column = new StringBuilder(key).append(" ").append(dataType.toSQL(dataTypeParamenterObject));
+
+        if (notNull) {
+            column.append(" NOT NULL");
+        }
+
+        if (columnType != null && columnType != ColumnType.DEFAULT) {
+            if (columnType.equals(ColumnType.PRIMARY_KEY_AUTOINCREMENT)) {
+                if (query.databaseAdapter() == null) {
+                    return null;
+                }
+                if (query.databaseAdapter().driverType().equals(DriverType.MYSQL) || query.databaseAdapter().driverType().equals(DriverType.MARIADB)) {
+                    if (!dataType.equals(DataType.TINYTEXT) && !dataType.equals(DataType.INTEGER) && !dataType.equals(DataType.BIGINT)) {
+                        System.out.println("ERROR: You cannot set an autoincrement to a non int value. Setting it to default primary key.");
+                        columnType = ColumnType.PRIMARY_KEY;
+                    }
+                } else if (query.databaseAdapter().driverType().equals(DriverType.SQLITE)) {
+                    if (!dataType.equals(DataType.INTEGER)) {
+                        System.out.println("ERROR: You cannot set an autoincrement to a non integer. Setting it to default primary key.");
+                        columnType = ColumnType.PRIMARY_KEY;
+                    }
+                }
+            }
+            column.append(" ").append(columnType.toString(query));
+        }
+
+        if (defaultValue != null) {
+            column.append(" DEFAULT '").append((defaultValue instanceof Boolean bool ? (bool ? 1 : 0) : defaultValue)).append("'");
+
+        }
+
+        return column.toString();
+    }
+
+    @Override
+    public String toString() {
+        return null;
+    }
+
+    /**
      * Retrieves the key or unique identifier of the column.
      *
      * @return a string representing the key or name of the column
@@ -280,7 +278,7 @@ public class Column {
      * Retrieves the column type associated with this instance of the Column.
      *
      * @return the ColumnType representing the type of constraint or attribute
-     *         applied to the column, such as DEFAULT, PRIMARY_KEY, or UNIQUE
+     * applied to the column, such as DEFAULT, PRIMARY_KEY, or UNIQUE
      */
     public ColumnType columnType() {
         return this.columnType;

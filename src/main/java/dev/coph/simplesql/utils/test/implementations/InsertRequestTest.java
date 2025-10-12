@@ -39,7 +39,6 @@ public class InsertRequestTest implements Test {
                 .actionAfterQuery(success -> {
                     if (!success) {
                         Logger.getInstance().debug("Not succeeded");
-                        return;
                     }
                 });
         Query query = new Query(databaseAdapter).executeQuery(insert);

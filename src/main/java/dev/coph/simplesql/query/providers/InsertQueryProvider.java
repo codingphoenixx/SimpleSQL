@@ -110,7 +110,7 @@ public class InsertQueryProvider implements QueryProvider {
 
         sql.append(";");
 
-       this.boundParams = List.copyOf(params);
+        this.boundParams = List.copyOf(params);
         return sql.toString();
     }
 

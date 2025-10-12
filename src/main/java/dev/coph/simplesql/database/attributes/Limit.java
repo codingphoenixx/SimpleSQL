@@ -1,7 +1,5 @@
 package dev.coph.simplesql.database.attributes;
 
-import lombok.experimental.Accessors;
-
 
 public class Limit {
 

@@ -23,9 +23,6 @@ dependencies {
     implementation 'org.mariadb.jdbc:mariadb-java-client:3.5.6'
     implementation 'org.postgresql:postgresql:42.7.8'
 
-    compileOnly 'org.projectlombok:lombok:1.18.42'
-    annotationProcessor 'org.projectlombok:lombok:1.18.42'
-
     implementation "dev.coph:simplelogger:2.2.0"
     implementation "dev.coph:simpleutilities:3.5.0"
 }

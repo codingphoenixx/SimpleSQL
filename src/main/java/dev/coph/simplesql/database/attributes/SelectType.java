@@ -14,5 +14,5 @@ public enum SelectType {
     /**
      * Represents a `DISTINCT` select type in a SQL query, used to ensure that the result set contains only unique records by eliminating duplicate rows.
      */
-    DISTINCT;
+    DISTINCT
 }

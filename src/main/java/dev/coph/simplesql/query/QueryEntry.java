@@ -2,15 +2,10 @@ package dev.coph.simplesql.query;
 
 
 import java.text.SimpleDateFormat;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
 
 public class QueryEntry {
-    private static SimpleDateFormat DATE_TIME_CONVERTER = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    private static SimpleDateFormat DATE_CONVERTER = new SimpleDateFormat("yyyy-MM-dd");
+    private static final SimpleDateFormat DATE_TIME_CONVERTER = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static final SimpleDateFormat DATE_CONVERTER = new SimpleDateFormat("yyyy-MM-dd");
 
     private String columName;
 

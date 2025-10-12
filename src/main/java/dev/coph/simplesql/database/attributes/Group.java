@@ -1,7 +1,5 @@
 package dev.coph.simplesql.database.attributes;
 
-import lombok.experimental.Accessors;
-
 import java.util.HashSet;
 import java.util.Set;
 
@@ -66,7 +64,6 @@ public class Group {
         keys.add(key);
         return this;
     }
-
 
 
     public Group condition(Condition condition) {
