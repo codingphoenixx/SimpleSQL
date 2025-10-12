@@ -10,6 +10,12 @@ public class DatabaseCheck {
         throw new FeatureNotSupportedException(driver);
     }
 
+
+    public static void missingDriver(DriverType driver) {
+        if (driver == null)
+            throw new IllegalStateException("Driver is not set.");
+    }
+
     public static void unsupportedDriver(DriverType driver, DriverType... disallowed) {
         for (DriverType d : disallowed)
             if (d == driver)

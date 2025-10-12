@@ -31,6 +31,8 @@ public class TableCreateQueryProvider implements QueryProvider {
     private String tableComment;
     private String tableOptions;
 
+    private String engine;
+
 
     @Override
     public DriverCompatibility compatibility() {
@@ -77,7 +79,26 @@ public class TableCreateQueryProvider implements QueryProvider {
     private void appendTableOptions(StringBuilder sql, DriverType driver) {
         if (tableOptions != null && !tableOptions.isBlank()) {
             sql.append(" ").append(tableOptions.trim());
-        } else if (tableComment != null && !tableComment.isBlank()) {
+            return;
+        }
+
+        StringBuilder opts = new StringBuilder();
+        if ((driver == DriverType.MYSQL || driver == DriverType.MARIADB) && engine != null && !engine.isBlank()) {
+            if (!opts.isEmpty()) opts.append(" ");
+            opts.append("ENGINE=").append(engine.trim());
+        }
+
+        if (tableComment != null && !tableComment.isBlank()) {
+            DatabaseCheck.requireDriver(driver, DriverType.MYSQL, DriverType.MARIADB);
+            if (!opts.isEmpty()) opts.append(" ");
+            opts.append("COMMENT='").append(escapeSqlSingleQuote(tableComment)).append("'");
+        }
+
+        if (!opts.isEmpty()) {
+            sql.append(" ").append(opts);
+        }
+
+        if (tableComment != null && !tableComment.isBlank()) {
             DatabaseCheck.requireDriver(driver, DriverType.MYSQL, DriverType.MARIADB);
             sql.append(" COMMENT=").append("'").append(escapeSqlSingleQuote(tableComment)).append("'");
         }
@@ -91,6 +112,14 @@ public class TableCreateQueryProvider implements QueryProvider {
     public TableCreateQueryProvider table(String table) {
         this.table = table;
         return this;
+    }
+
+    public String engine() {
+        return engine;
+    }
+
+    public void engine(String engine) {
+        this.engine = engine;
     }
 
     public TableCreateQueryProvider createMethode(CreateMethode createMethode) {
