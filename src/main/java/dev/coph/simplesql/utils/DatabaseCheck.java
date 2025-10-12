@@ -9,4 +9,10 @@ public class DatabaseCheck {
         for (DriverType d : allowed) if (d == driver) return;
         throw new FeatureNotSupportedException(driver);
     }
+
+    public static void unsupportedDriver(DriverType driver, DriverType... disallowed) {
+        for (DriverType d : disallowed)
+            if (d == driver)
+                throw new FeatureNotSupportedException(driver);
+    }
 }

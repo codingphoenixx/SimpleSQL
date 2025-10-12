@@ -7,6 +7,7 @@ import dev.coph.simplesql.exception.FeatureNotSupportedException;
 import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.query.QueryProvider;
 import dev.coph.simplesql.query.SimpleResultSet;
+import dev.coph.simplesql.utils.DatabaseCheck;
 import dev.coph.simpleutilities.action.RunnableAction;
 import dev.coph.simpleutilities.check.Check;
 
@@ -20,7 +21,7 @@ public class SelectQueryProvider implements QueryProvider {
 
     private SelectFunction function = SelectFunction.NORMAL;
     private SelectType selectType = SelectType.NORMAL;
-
+    private String columnAlias;
     private Order order;
 
     private LinkedHashSet<Condition> whereConditions = new LinkedHashSet<>();
@@ -36,7 +37,7 @@ public class SelectQueryProvider implements QueryProvider {
 
     private Group group;
 
-
+    private final List<Join> joins = new ArrayList<>();
     private RunnableAction<SimpleResultSet> resultActionAfterQuery;
     private RunnableAction<Boolean> actionAfterQuery;
 
@@ -60,12 +61,10 @@ public class SelectQueryProvider implements QueryProvider {
         StringBuilder sql = new StringBuilder("SELECT ");
         List<Object> params = new ArrayList<>();
 
-        // DISTINCT
         if (selectType == SelectType.DISTINCT) {
             sql.append("DISTINCT ");
         }
 
-        // Function or columns
         if (function != null && function != SelectFunction.NORMAL) {
             String col = columnKeys.get(0);
             sql.append(function.name()).append("(").append(col).append(")");
@@ -75,42 +74,41 @@ public class SelectQueryProvider implements QueryProvider {
 
         sql.append(" FROM ").append(table);
 
-        // WHERE
+        if (columnAlias != null && !columnAlias.isBlank()) {
+            sql.append(" AS ").append(columnAlias);
+        }
+
+
+        if (!joins.isEmpty()) {
+            for (Join j : joins) {
+                renderJoin(sql, driver, j, params);
+            }
+        }
+
         if (whereConditions != null && !whereConditions.isEmpty()) {
             sql.append(" WHERE ");
             sql.append(buildConditions(whereConditions.iterator(), params));
         }
 
-        // GROUP BY
         if (group != null && group.keys() != null && !group.keys().isEmpty()) {
             sql.append(" ").append(buildGroupBy(group));
         }
 
-        // HAVING
         if (group != null && group.conditions() != null && !group.conditions().isEmpty()) {
-            // If no GROUP BY keys but HAVING exists, standard SQL allows HAVING without GROUP BY
-            // in some DBs it acts like WHERE on aggregates. We still permit it.
-            if (group.keys() == null || group.keys().isEmpty()) {
-                sql.append(" HAVING ");
-            } else {
-                sql.append(" HAVING ");
-            }
+            sql.append(" HAVING ");
             sql.append(buildConditions(group.conditions().iterator(), params));
         }
 
-        // ORDER BY
         if (order != null && order.orderRules() != null && !order.orderRules().isEmpty()) {
             sql.append(order.toString(query));
         }
 
-        // LIMIT/OFFSET
         int lim = (limit != null) ? limit.limit() : 0;
         int off = (limit != null) ? limit.offset() : 0;
         if (lim > 0 || off > 0) {
             appendLimitOffset(sql, driver, lim, off);
         }
 
-        // Locking
         if (lockMode != null || skipLocked || noWait) {
             appendLocking(sql, driver);
         }
@@ -135,7 +133,6 @@ public class SelectQueryProvider implements QueryProvider {
     }
 
     private String buildGroupBy(Group group) {
-        // Render "GROUP BY k1, k2"
         StringBuilder sb = new StringBuilder("GROUP BY ");
         boolean first = true;
         for (String k : group.keys()) {
@@ -173,61 +170,59 @@ public class SelectQueryProvider implements QueryProvider {
         return sb.toString();
     }
 
-    private int appendIn(StringBuilder sb, String column, boolean not, Object value, List<Object> params) {
-        Collection<?> coll = null;
-        if (value instanceof Collection<?> c) {
-            coll = c;
-        } else if (value != null && value.getClass().isArray()) {
-            int len = java.lang.reflect.Array.getLength(value);
-            List<Object> list = new ArrayList<>(len);
-            for (int i = 0; i < len; i++) list.add(java.lang.reflect.Array.get(value, i));
-            coll = list;
+    private void renderJoin(StringBuilder sql, DriverType driver, Join join, List<Object> params) {
+        switch (join.type()) {
+            case INNER -> sql.append(" INNER JOIN ");
+            case LEFT -> sql.append(" LEFT JOIN ");
+            case RIGHT -> {
+                DatabaseCheck.unsupportedDriver(driver, DriverType.SQLITE);
+                if (driver == DriverType.SQLITE) throw new FeatureNotSupportedException(driver);
+                sql.append(" RIGHT JOIN ");
+            }
+            case FULL -> {
+                DatabaseCheck.requireDriver(driver, DriverType.POSTGRESQL);
+                sql.append(" FULL OUTER JOIN ");
+            }
         }
-        if (coll == null || coll.isEmpty()) return 0;
-
-        sb.append(column).append(not ? " NOT IN (" : " IN (");
-        StringJoiner join = new StringJoiner(", ");
-        for (Object v : coll) {
-            join.add("?");
-            params.add(v);
+        sql.append(join.table());
+        if (join.alias() != null && !join.alias().isBlank()) {
+            sql.append(" AS ").append(join.alias());
         }
-        sb.append(join).append(")");
-        return coll.size();
+        if (join.onConditions() != null && !join.onConditions().isEmpty()) {
+            sql.append(" ON ");
+            sql.append(buildConditions(join.onConditions().iterator(), params));
+        } else {
+            throw new IllegalArgumentException("JOIN requires ON conditions");
+        }
     }
 
 
+
     private void appendLimitOffset(StringBuilder sql, DriverType driver, int limit, int offset) {
-        // Use ANSI-ish "LIMIT n OFFSET m" which is supported by PostgreSQL and SQLite.
-        // MySQL/MariaDB support it in modern versions; if you must support very old MySQL, switch to "LIMIT m, n".
         if (limit > 0) {
             sql.append(" LIMIT ").append(limit);
             if (offset > 0) {
                 sql.append(" OFFSET ").append(offset);
             }
         } else {
-            // explicit offset without limit: treat as unsupported explicit request
             throw new FeatureNotSupportedException(driver);
         }
     }
 
     private void appendLocking(StringBuilder sql, DriverType driver) {
-        // Only if user explicitly requested locking, enforce driver support
         switch (driver) {
             case MYSQL, MARIADB -> {
                 if (lockMode == LockMode.FOR_UPDATE) {
                     sql.append(" FOR UPDATE");
                 } else if (lockMode == LockMode.FOR_SHARE) {
-                    // Prefer FOR SHARE (MySQL 8+/MariaDB) over deprecated "LOCK IN SHARE MODE"
                     sql.append(" FOR SHARE");
                 } else if (lockMode == LockMode.FOR_NO_KEY_UPDATE || lockMode == LockMode.FOR_KEY_SHARE) {
                     throw new FeatureNotSupportedException(driver);
                 }
                 if (skipLocked) {
-                    // Requires MySQL 8+/MariaDB 10.3+. Without version probing, be strict:
                     throw new FeatureNotSupportedException(driver);
                 }
                 if (noWait) {
-                    // Also version/engine dependent in MySQL; throw to be safe
                     throw new FeatureNotSupportedException(driver);
                 }
             }
@@ -243,7 +238,6 @@ public class SelectQueryProvider implements QueryProvider {
                 if (noWait) sql.append(" NOWAIT");
             }
             case SQLITE -> {
-                // SQLite does not support SELECT ... FOR UPDATE
                 throw new FeatureNotSupportedException(driver);
             }
             default -> throw new FeatureNotSupportedException(driver);
