@@ -1,6 +1,6 @@
 package dev.coph.simplesql.database.attributes;
 
-public enum TruncateBehaviour {
+public enum DropBehaviour {
     NONE,
     CASCADE,
     RESTRICT;

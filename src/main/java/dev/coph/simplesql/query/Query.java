@@ -44,6 +44,22 @@ public class Query {
      */
     private final DatabaseAdapter databaseAdapter;
     /**
+     * A list containing all the SQL queries associated with the current Query instance.
+     * Each entry in the list implements the {@link QueryProvider} interface, which
+     * provides the SQL query generation logic and represents a single database action.
+     * <p>
+     * This collection allows for batch processing of queries, supporting both
+     * Insert and Select operations among others, depending on the implementation
+     * of {@link QueryProvider}.
+     * <p>
+     * The queries are executed either synchronously or asynchronously based
+     * on the settings of the owning Query object.
+     * <p>
+     * This field plays a primary role in SQL command preparation and submission
+     * to the underlying database system.
+     */
+    private final ArrayList<QueryProvider> queries = new ArrayList<>();
+    /**
      * Indicates whether the query execution should be performed asynchronously.
      * <p>
      * When set to `true`, the queries will be executed asynchronously in a separate thread,
@@ -79,22 +95,6 @@ public class Query {
     private boolean succeeded = false;
     private boolean preserveQueriesAfterExecution = false;
     private boolean useTransaction = true;
-    /**
-     * A list containing all the SQL queries associated with the current Query instance.
-     * Each entry in the list implements the {@link QueryProvider} interface, which
-     * provides the SQL query generation logic and represents a single database action.
-     * <p>
-     * This collection allows for batch processing of queries, supporting both
-     * Insert and Select operations among others, depending on the implementation
-     * of {@link QueryProvider}.
-     * <p>
-     * The queries are executed either synchronously or asynchronously based
-     * on the settings of the owning Query object.
-     * <p>
-     * This field plays a primary role in SQL command preparation and submission
-     * to the underlying database system.
-     */
-    private final ArrayList<QueryProvider> queries = new ArrayList<>();
 
 
     /**

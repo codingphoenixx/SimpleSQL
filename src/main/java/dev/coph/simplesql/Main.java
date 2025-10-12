@@ -71,7 +71,6 @@ public class Main {
 
 //      - TableAlterQueryProviders
 
-//TODO:  Add indexes
 //TODO:  DELETE Where in
 //TODO:  Metadata -> Table/Column Name/Amount/DATATYPE
 //TODO:  FOREIGN KEY

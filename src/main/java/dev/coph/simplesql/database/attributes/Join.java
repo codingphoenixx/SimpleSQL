@@ -8,6 +8,7 @@ public class Join {
     private final String table;
     private final String alias;
     private final LinkedHashSet<Condition> onConditions = new LinkedHashSet<>();
+
     public Join(JoinType type, String table, String alias) {
         this.type = type;
         this.table = table;

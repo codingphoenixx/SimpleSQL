@@ -17,12 +17,12 @@ import java.util.*;
 public class SelectQueryProvider implements QueryProvider {
 
     private final List<Join> joins = new ArrayList<>();
+    private final LinkedHashSet<Condition> whereConditions = new LinkedHashSet<>();
     private String table;
     private SelectFunction function = SelectFunction.NORMAL;
     private SelectType selectType = SelectType.NORMAL;
     private String columnAlias;
     private Order order;
-    private final LinkedHashSet<Condition> whereConditions = new LinkedHashSet<>();
     private List<String> columnKeys = new ArrayList<>();
     private Limit limit;
     private LockMode lockMode;

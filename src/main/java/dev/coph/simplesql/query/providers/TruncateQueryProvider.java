@@ -1,6 +1,6 @@
 package dev.coph.simplesql.query.providers;
 
-import dev.coph.simplesql.database.attributes.TruncateBehaviour;
+import dev.coph.simplesql.database.attributes.DropBehaviour;
 import dev.coph.simplesql.driver.DriverCompatibility;
 import dev.coph.simplesql.driver.DriverType;
 import dev.coph.simplesql.exception.FeatureNotSupportedException;
@@ -14,12 +14,8 @@ public class TruncateQueryProvider implements QueryProvider {
 
     private String table;
     private RunnableAction<Boolean> actionAfterQuery;
-
-    public enum IdentityMode { RESTART, CONTINUE }
     private IdentityMode identityMode;
-    private TruncateBehaviour behaviour = TruncateBehaviour.NONE;
-
-
+    private DropBehaviour behaviour = DropBehaviour.NONE;
 
     @Override
     public DriverCompatibility compatibility() {
@@ -41,7 +37,7 @@ public class TruncateQueryProvider implements QueryProvider {
 
         switch (driver) {
             case MYSQL, MARIADB -> {
-                if (identityMode != null || behaviour != TruncateBehaviour.NONE) {
+                if (identityMode != null || behaviour != DropBehaviour.NONE) {
                     throw new FeatureNotSupportedException(driver);
                 }
                 sql.append("TRUNCATE TABLE ").append(table).append(";");
@@ -76,11 +72,10 @@ public class TruncateQueryProvider implements QueryProvider {
         return this;
     }
 
-    public TruncateQueryProvider cascade(TruncateBehaviour behaviour) {
+    public TruncateQueryProvider dropBehaviour(DropBehaviour behaviour) {
         this.behaviour = behaviour;
         return this;
     }
-
 
     public TruncateQueryProvider actionAfterQuery(RunnableAction<Boolean> actionAfterQuery) {
         this.actionAfterQuery = actionAfterQuery;
@@ -92,7 +87,6 @@ public class TruncateQueryProvider implements QueryProvider {
         return actionAfterQuery;
     }
 
-
     public String table() {
         return this.table;
     }
@@ -101,8 +95,10 @@ public class TruncateQueryProvider implements QueryProvider {
         return this.identityMode;
     }
 
-    public TruncateBehaviour behaviour() {
+    public DropBehaviour behaviour() {
         return this.behaviour;
     }
+
+    public enum IdentityMode {RESTART, CONTINUE}
 
 }
