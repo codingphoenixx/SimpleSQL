@@ -77,22 +77,22 @@ public class QueryEntry {
         if(value == null)
             return "NULL";
 
-        if (value != null && value instanceof Boolean bool) {
+        if (value instanceof Boolean bool) {
             if (bool)
                 return "'1'";
             else
                 return "'0'";
         }
-        if (value != null && value instanceof Number number)
+        if (value instanceof Number number)
             return number.toString();
 
-        if(value != null && value instanceof Enum<?> enumValue)
+        if(value instanceof Enum<?> enumValue)
             return "'%s'".formatted(enumValue.name());
 
-        if (value != null && value instanceof Date date)
+        if (value instanceof Date date)
             return "'%s'".formatted(DATE_TIME_CONVERTER.format(date));
 
-        if(value != null && value instanceof OffsetDateTime odt)
+        if(value instanceof OffsetDateTime odt)
             return "'%s'".formatted(odt.atZoneSameInstant(ZoneOffset.UTC).toLocalDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
 
         if (rawValue)
