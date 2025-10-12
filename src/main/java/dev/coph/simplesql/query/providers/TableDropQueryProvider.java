@@ -69,7 +69,6 @@ public class TableDropQueryProvider implements QueryProvider {
     }
 
 
-    // Fluent API
 
     public TableDropQueryProvider table(String... tables) {
         if (this.tables == null) this.tables = new ArrayList<>();

@@ -64,9 +64,6 @@ public class Main {
 
 
 //TODO:
-//      REWORK-CLASSES:
-//      - TableDropQueryProvider
-
 //      - TableAlterQueryProviders
 
 //TODO:  DELETE Where in
