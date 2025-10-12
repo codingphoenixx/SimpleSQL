@@ -206,7 +206,7 @@ public class Query {
 
                     String sql = queryProvider.generateSQLString(this);
                     if (sql == null) {
-                        System.out.println("Generated SQL-String is null. Canceling request.");
+                        Logger.getInstance().log(Logger.LogLevel.ERROR, "Generated SQL-String is null. Canceling request");
                         if (useTransaction)
                             connection.rollback();
                         return;

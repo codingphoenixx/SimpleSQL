@@ -17,6 +17,7 @@ import java.sql.ResultSet;
 import java.sql.ResultSetMetaData;
 import java.sql.SQLException;
 import java.util.Base64;
+import java.util.Random;
 import java.util.UUID;
 
 /**
@@ -135,13 +136,18 @@ public class Main {
                 .table("test6")
                 .createMethode(CreateMethode.IF_NOT_EXISTS)
                 .column("uuid", DataType.VARCHAR, 36, true)
-                .column("number", DataType.INTEGER);
+                .column("number", DataType.INTEGER)
+                .column("comment", DataType.TINYTEXT);
+
         TableCreateQueryProvider tableCreateQueryProvider2 = new TableCreateQueryProvider()
                 .table("test7")
                 .createMethode(CreateMethode.IF_NOT_EXISTS)
                 .column("uuid", DataType.VARCHAR, 36, true)
-                .column("number", DataType.INTEGER);
+                .column("number", DataType.INTEGER)
+                .column("comment", DataType.TINYTEXT);
         query.executeQuery(tableCreateQueryProvider, tableCreateQueryProvider2);
+
+        createDefaultEntries(databaseAdapter);
 
 
         SelectQueryProvider selectQueryProvider = new SelectQueryProvider()
@@ -184,9 +190,17 @@ public class Main {
             InsertQueryProvider insertQueryProvider = new InsertQueryProvider()
                     .table("test6")
                     .entry("uuid", uuid.toString())
+                    .entry("number", i + new Random().nextInt())
                     .entry("comment", comment);
-            insertQuery.queries(insertQueryProvider);
+
+            InsertQueryProvider insertQueryProvider2 = new InsertQueryProvider()
+                    .table("test7")
+                    .entry("uuid", uuid.toString())
+                    .entry("number", i+ new Random().nextInt())
+                    .entry("comment", comment);
+            insertQuery.queries(insertQueryProvider, insertQueryProvider2);
         }
+        System.out.println("Inserting 1000 entries into test6 and test7...");
         insertQuery.execute();
     }
 
