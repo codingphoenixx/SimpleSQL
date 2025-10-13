@@ -61,7 +61,6 @@ public class DatabaseDropQueryProvider implements QueryProvider {
         return this;
     }
 
-    // Fluent API
 
     public DatabaseDropQueryProvider database(String database) {
         this.database = database;

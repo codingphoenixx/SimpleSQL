@@ -237,7 +237,6 @@ public class SelectQueryProvider implements QueryProvider {
         return boundParams != null ? boundParams : List.of();
     }
 
-    // QueryProvider
 
     @Override
     public RunnableAction<Boolean> actionAfterQuery() {
@@ -254,7 +253,6 @@ public class SelectQueryProvider implements QueryProvider {
         return this;
     }
 
-    // Fluent API
 
     public SelectQueryProvider function(SelectFunction function) {
         this.function = (function != null) ? function : SelectFunction.NORMAL;
@@ -333,7 +331,6 @@ public class SelectQueryProvider implements QueryProvider {
         return this;
     }
 
-    // Locking options
     public SelectQueryProvider lock(LockMode mode) {
         this.lockMode = mode;
         return this;
@@ -353,7 +350,6 @@ public class SelectQueryProvider implements QueryProvider {
         return this.table;
     }
 
-    // Getters
 
     public SelectFunction function() {
         return this.function;
