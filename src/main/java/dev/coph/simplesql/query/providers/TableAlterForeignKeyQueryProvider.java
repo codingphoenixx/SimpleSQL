@@ -15,28 +15,15 @@ import java.util.StringJoiner;
 
 public class TableAlterForeignKeyQueryProvider extends TableAlterQueryProvider {
 
-    public enum ReferentialAction {
-        NO_ACTION, RESTRICT, CASCADE, SET_NULL, SET_DEFAULT
-    }
-
-    public enum DeferrableType {NO, DEFERRABLE, NOT_DEFERRABLE}
-
-    public enum InitiallyDeferrable {NO, INITIALLY_DEFERRED, INITIALLY_IMMEDIATE}
-
     private ActionType action;
-
     private String constraintName;
     private List<String> columns = new ArrayList<>();
-
     private String referencedTable;
     private List<String> referencedColumns = new ArrayList<>();
-
     private ReferentialAction onDelete;
     private ReferentialAction onUpdate;
-
     private DeferrableType deferrable;
     private InitiallyDeferrable initiallyDeferred;
-
     private RunnableAction<Boolean> actionAfterQuery;
 
     @Override
@@ -150,7 +137,6 @@ public class TableAlterForeignKeyQueryProvider extends TableAlterQueryProvider {
         return j.toString();
     }
 
-
     public TableAlterForeignKeyQueryProvider action(ActionType action) {
         this.action = action;
         return this;
@@ -215,4 +201,12 @@ public class TableAlterForeignKeyQueryProvider extends TableAlterQueryProvider {
     public RunnableAction<Boolean> actionAfterQuery() {
         return actionAfterQuery;
     }
+
+    public enum ReferentialAction {
+        NO_ACTION, RESTRICT, CASCADE, SET_NULL, SET_DEFAULT
+    }
+
+    public enum DeferrableType {NO, DEFERRABLE, NOT_DEFERRABLE}
+
+    public enum InitiallyDeferrable {NO, INITIALLY_DEFERRED, INITIALLY_IMMEDIATE}
 }

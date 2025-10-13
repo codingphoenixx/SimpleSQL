@@ -69,7 +69,6 @@ public class TableDropQueryProvider implements QueryProvider {
     }
 
 
-
     public TableDropQueryProvider table(String... tables) {
         if (this.tables == null) this.tables = new ArrayList<>();
         this.tables.addAll(Arrays.asList(tables));

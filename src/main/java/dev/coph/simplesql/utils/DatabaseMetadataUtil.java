@@ -12,93 +12,6 @@ public final class DatabaseMetadataUtil {
     private DatabaseMetadataUtil() {
     }
 
-    public static final class CatalogInfo {
-        public final String catalog;
-
-        public CatalogInfo(String catalog) {
-            this.catalog = catalog;
-        }
-
-        @Override
-        public String toString() {
-            return catalog;
-        }
-    }
-
-    public static final class SchemaInfo {
-        public final String catalog;
-        public final String schema;
-
-        public SchemaInfo(String catalog, String schema) {
-            this.catalog = catalog;
-            this.schema = schema;
-        }
-
-        @Override
-        public String toString() {
-            return (catalog != null ? catalog + "." : "") + schema;
-        }
-    }
-
-    public static final class TableInfo {
-        public final String catalog;
-        public final String schema;
-        public final String tableName;
-        public final String tableType;
-
-        public TableInfo(String catalog, String schema, String tableName, String tableType) {
-            this.catalog = catalog;
-            this.schema = schema;
-            this.tableName = tableName;
-            this.tableType = tableType;
-        }
-
-        @Override
-        public String toString() {
-            return (schema != null ? schema + "." : "") + tableName + " (" + tableType + ")";
-        }
-    }
-
-    public static final class ColumnInfo {
-        public final String catalog;
-        public final String schema;
-        public final String tableName;
-        public final String columnName;
-        public final int dataType;
-        public final String typeName;
-        public final int columnSize;
-        public final int decimalDigits;
-        public final boolean nullable;
-
-        public ColumnInfo(
-                String catalog,
-                String schema,
-                String tableName,
-                String columnName,
-                int dataType,
-                String typeName,
-                int columnSize,
-                int decimalDigits,
-                boolean nullable) {
-            this.catalog = catalog;
-            this.schema = schema;
-            this.tableName = tableName;
-            this.columnName = columnName;
-            this.dataType = dataType;
-            this.typeName = typeName;
-            this.columnSize = columnSize;
-            this.decimalDigits = decimalDigits;
-            this.nullable = nullable;
-        }
-
-        @Override
-        public String toString() {
-            return columnName + " " + typeName +
-                    "(" + columnSize + (decimalDigits > 0 ? "," + decimalDigits : "") + ")" +
-                    (nullable ? "" : " NOT NULL");
-        }
-    }
-
     public static DriverType detectDriverType(Connection conn) throws SQLException {
         String url = conn.getMetaData().getURL();
         if (url == null) return null;
@@ -214,6 +127,93 @@ public final class DatabaseMetadataUtil {
             return rs.getString(col);
         } catch (SQLException ignored) {
             return null;
+        }
+    }
+
+    public static final class CatalogInfo {
+        public final String catalog;
+
+        public CatalogInfo(String catalog) {
+            this.catalog = catalog;
+        }
+
+        @Override
+        public String toString() {
+            return catalog;
+        }
+    }
+
+    public static final class SchemaInfo {
+        public final String catalog;
+        public final String schema;
+
+        public SchemaInfo(String catalog, String schema) {
+            this.catalog = catalog;
+            this.schema = schema;
+        }
+
+        @Override
+        public String toString() {
+            return (catalog != null ? catalog + "." : "") + schema;
+        }
+    }
+
+    public static final class TableInfo {
+        public final String catalog;
+        public final String schema;
+        public final String tableName;
+        public final String tableType;
+
+        public TableInfo(String catalog, String schema, String tableName, String tableType) {
+            this.catalog = catalog;
+            this.schema = schema;
+            this.tableName = tableName;
+            this.tableType = tableType;
+        }
+
+        @Override
+        public String toString() {
+            return (schema != null ? schema + "." : "") + tableName + " (" + tableType + ")";
+        }
+    }
+
+    public static final class ColumnInfo {
+        public final String catalog;
+        public final String schema;
+        public final String tableName;
+        public final String columnName;
+        public final int dataType;
+        public final String typeName;
+        public final int columnSize;
+        public final int decimalDigits;
+        public final boolean nullable;
+
+        public ColumnInfo(
+                String catalog,
+                String schema,
+                String tableName,
+                String columnName,
+                int dataType,
+                String typeName,
+                int columnSize,
+                int decimalDigits,
+                boolean nullable) {
+            this.catalog = catalog;
+            this.schema = schema;
+            this.tableName = tableName;
+            this.columnName = columnName;
+            this.dataType = dataType;
+            this.typeName = typeName;
+            this.columnSize = columnSize;
+            this.decimalDigits = decimalDigits;
+            this.nullable = nullable;
+        }
+
+        @Override
+        public String toString() {
+            return columnName + " " + typeName +
+                    "(" + columnSize + (decimalDigits > 0 ? "," + decimalDigits : "") + ")" +
+                    (nullable ? "" : " NOT NULL");
         }
     }
 }

@@ -24,7 +24,6 @@ public abstract class TableAlterQueryProvider implements QueryProvider {
     }
 
 
-
     public String table() {
         return this.table;
     }

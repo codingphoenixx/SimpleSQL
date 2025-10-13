@@ -43,9 +43,17 @@ public class TableAlterModifyTypeQueryProvider extends TableAlterQueryProvider {
         };
     }
 
-    public DataType dataType() { return this.dataType; }
-    public Object dataTypeParameter() { return this.dataTypeParameter; }
-    public String columnName() { return this.columnName; }
+    public DataType dataType() {
+        return this.dataType;
+    }
+
+    public Object dataTypeParameter() {
+        return this.dataTypeParameter;
+    }
+
+    public String columnName() {
+        return this.columnName;
+    }
 
     public TableAlterModifyTypeQueryProvider dataType(DataType dataType) {
         this.dataType = dataType;

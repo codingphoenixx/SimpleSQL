@@ -9,8 +9,6 @@ import dev.coph.simpleutilities.check.Check;
 
 public class TableAlterDropColumnQueryProvider extends TableAlterQueryProvider {
 
-    public enum DropType { COLUMN, PRIMARY_KEY }
-
     private DropType dropType;
     private String dropObjectName;
     private String constraintName;
@@ -53,9 +51,17 @@ public class TableAlterDropColumnQueryProvider extends TableAlterQueryProvider {
         };
     }
 
-    public DropType dropType() { return this.dropType; }
-    public String dropObjectName() { return this.dropObjectName; }
-    public String constraintName() { return this.constraintName; }
+    public DropType dropType() {
+        return this.dropType;
+    }
+
+    public String dropObjectName() {
+        return this.dropObjectName;
+    }
+
+    public String constraintName() {
+        return this.constraintName;
+    }
 
     public TableAlterDropColumnQueryProvider dropType(DropType dropType) {
         this.dropType = dropType;
@@ -81,4 +87,6 @@ public class TableAlterDropColumnQueryProvider extends TableAlterQueryProvider {
     public RunnableAction<Boolean> actionAfterQuery() {
         return actionAfterQuery;
     }
+
+    public enum DropType {COLUMN, PRIMARY_KEY}
 }
