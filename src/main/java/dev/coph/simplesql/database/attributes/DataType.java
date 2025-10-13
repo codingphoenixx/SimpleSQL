@@ -116,6 +116,7 @@ public record DataType(boolean canHaveObject, boolean requireObject, String name
      */
     public DataType {
         //TODO: ENUM
+        //TODO: Add unsigned
     }
 
     @Override
