@@ -3,6 +3,8 @@ package dev.coph.simplesql.database.attributes;
 import dev.coph.simplesql.utils.StringEscapeUtils;
 import dev.coph.simpleutilities.check.Check;
 
+import java.sql.Timestamp;
+
 /**
  * This class represents a condition used in SQL queries.
  * It serves to define filter criteria and supports various comparison operators,
@@ -114,7 +116,8 @@ public class Condition {
         String queryValue;
         if (operator.needToBeANumber()) {
             queryValue = value.toString();
-            Check.ifNotNumber(value, "value");
+            if (!(value instanceof Timestamp))
+                Check.ifNotNumber(value, "value");
         } else {
             if (rawValue)
                 queryValue = value.toString();
