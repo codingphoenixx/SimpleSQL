@@ -1,84 +1,147 @@
 package dev.coph.simplesql.query.providers;
 
-
-import dev.coph.simplesql.driver.DriverCompatibility;
+import dev.coph.simplesql.driver.DriverType;
+import dev.coph.simplesql.exception.FeatureNotSupportedException;
 import dev.coph.simplesql.query.Query;
+import dev.coph.simplesql.utils.DatabaseCheck;
 import dev.coph.simpleutilities.action.RunnableAction;
 import dev.coph.simpleutilities.check.Check;
 
-/**
- * A class that generates SQL "ALTER TABLE" queries for adding attributes to
- * a specified column. This class extends {@code TableAlterQueryProvider} and
- * specializes in constructing statements to add attributes such as "UNIQUE" or
- * "PRIMARY KEY" to existing columns in a database table.
- */
+import java.util.ArrayList;
+import java.util.List;
+import java.util.StringJoiner;
+
 public class TableAlterAddAttributeQueryProvider extends TableAlterQueryProvider {
 
-    /**
-     * The name of the column the attribute should be added.
-     */
     private String columnName;
+    private List<String> columns;
 
-    /**
-     * The Type of the new column.
-     */
     private AttributeType attributeType;
+
+    private String constraintName;
+    private String indexName;
+
     private RunnableAction<Boolean> actionAfterQuery;
 
     @Override
-    public DriverCompatibility compatibility() {
-        return driverType -> true;
-    }
-
-    @Override
     public String getAlterTableString(Query query) {
-        Check.ifNullOrEmptyMap(columnName, "columnName");
-        Check.ifNullOrEmptyMap(attributeType, "attributeType");
-        return "ADD " + attributeType.name().replaceAll("_", " ") + " (" + columnName + ")";
+        Check.ifNull(attributeType, "attributeType");
+
+        var driver = query.databaseAdapter() != null
+                ? query.databaseAdapter().driverType()
+                : null;
+
+        DatabaseCheck.missingDriver(driver);
+
+        List<String> cols = new ArrayList<>();
+        if (columns != null && !columns.isEmpty()) {
+            cols.addAll(columns);
+        } else {
+            Check.ifNullOrEmptyMap(columnName, "columnName");
+            cols.add(columnName);
+        }
+
+        String colList = renderColumnList(cols);
+
+        return switch (attributeType) {
+            case PRIMARY_KEY -> renderAddPrimaryKey(driver, colList);
+            case UNIQUE -> renderAddUnique(driver, colList);
+        };
     }
 
-    /**
-     * Retrieves the name of the column to which the attribute should be added.
-     *
-     * @return the name of the column as a string.
-     */
+    private String renderAddPrimaryKey(DriverType driver, String colList) {
+        return switch (driver) {
+            case MYSQL, MARIADB -> "ADD PRIMARY KEY " + "(" + colList + ")";
+            case POSTGRESQL -> {
+                if (constraintName != null && !constraintName.isBlank()) {
+                    yield "ADD CONSTRAINT " + constraintName + " PRIMARY KEY (" + colList + ")";
+                } else {
+                    yield "ADD PRIMARY KEY (" + colList + ")";
+                }
+            }
+            default -> throw new FeatureNotSupportedException(driver);
+        };
+    }
+
+    private String renderAddUnique(DriverType driver, String colList) {
+        return switch (driver) {
+            case MYSQL, MARIADB -> {
+                if (constraintName != null && !constraintName.isBlank()) {
+                    yield "ADD CONSTRAINT " + constraintName + " UNIQUE (" + colList + ")";
+                } else if (indexName != null && !indexName.isBlank()) {
+                    yield "ADD UNIQUE INDEX " + indexName + " (" + colList + ")";
+                } else {
+                    yield "ADD UNIQUE (" + colList + ")";
+                }
+            }
+            case POSTGRESQL -> {
+                if (constraintName != null && !constraintName.isBlank()) {
+                    yield "ADD CONSTRAINT " + constraintName + " UNIQUE (" + colList + ")";
+                } else {
+                    yield "ADD UNIQUE (" + colList + ")";
+                }
+            }
+            default -> throw new FeatureNotSupportedException(driver);
+        };
+    }
+
+    private String renderColumnList(List<String> cols) {
+        StringJoiner joiner = new StringJoiner(", ");
+        for (String c : cols) {
+            Check.ifNullOrEmptyMap(c, "column in columns");
+            joiner.add(c);
+        }
+        return joiner.toString();
+    }
+
     public String columnName() {
         return this.columnName;
     }
 
-    /**
-     * Retrieves the type of the attribute to add.
-     *
-     * @return the attribute type, represented as an instance of {@code AttributeType}.
-     */
+    public List<String> columns() {
+        return this.columns;
+    }
+
     public AttributeType attributeType() {
         return this.attributeType;
     }
 
-    /**
-     * Sets the name of the column to which the attribute should be added.
-     *
-     * @param columnName the name of the column as a string
-     * @return the current instance of TableAlterAddAttributeQueryProvider for method chaining
-     */
+    public String constraintName() {
+        return this.constraintName;
+    }
+
+    public String indexName() {
+        return this.indexName;
+    }
+
     public TableAlterAddAttributeQueryProvider columnName(String columnName) {
         this.columnName = columnName;
         return this;
     }
 
-    public TableAlterAddAttributeQueryProvider actionAfterQuery(RunnableAction<Boolean> actionAfterQuery) {
-        this.actionAfterQuery = actionAfterQuery;
+    public TableAlterAddAttributeQueryProvider columns(List<String> columns) {
+        this.columns = columns != null ? new ArrayList<>(columns) : null;
         return this;
     }
 
-    /**
-     * Sets the type of the attribute to be added to the column.
-     *
-     * @param attributeType the type of the attribute, represented as an instance of {@code AttributeType}
-     * @return the current instance of {@code TableAlterAddAttributeQueryProvider} for method chaining
-     */
     public TableAlterAddAttributeQueryProvider attributeType(AttributeType attributeType) {
         this.attributeType = attributeType;
+        return this;
+    }
+
+    public TableAlterAddAttributeQueryProvider constraintName(String constraintName) {
+        this.constraintName = constraintName;
+        return this;
+    }
+
+    public TableAlterAddAttributeQueryProvider indexName(String indexName) {
+        this.indexName = indexName;
+        return this;
+    }
+
+    public TableAlterAddAttributeQueryProvider actionAfterQuery(
+            RunnableAction<Boolean> actionAfterQuery) {
+        this.actionAfterQuery = actionAfterQuery;
         return this;
     }
 
@@ -87,24 +150,8 @@ public class TableAlterAddAttributeQueryProvider extends TableAlterQueryProvider
         return actionAfterQuery;
     }
 
-    /**
-     * The type of attribute to add.
-     */
     public enum AttributeType {
-        /**
-         * Represents a type of attribute that enforces uniqueness on the values
-         * of the associated column or field in a database context. This constraint
-         * ensures that all values in the column or field are distinct, preventing
-         * duplicate entries.
-         */
         UNIQUE,
-        /**
-         * Designates an attribute that serves as the primary key in a database context.
-         * A primary key uniquely identifies each record in a table and ensures that
-         * no duplicate values exist in the associated column.
-         */
         PRIMARY_KEY
     }
-
-
 }
