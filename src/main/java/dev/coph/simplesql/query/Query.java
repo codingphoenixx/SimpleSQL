@@ -574,6 +574,7 @@ public class Query {
         }
     }
 
+
     /**
      * Adds one or more {@code QueryProvider} objects to this {@code Query} instance.
      * <p>
@@ -585,6 +586,11 @@ public class Query {
      */
     public Query queries(QueryProvider... queries) {
         this.queries.addAll(Arrays.asList(queries));
+        return this;
+    }
+
+    public Query query(QueryProvider query) {
+        this.queries.add(query);
         return this;
     }
 
