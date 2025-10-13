@@ -237,7 +237,6 @@ public class SelectQueryProvider implements QueryProvider {
         return boundParams != null ? boundParams : List.of();
     }
 
-
     @Override
     public RunnableAction<Boolean> actionAfterQuery() {
         return actionAfterQuery;
@@ -252,7 +251,6 @@ public class SelectQueryProvider implements QueryProvider {
         this.table = table;
         return this;
     }
-
 
     public SelectQueryProvider function(SelectFunction function) {
         this.function = (function != null) ? function : SelectFunction.NORMAL;
@@ -349,7 +347,6 @@ public class SelectQueryProvider implements QueryProvider {
     public String table() {
         return this.table;
     }
-
 
     public SelectFunction function() {
         return this.function;
