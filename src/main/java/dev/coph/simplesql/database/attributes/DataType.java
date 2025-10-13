@@ -105,6 +105,8 @@ public record DataType(boolean canHaveObject, boolean requireObject, String name
      */
     public static final DataType TIME = new DataType(false, false, "TIME");
 
+    public static final DataType ENUM = new DataType(true, true, "ENUM");
+
     /**
      * Constructs a new instance of the DataType class with the specified parameters.
      *
@@ -113,6 +115,7 @@ public record DataType(boolean canHaveObject, boolean requireObject, String name
      * @param name          The name of the DataType as a string.
      */
     public DataType {
+        //TODO: ENUM
     }
 
     @Override
@@ -129,6 +132,7 @@ public record DataType(boolean canHaveObject, boolean requireObject, String name
      * its associated value based on the internal logic of the DataType.
      */
     public StringBuilder toSQL(Object value) {
+
         return new StringBuilder().append(name).append(canHaveObject() && value != (requireObject ? 0 : null) ? "(" + value + ")" : "");
     }
 

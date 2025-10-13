@@ -5,11 +5,12 @@ plugins {
 }
 
 group = 'dev.coph'
-version = '3.0.0'
+version = '4.0.0-rc1'
 
 repositories {
     maven {
-        url = uri("https://repo.coph.dev/releases")
+        url = uri("http://repo.coph.dev/releases")
+        allowInsecureProtocol =  true
     }
 
     mavenCentral()
@@ -36,7 +37,8 @@ publishing {
     repositories {
         maven {
             name = "cophrepository"
-            url = "https://repo.coph.dev/releases"
+            url = "http://repo.coph.dev/releases"
+            allowInsecureProtocol = true
             credentials(PasswordCredentials)
             authentication {
                 basic(BasicAuthentication)
