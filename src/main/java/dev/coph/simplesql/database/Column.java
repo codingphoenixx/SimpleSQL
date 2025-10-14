@@ -303,6 +303,23 @@ public class Column {
         this.notNull = notNull;
     }
 
+    public Column(String key, DataType dataType, UnsignedState unsignedState, Object dataTypeParameterObject, ColumnType columnType) {
+        this.key = key;
+        this.dataType = dataType;
+        this.unsigned = unsignedState;
+        this.dataTypeParamenterObject = dataTypeParameterObject;
+        this.columnType = columnType;
+    }
+
+    public Column(String key, DataType dataType, UnsignedState unsignedState, Object dataTypeParameterObject, ColumnType columnType, boolean notNull) {
+        this.key = key;
+        this.dataType = dataType;
+        this.unsigned = unsignedState;
+        this.dataTypeParamenterObject = dataTypeParameterObject;
+        this.columnType = columnType;
+        this.notNull = notNull;
+    }
+
     /**
      * Generates a string representation of the column definition using the provided query context.
      * The generated string outlines the column attributes such as key, data type, constraints,

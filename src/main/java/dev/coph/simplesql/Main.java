@@ -72,3 +72,5 @@ public class Main {
 //TODO:  User administration: CREATE USER, GRANT, REVOKE
 //TODO:  CREATE TRIGGER
 
+//TODO: Remove overloaded constructors in column and change to builder
+

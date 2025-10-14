@@ -4,6 +4,7 @@ import dev.coph.simplesql.database.Column;
 import dev.coph.simplesql.database.attributes.ColumnType;
 import dev.coph.simplesql.database.attributes.CreateMethode;
 import dev.coph.simplesql.database.attributes.DataType;
+import dev.coph.simplesql.database.attributes.UnsignedState;
 import dev.coph.simplesql.driver.DriverCompatibility;
 import dev.coph.simplesql.driver.DriverType;
 import dev.coph.simplesql.query.Query;
@@ -137,8 +138,18 @@ public class TableCreateQueryProvider implements QueryProvider {
         return this;
     }
 
+    public TableCreateQueryProvider column(String key, DataType dataType, UnsignedState unsignedState) {
+        columns.add(new Column(key, dataType, unsignedState));
+        return this;
+    }
+
     public TableCreateQueryProvider column(String key, DataType dataType, Object dataTypeParameterObject) {
         columns.add(new Column(key, dataType, dataTypeParameterObject));
+        return this;
+    }
+
+    public TableCreateQueryProvider column(String key, DataType dataType, UnsignedState unsignedState, boolean notNull) {
+        columns.add(new Column(key, dataType, unsignedState, notNull));
         return this;
     }
 
@@ -147,9 +158,16 @@ public class TableCreateQueryProvider implements QueryProvider {
         return this;
     }
 
+
     public TableCreateQueryProvider column(
             String key, DataType dataType, Object dataTypeParameterObject, boolean notNull) {
         columns.add(new Column(key, dataType, dataTypeParameterObject, notNull));
+        return this;
+    }
+
+    public TableCreateQueryProvider column(
+            String key, DataType dataType, UnsignedState unsignedState, Object dataTypeParameterObject, ColumnType columnType) {
+        columns.add(new Column(key, dataType, unsignedState, dataTypeParameterObject, columnType));
         return this;
     }
 
@@ -168,6 +186,18 @@ public class TableCreateQueryProvider implements QueryProvider {
         columns.add(new Column(key, dataType, dataTypeParameterObject, columnType, notNull));
         return this;
     }
+
+    public TableCreateQueryProvider column(
+            String key,
+            DataType dataType,
+            UnsignedState unsignedState,
+            Object dataTypeParameterObject,
+            ColumnType columnType,
+            boolean notNull) {
+        columns.add(new Column(key, dataType, unsignedState, dataTypeParameterObject, columnType, notNull));
+        return this;
+    }
+
 
     public TableCreateQueryProvider column(String key, DataType dataType, ColumnType columnType) {
         columns.add(new Column(key, dataType, columnType));
