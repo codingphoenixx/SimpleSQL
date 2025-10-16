@@ -1,5 +1,6 @@
 package dev.coph.simplesql.query;
 
+import com.mysql.cj.log.Log;
 import dev.coph.simplelogger.Logger;
 import dev.coph.simplesql.adapter.DatabaseAdapter;
 import dev.coph.simplesql.exception.RequestNotExecutableException;
@@ -348,7 +349,7 @@ public class Query {
      */
     public Query executeQuery(QueryProvider... queries) {
         Check.ifNullOrEmptyMap(queries, "Query");
-        Arrays.stream(queries).forEach(query -> this.queries.add(query));
+        this.queries.addAll(Arrays.asList(queries));
         execute();
         return this;
     }
@@ -408,7 +409,7 @@ public class Query {
 
                     String sql = queryProvider.generateSQLString(this);
                     if (sql == null) {
-                        Logger.getInstance().log(Logger.LogLevel.ERROR, "Generated SQL-String is null. Canceling request");
+                        Logger.instance().log(Logger.LogLevel.ERROR, "Generated SQL-String is null. Canceling request");
                         if (useTransaction)
                             connection.rollback();
                         return;
@@ -416,7 +417,7 @@ public class Query {
 
                     try (var ps = connection.prepareStatement(sql)) {
                         queryProvider.bindParameters(ps);
-                        Logger.getInstance().log(Logger.LogLevel.DEBUG, "Executing query: " + sql);
+                        Logger.instance().log(Logger.LogLevel.DEBUG, "Executing query: " + sql);
 
                         if (queryProvider instanceof SelectQueryProvider selectRequest) {
                             try (ResultSet rs = ps.executeQuery()) {
@@ -433,6 +434,9 @@ public class Query {
                             ps.execute();
                             succeeded = true;
                         }
+                    }catch (Exception e){
+                        Logger.instance().error( "Failed to execute query: " + sql, e);
+                        throw e;
                     }
 
                     if (queryProvider.actionAfterQuery() != null) {
@@ -484,7 +488,7 @@ public class Query {
 
                     for (Bucket bucket : batchBuckets.values()) {
                         String sql = bucket.sql;
-                        Logger.getInstance().log(Logger.LogLevel.DEBUG,
+                        Logger.instance().log(Logger.LogLevel.DEBUG,
                                 "Executing batch for SQL: " + sql + " with size " + bucket.providers.size());
                         try (var ps = connection.prepareStatement(sql)) {
                             for (QueryProvider qp : bucket.providers) {
@@ -526,7 +530,7 @@ public class Query {
                             allOk = false;
                             continue;
                         }
-                        Logger.getInstance().log(Logger.LogLevel.DEBUG, "Executing query: " + sql);
+                        Logger.instance().log(Logger.LogLevel.DEBUG, "Executing query: " + sql);
                         try (var ps = connection.prepareStatement(sql)) {
                             qp.bindParameters(ps);
                             SelectQueryProvider select = (SelectQueryProvider) qp;

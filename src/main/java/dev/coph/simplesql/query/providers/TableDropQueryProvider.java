@@ -41,8 +41,8 @@ public class TableDropQueryProvider implements QueryProvider {
 
         StringBuilder sql = new StringBuilder("DROP ");
 
-        if (temporary) {
-            DatabaseCheck.requireDriver(driver, DriverType.MYSQL, DriverType.MARIADB, DriverType.SQLITE);
+        if (temporary && (driver != null && driver != DriverType.POSTGRESQL)) {
+            DatabaseCheck.requireDriver(driver, DriverType.MYSQL, DriverType.MARIADB);
             sql.append("TEMPORARY ");
         }
 
@@ -52,6 +52,9 @@ public class TableDropQueryProvider implements QueryProvider {
             sql.append(" IF EXISTS");
         }
 
+        if(tables.size() > 1) {
+            DatabaseCheck.unsupportedDriver(driver, DriverType.SQLITE);
+        }
         StringJoiner tj = new StringJoiner(", ", " ", "");
         for (String t : tables) {
             Check.ifNull(t, "table");

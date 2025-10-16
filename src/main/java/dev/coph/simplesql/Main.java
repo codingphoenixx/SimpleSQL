@@ -12,7 +12,7 @@ import java.io.IOException;
 public class Main {
 
     public static void main(String[] args) {
-        Logger.getInstance().logLevel(Logger.LogLevel.DEBUG);
+        Logger.instance().logLevel(Logger.LogLevel.DEBUG);
         System.out.println("--------------------------------------- MARIADB ------------------------------------------");
         startMariaDB();
         System.out.println("--------------------------------------- SQLITE ------------------------------------------");
