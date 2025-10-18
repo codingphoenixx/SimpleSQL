@@ -49,9 +49,9 @@ public class Tester {
 
     public void runTests() {
         for (Test test : tests) {
-            Logger.instance().info("Setting up for Test '%s'...".formatted(test.name()));
+            Logger.info("Setting up for Test '%s'...".formatted(test.name()));
             setupForTest(test);
-            Logger.instance().info("Start Test '%s' with Driver %s".formatted(test.name(), databaseAdapter.driverType().name()));
+            Logger.info("Start Test '%s' with Driver %s".formatted(test.name(), databaseAdapter.driverType().name()));
             boolean succeeded;
             Exception ex = null;
             try {
@@ -61,9 +61,9 @@ public class Tester {
                 succeeded = false;
             }
             if (succeeded) {
-                Logger.instance().success("Test '%s' succeeded".formatted(test.name()));
+                Logger.success("Test '%s' succeeded".formatted(test.name()));
             } else {
-                Logger.instance().error("Test '%s' failed".formatted(test.name()));
+                Logger.error("Test '%s' failed".formatted(test.name()));
                 if (ex != null)
                     ex.printStackTrace();
             }
