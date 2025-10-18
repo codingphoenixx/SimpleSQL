@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'dev.coph'
-version = '4.0.0-rc8'
+version = '4.0.0-rc9'
 
 repositories {
     maven {
@@ -24,7 +24,7 @@ dependencies {
     implementation 'org.postgresql:postgresql:42.7.8'
 
     implementation "dev.coph:simplelogger:3.0.0"
-    implementation "dev.coph:simpleutilities:3.6.0"
+    implementation "dev.coph:simpleutilities:3.7.0"
 }
 
 javadoc {
