@@ -1,7 +1,6 @@
 plugins {
     id 'java'
     id 'maven-publish'
-
 }
 
 group = 'dev.coph'
@@ -24,8 +23,8 @@ dependencies {
     implementation 'org.mariadb.jdbc:mariadb-java-client:3.5.6'
     implementation 'org.postgresql:postgresql:42.7.8'
 
-    implementation "dev.coph:simplelogger:2.3.0"
-    implementation "dev.coph:simpleutilities:3.6.0"
+    implementation "dev.coph:simplelogger"
+    implementation "dev.coph:simpleutilities"
 }
 
 javadoc {
