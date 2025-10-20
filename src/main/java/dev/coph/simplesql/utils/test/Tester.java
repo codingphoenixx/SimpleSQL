@@ -3,7 +3,6 @@ package dev.coph.simplesql.utils.test;
 import dev.coph.simplelogger.Logger;
 import dev.coph.simplesql.adapter.DatabaseAdapter;
 import dev.coph.simplesql.database.attributes.DeleteMethode;
-import dev.coph.simplesql.driver.DriverType;
 import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.query.providers.TableCreateQueryProvider;
 import dev.coph.simplesql.query.providers.TableDropQueryProvider;

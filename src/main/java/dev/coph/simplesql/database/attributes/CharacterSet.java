@@ -273,24 +273,59 @@ public enum CharacterSet {
      */
     UTF32;
 
+    /**
+     * Checks if the SQLite database supports the current character set.
+     *
+     * @return a boolean value indicating whether the SQLite database supports the current character set.
+     * Returns false in the current implementation.
+     */
     public static boolean sqliteSupports() {
         return false;
     }
 
+    /**
+     * Determines whether MySQL supports the current character set.
+     *
+     * @return a boolean value indicating whether MySQL supports the current character set.
+     * Always returns true in the current implementation.
+     */
     public static boolean mysqlSupports() {
         return true;
     }
 
+    /**
+     * Converts the name of the current character set instance to the MySQL-compatible charset name.
+     * The resulting charset name is transformed into lowercase using the root locale.
+     *
+     * @return the MySQL-compatible charset name as a lowercase string.
+     */
     public String toMySqlCharset() {
         return name().toLowerCase(Locale.ROOT);
     }
 
+    /**
+     * Converts the current character set to its PostgreSQL-compatible encoding name.
+     * If the character set does not have a corresponding PostgreSQL encoding,
+     * a {@link FeatureNotSupportedException} is thrown.
+     *
+     * @return the PostgreSQL-compatible encoding name as a {@code String}.
+     * @throws FeatureNotSupportedException if there is no corresponding PostgreSQL encoding
+     *                                      for the current character set.
+     */
     public String toPostgresEncodingOrThrow() {
         String enc = toPostgresEncoding();
         if (enc == null) throw new FeatureNotSupportedException(DriverType.POSTGRESQL);
         return enc;
     }
 
+    /**
+     * Converts the current character set to its corresponding PostgreSQL-compatible encoding name.
+     * If the character set is not directly supported for conversion to a PostgreSQL encoding,
+     * it will return {@code null}.
+     *
+     * @return the PostgreSQL-compatible encoding name as a {@code String}, or {@code null}
+     * if there is no corresponding PostgreSQL encoding for the current character set.
+     */
     public String toPostgresEncoding() {
         return switch (this) {
             case UTF8MB4, UTF8MB3 -> "UTF8";
@@ -314,6 +349,12 @@ public enum CharacterSet {
         };
     }
 
+    /**
+     * Determines whether the current character set is supported by PostgreSQL.
+     *
+     * @return true if the current character set has a corresponding PostgreSQL-compatible
+     * encoding; false otherwise.
+     */
     public boolean postgresSupports() {
         return toPostgresEncoding() != null;
     }

@@ -13,9 +13,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
 
-
+/**
+ * A class that provides functionality to build and generate SQL INSERT queries.
+ * It implements the {@code QueryProvider} interface, allowing for customizable
+ * and parameterized query generation based on different database adapter types.
+ */
 public class InsertQueryProvider implements QueryProvider {
-
 
     private String table;
 
@@ -27,6 +30,14 @@ public class InsertQueryProvider implements QueryProvider {
     private List<String> conflictColumns;
     private List<Object> boundParams = List.of();
 
+    /**
+     * Adds a new column-value pair to the insert query.
+     * This method allows chaining to add multiple entries.
+     *
+     * @param column the name of the column to which the value will be assigned
+     * @param value  the value to be assigned to the specified column
+     * @return the current {@code InsertQueryProvider} instance for method chaining
+     */
     public InsertQueryProvider entry(String column, Object value) {
         if (entries == null) {
             entries = new ArrayList<>();
@@ -35,6 +46,13 @@ public class InsertQueryProvider implements QueryProvider {
         return this;
     }
 
+    /**
+     * Sets the action to be executed after the query is run.
+     *
+     * @param actionAfterQuery the {@code RunnableAction<Boolean>} to be performed after the query execution,
+     *                         where the Boolean parameter represents the success or failure of the query
+     * @return the current {@code InsertQueryProvider} instance for method chaining
+     */
     public InsertQueryProvider actionAfterQuery(RunnableAction<Boolean> actionAfterQuery) {
         this.actionAfterQuery = actionAfterQuery;
         return this;
@@ -124,6 +142,13 @@ public class InsertQueryProvider implements QueryProvider {
         return actionAfterQuery;
     }
 
+    /**
+     * Sets the columns to be used for conflict resolution in the insert query.
+     *
+     * @param cols a list of column names to be included for conflict resolution.
+     *             If the provided list is null or empty, no conflict columns will be considered.
+     * @return the current {@code InsertQueryProvider} instance for method chaining.
+     */
     public InsertQueryProvider conflictColumns(List<String> cols) {
         if (cols == null || cols.isEmpty()) {
             this.conflictColumns = null;
@@ -133,28 +158,56 @@ public class InsertQueryProvider implements QueryProvider {
         return this;
     }
 
-
+    /**
+     * Retrieves the name of the table associated with this query provider.
+     *
+     * @return the table name as a String
+     */
     public String table() {
         return this.table;
     }
 
-
+    /**
+     * Retrieves the list of {@code QueryEntry} objects associated with the current
+     * {@code InsertQueryProvider}. These entries define the column-value pairs
+     * to be used in the insert query.
+     *
+     * @return a {@code List} of {@code QueryEntry} objects representing the column-value pairs
+     */
     public List<QueryEntry> entries() {
         return this.entries;
     }
 
-
+    /**
+     * Retrieves the current {@code InsertMethode} configuration.
+     * This defines the strategy for the SQL INSERT operation, such as
+     * standard insertion, insertion with conflict handling, or ignoring duplicates.
+     *
+     * @return the {@code InsertMethode} currently set for this query provider
+     */
     public InsertMethode insertMethode() {
         return this.insertMethode;
     }
 
-
+    /**
+     * Sets the name of the table to be used in the query.
+     *
+     * @param table the name of the table as a String
+     * @return the current {@code InsertQueryProvider} instance for method chaining
+     */
     public InsertQueryProvider table(String table) {
         this.table = table;
         return this;
     }
 
-
+    /**
+     * Sets the {@code InsertMethode} to be used for this query provider.
+     * The {@code InsertMethode} defines the strategy for the SQL INSERT operation,
+     * such as standard insertion, insertion with conflict handling, or ignoring duplicates.
+     *
+     * @param insertMethode the {@code InsertMethode} to be set for this query provider
+     * @return the current {@code InsertQueryProvider} instance for method chaining
+     */
     public InsertQueryProvider insertMethode(InsertMethode insertMethode) {
         this.insertMethode = insertMethode;
         return this;

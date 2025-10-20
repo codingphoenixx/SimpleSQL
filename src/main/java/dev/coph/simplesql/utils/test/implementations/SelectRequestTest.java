@@ -9,6 +9,12 @@ import dev.coph.simplesql.utils.test.Test;
 
 import java.util.List;
 
+/**
+ * A test implementation to validate the functionality of select queries on a database.
+ * This class implements the Test interface and provides specific logic for testing
+ * a "SELECT" operation on a database table named "test". The test ensures query
+ * execution succeeds and evaluates the result set behavior.
+ */
 public class SelectRequestTest implements Test {
 
 

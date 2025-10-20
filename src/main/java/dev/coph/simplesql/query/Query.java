@@ -1,6 +1,5 @@
 package dev.coph.simplesql.query;
 
-import com.mysql.cj.log.Log;
 import dev.coph.simplelogger.Logger;
 import dev.coph.simplesql.adapter.DatabaseAdapter;
 import dev.coph.simplesql.exception.RequestNotExecutableException;
@@ -434,8 +433,9 @@ public class Query {
                             ps.execute();
                             succeeded = true;
                         }
-                    }catch (Exception e){
-                        Logger.instance().error( "Failed to execute query: " + sql, e);
+                    } catch (Exception e) {
+                        Logger.instance();
+                        Logger.error("Failed to execute query: " + sql, e);
                         throw e;
                     }
 
@@ -593,25 +593,58 @@ public class Query {
         return this;
     }
 
+    /**
+     * Adds a new query to the list of queries and returns the updated Query object.
+     *
+     * @param query the QueryProvider object to be added to the list of queries
+     * @return the updated Query object for method chaining
+     */
     public Query query(QueryProvider query) {
         this.queries.add(query);
         return this;
     }
 
+    /**
+     * Sets whether to use a transaction for the current query.
+     *
+     * @param use a boolean indicating whether to enable transaction (true) or disable it (false).
+     * @return the current Query instance for method chaining.
+     */
     public Query useTransaction(boolean use) {
         this.useTransaction = use;
         return this;
     }
 
+    /**
+     * Returns whether transactions are enabled or not.
+     *
+     * @return true if transactions are enabled, false otherwise
+     */
     public boolean useTransaction() {
         return useTransaction;
     }
 
+    /**
+     * Configures whether queries should be preserved after execution.
+     * If set to true, the executed queries will be stored and remain accessible
+     * for inspection or debugging purposes.
+     *
+     * @param preserve a boolean indicating whether to preserve queries after execution.
+     *                 If true, queries will not be cleared after execution; otherwise,
+     *                 they will be cleared.
+     * @return the current Query instance with the updated configuration.
+     */
     public Query preserveQueriesAfterExecution(boolean preserve) {
         this.preserveQueriesAfterExecution = preserve;
         return this;
     }
 
+    /**
+     * Indicates whether queries should be preserved after execution.
+     * This method returns the state of the preserveQueriesAfterExecution flag.
+     *
+     * @return true if queries are preserved after execution, false otherwise
+     */
     public boolean preserveQueriesAfterExecution() {
         return preserveQueriesAfterExecution;
     }

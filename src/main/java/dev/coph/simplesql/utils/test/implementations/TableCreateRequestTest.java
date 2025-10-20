@@ -1,6 +1,5 @@
 package dev.coph.simplesql.utils.test.implementations;
 
-import dev.coph.simplelogger.Logger;
 import dev.coph.simplesql.adapter.DatabaseAdapter;
 import dev.coph.simplesql.database.attributes.ColumnType;
 import dev.coph.simplesql.database.attributes.CreateMethode;

@@ -11,6 +11,15 @@ import dev.coph.simplesql.utils.test.Test;
 
 import java.util.List;
 
+/**
+ * The InsertRequestTest class is a test case implementation of the Test interface
+ * which validates the insertion of data into a database table and verifies the
+ * correctness of the operation.
+ * <p>
+ * This class defines a test to insert a value into a specific column of a table
+ * and subsequently verifies if the data inserted is correct by performing a
+ * selection query.
+ */
 public class InsertRequestTest implements Test {
     private final String COLUMN_NAME = "number";
     private final int COLUMN_VALUE = 42;

@@ -93,10 +93,11 @@ public class Column {
     }
 
     /**
-     * Constructs a Column instance with the specified key and data type.
+     * Represents a column definition with a key, data type, and unsigned state.
      *
-     * @param key      the name of the column, representing its unique identifier
-     * @param dataType the data type of the column, specifying the type of data it holds
+     * @param key      the unique identifier for the column
+     * @param dataType the data type of the column
+     * @param unsigned the unsigned state of the column
      */
     public Column(String key, DataType dataType, UnsignedState unsigned) {
         this.key = key;
@@ -120,12 +121,12 @@ public class Column {
     }
 
     /**
-     * Constructs a Column instance with the specified key, data type,
-     * and an additional parameter object associated with the data type.
+     * Constructs a Column object with the specified parameters.
      *
-     * @param key                      the name of the column, representing its unique identifier
-     * @param dataType                 the data type of the column, defining the type of data it holds
-     * @param dataTypeParamenterObject an additional parameter object associated with the column's data type
+     * @param key                      The name or identifier of the column.
+     * @param dataType                 The data type of the column.
+     * @param unsigned                 The unsigned state of the column, indicating whether it is unsigned.
+     * @param dataTypeParamenterObject An additional parameter object for the data type when needed.
      */
     public Column(String key, DataType dataType, UnsignedState unsigned, Object dataTypeParamenterObject) {
         this.key = key;
@@ -148,11 +149,12 @@ public class Column {
     }
 
     /**
-     * Constructs a new Column with the specified key, data type, and column type.
+     * Constructs a new Column object with the specified parameters.
      *
-     * @param key        the unique identifier for the column, representing its name
-     * @param dataType   the data type defining the kind of data this column holds
-     * @param columnType the column type specifying constraints or attributes of the column, such as PRIMARY_KEY or UNIQUE
+     * @param key        the name or identifier of the column
+     * @param dataType   the data type of the column
+     * @param unsigned   the unsigned state of the column
+     * @param columnType the type of the column
      */
     public Column(String key, DataType dataType, UnsignedState unsigned, ColumnType columnType) {
         this.key = key;
@@ -175,11 +177,12 @@ public class Column {
     }
 
     /**
-     * Constructs a Column instance with the specified key, data type, and nullability constraint.
+     * Constructs a Column with the specified properties.
      *
-     * @param key      the unique identifier for the column, representing its name
-     * @param dataType the data type of the column, defining the type of data it holds
-     * @param notNull  a boolean indicating whether the column disallows null values
+     * @param key      the unique identifier for the column
+     * @param dataType the data type of the column
+     * @param unsigned the unsigned state of the column
+     * @param notNull  indicates whether the column is not nullable
      */
     public Column(String key, DataType dataType, UnsignedState unsigned, boolean notNull) {
         this.key = key;
@@ -204,12 +207,13 @@ public class Column {
     }
 
     /**
-     * Constructs a Column instance with the specified key, data type, data type parameter object, and column type.
+     * Constructs a new Column instance with the specified parameters.
      *
-     * @param key                      the name of the column, representing its unique identifier
-     * @param dataType                 the data type of the column, defining the type of data it holds
-     * @param dataTypeParamenterObject an additional parameter object associated with the column's data type
-     * @param columnType               the column type specifying constraints or attributes of the column, such as PRIMARY_KEY or UNIQUE
+     * @param key                      the key or name of the column
+     * @param dataType                 the data type of the column
+     * @param dataTypeParamenterObject the parameter object related to the data type of the column
+     * @param unsigned                 the unsigned state of the column, indicating whether the column is unsigned
+     * @param columnType               the type of the column
      */
     public Column(String key, DataType dataType, Object dataTypeParamenterObject, UnsignedState unsigned, ColumnType columnType) {
         this.key = key;
@@ -234,6 +238,15 @@ public class Column {
         this.notNull = notNull;
     }
 
+    /**
+     * Constructs a Column object with the specified attributes.
+     *
+     * @param key                      the key or name of the column.
+     * @param dataType                 the data type of the column.
+     * @param dataTypeParamenterObject the parameter object associated with the data type, if applicable.
+     * @param unsigned                 the unsigned state of the column.
+     * @param notNull                  boolean value indicating whether the column allows null values.
+     */
     public Column(String key, DataType dataType, Object dataTypeParamenterObject, UnsignedState unsigned, boolean notNull) {
         this.key = key;
         this.dataType = dataType;
@@ -261,14 +274,18 @@ public class Column {
     }
 
     /**
-     * Constructs a Column instance with the specified key, data type, additional parameter object, column type,
-     * and a constraint on whether the column allows null values.
+     * Constructor to create a Column object with specific attributes.
      *
-     * @param key                      the unique identifier for the column, representing its name
-     * @param dataType                 the data type of the column, defining the type of data it holds
-     * @param dataTypeParamenterObject an additional parameter object associated with the column's data type
-     * @param columnType               the column type specifying constraints or attributes of the column, such as PRIMARY_KEY or UNIQUE
-     * @param notNull                  a boolean indicating whether the column disallows null values
+     * @param key                      The name or identifier of the column.
+     * @param dataType                 The data type of the column.
+     * @param dataTypeParamenterObject The parameter object associated with the data type,
+     *                                 which may define additional constraints or specifications.
+     * @param unsigned                 The unsigned state of the column, specifying whether the column
+     *                                 can store only non-negative values.
+     * @param columnType               The type of the column, indicating its role or behavior
+     *                                 within the database (e.g., primary key, foreign key).
+     * @param notNull                  A boolean flag indicating if the column must always have a value
+     *                                 (i.e., cannot be null).
      */
     public Column(String key, DataType dataType, Object dataTypeParamenterObject, UnsignedState unsigned, ColumnType columnType, boolean notNull) {
         this.key = key;
@@ -299,6 +316,17 @@ public class Column {
         this.notNull = notNull;
     }
 
+    /**
+     * Constructs a Column object with specified parameters.
+     *
+     * @param key                      The name or identifier of the column.
+     * @param dataType                 The data type of the column.
+     * @param dataTypeParamenterObject Additional parameter object related to the data type, if applicable.
+     * @param unsigned                 Specifies whether the column is unsigned.
+     * @param columnType               The type of column (e.g., primary key, foreign key).
+     * @param defaultValue             The default value for the column.
+     * @param notNull                  Indicates whether the column should have a NOT NULL constraint.
+     */
     public Column(String key, DataType dataType, Object dataTypeParamenterObject, UnsignedState unsigned, ColumnType columnType, Object defaultValue, boolean notNull) {
         this.key = key;
         this.dataType = dataType;
@@ -309,6 +337,15 @@ public class Column {
         this.notNull = notNull;
     }
 
+    /**
+     * Constructs a Column object with the specified attributes.
+     *
+     * @param key                     the unique identifier for the column
+     * @param dataType                the data type of the column
+     * @param unsignedState           the unsigned state of the column, indicating whether the column supports unsigned values
+     * @param dataTypeParameterObject an optional parameter object with additional settings for the data type
+     * @param columnType              the type of the column (e.g., primary key, foreign key, etc.)
+     */
     public Column(String key, DataType dataType, UnsignedState unsignedState, Object dataTypeParameterObject, ColumnType columnType) {
         this.key = key;
         this.dataType = dataType;
@@ -317,6 +354,16 @@ public class Column {
         this.columnType = columnType;
     }
 
+    /**
+     * Constructs a Column object with the specified attributes.
+     *
+     * @param key                     the name or identifier of the column
+     * @param dataType                the data type of the column
+     * @param unsignedState           the unsigned state of the column, specifies if values are unsigned
+     * @param dataTypeParameterObject an optional parameter object associated with the column's data type
+     * @param columnType              the type of column, indicating its specific role or nature
+     * @param notNull                 a boolean indicating if the column is constrained to not allow null values
+     */
     public Column(String key, DataType dataType, UnsignedState unsignedState, Object dataTypeParameterObject, ColumnType columnType, boolean notNull) {
         this.key = key;
         this.dataType = dataType;
@@ -461,10 +508,20 @@ public class Column {
         return this.notNull;
     }
 
+    /**
+     * Retrieves the unsigned state of the current object.
+     *
+     * @return the unsigned state represented by an {@code UnsignedState} object
+     */
     public UnsignedState unsigned() {
         return unsigned;
     }
 
+    /**
+     * Retrieves the default expression.
+     *
+     * @return the default expression as a string.
+     */
     public String defaultExpression() {
         return this.defaultExpression;
     }
@@ -492,6 +549,12 @@ public class Column {
         return this;
     }
 
+    /**
+     * Sets the unsigned state for the column.
+     *
+     * @param unsigned the unsigned state to be applied to the column
+     * @return the updated Column instance
+     */
     public Column unsigned(UnsignedState unsigned) {
         this.unsigned = unsigned;
         return this;
@@ -543,6 +606,12 @@ public class Column {
         return this;
     }
 
+    /**
+     * Sets the default expression for the column.
+     *
+     * @param expr the default expression to be set
+     * @return the updated Column instance
+     */
     public Column defaultExpression(String expr) {
         this.defaultExpression = expr;
         return this;

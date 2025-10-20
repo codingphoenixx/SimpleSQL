@@ -52,7 +52,7 @@ public class TableDropQueryProvider implements QueryProvider {
             sql.append(" IF EXISTS");
         }
 
-        if(tables.size() > 1) {
+        if (tables.size() > 1) {
             DatabaseCheck.unsupportedDriver(driver, DriverType.SQLITE);
         }
         StringJoiner tj = new StringJoiner(", ", " ", "");

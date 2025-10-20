@@ -108,14 +108,28 @@ public record DataType(boolean canHaveObject, boolean requireObject, boolean can
      */
     public static final DataType TIME = new DataType(false, false, false, "TIME");
 
+    /**
+     * Represents the ENUM SQL data type in a database schema.
+     * This data type allows a predefined set of string values,
+     * from which a column can store one. Useful for defining
+     * constrained categorical data.
+     * <p>
+     * The attributes of this data type are:
+     * - Can have an associated object.
+     * - Requires an associated object.
+     * - Cannot be unsigned.
+     * - Has the name "ENUM".
+     */
     public static final DataType ENUM = new DataType(true, true, false, "ENUM");
 
     /**
-     * Constructs a new instance of the DataType class with the specified parameters.
+     * Represents a data type in a SQL schema. This class defines various attributes and behavior
+     * for different SQL data types, allowing for handling SQL-compatible operations and definitions.
      *
-     * @param canHaveObject A boolean indicating whether this DataType can have an associated object.
-     * @param requireObject A boolean indicating whether this DataType requires an associated object.
-     * @param name          The name of the DataType as a string.
+     * @param canHaveObject Specifies whether the data type can have an associated object.
+     * @param requireObject Specifies whether the data type requires an associated object.
+     * @param canBeUnsigned Specifies whether the data type can hold unsigned values.
+     * @param name          The name of the SQL data type.
      */
     public DataType {
     }
@@ -126,12 +140,19 @@ public record DataType(boolean canHaveObject, boolean requireObject, boolean can
     }
 
     /**
-     * Converts the DataType and associated value into a SQL-compatible representation as a StringBuilder.
+     * Converts the current data type representation to its corresponding SQL definition.
+     * This method generates a SQL-compatible StringBuilder representation for the data type
+     * based on the provided value and unsigned state.
      *
-     * @param value The object value to be included in the SQL representation. It is used to represent
-     *              any associated data for the DataType if applicable and valid.
-     * @return A StringBuilder object containing the SQL-compatible string for the DataType and optionally
-     * its associated value based on the internal logic of the DataType.
+     * @param value    The value to be used in the SQL definition, relevant for ENUM types or
+     *                 data types that can have an associated object.
+     * @param unsigned The unsigned state of the data type. Determines if the data type
+     *                 should include an "UNSIGNED" modifier in its SQL representation.
+     * @return A StringBuilder object representing the SQL definition of the data type.
+     * If the type is ENUM, the SQL definition includes the enum values. For other
+     * types, the definition may include the value or unsigned modifier based on
+     * the type's characteristics.
+     * @throws IllegalArgumentException If the data type is ENUM and the provided value is null.
      */
     public StringBuilder toSQL(Object value, UnsignedState unsigned) {
         if (name.equals("ENUM")) {

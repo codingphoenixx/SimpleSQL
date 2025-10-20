@@ -45,7 +45,23 @@ public enum Operator {
      * to specify conditions where values in a column must not match a given value.
      */
     NOT_EQUALS("!=", false),
+    /**
+     * Represents the "IS NULL" operator used in expressions or queries.
+     * <p>
+     * This operator checks whether a given value is null. It is commonly
+     * utilized in conditions where determining nullability is relevant, for
+     * instance, in SQL queries or data filtering operations.
+     * <p>
+     * The {@code IS_NULL} operator does not require its operand to be a number.
+     */
     IS_NULL("IS NULL", false),
+    /**
+     * Represents the "IS NOT NULL" operator in a query, used to determine if
+     * a specific attribute or column contains a non-null value.
+     * <p>
+     * This operator is typically utilized in database queries or conditions
+     * to filter results that explicitly have a non-null value for the specified column.
+     */
     IS_NOT_NULL("IS NOT NULL", false),
     ;
 
