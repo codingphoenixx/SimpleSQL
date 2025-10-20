@@ -267,9 +267,11 @@ public class TableAlterAddColumnQueryProvider extends TableAlterQueryProvider {
     }
 
     /**
-     * Sets the {@link CreateMethode} for the table alteration query in the provider.
-     * The {@link CreateMethode} determines the strategy to be used during the creation
-     **/
+     * Sets the createMethode property and returns the updated instance of TableAlterAddColumnQueryProvider.
+     *
+     * @param createMethode the CreateMethode object to be set
+     * @return the updated instance of TableAlterAddColumnQueryProvider
+     */
     public TableAlterAddColumnQueryProvider createMethode(CreateMethode createMethode) {
         this.createMethode = createMethode;
         return this;

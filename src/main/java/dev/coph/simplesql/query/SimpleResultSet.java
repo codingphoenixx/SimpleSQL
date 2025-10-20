@@ -245,10 +245,17 @@ public record SimpleResultSet(ResultSet resultSet) {
      * <p>
      * This interface is typically employed in conjunction with APIs that iterate over database
      * ResultSets, allowing for the specification of behavior in cases where the ResultSet is empty.
-     *
-     * @throws SQLException if an SQL-related error occurs during execution
      */
     public interface EmptyResultSetConsumer {
+        /**
+         * Defines the action to be executed when a ResultSet is empty.
+         *
+         * The accept method is designed to handle the scenario where a database query yields no results.
+         * Implementations of this method can provide custom logic to handle such cases, ensuring appropriate
+         * behavior when there are no rows available in the underlying ResultSet.
+         *
+         * @throws SQLException if a database access error occurs
+         */
         void accept() throws SQLException;
     }
 
@@ -262,6 +269,11 @@ public record SimpleResultSet(ResultSet resultSet) {
      * to methods of the SimpleResultSet class that support exception handling.
      */
     public interface ExceptionConsumer {
+        /**
+         * Performs an operation on the given throwable, typically involving exception handling logic.
+         *
+         * @param e the throwable to be processed, representing the exception that occurred during execution
+         */
         void accept(Throwable e);
     }
 
@@ -278,6 +290,14 @@ public record SimpleResultSet(ResultSet resultSet) {
      * error occurs during result set handling.
      */
     public interface ResultSetConsumer {
+        /**
+         * Processes the given {@link ResultSet}, typically for performing operations
+         * on the current row of the result set. Implementations of this method are
+         * responsible for defining how the {@link ResultSet} is handled.
+         *
+         * @param resultSet the {@link ResultSet} to be processed; must not be null
+         * @throws SQLException if an SQL error occurs during result set processing
+         */
         void accept(ResultSet resultSet) throws SQLException;
     }
 }

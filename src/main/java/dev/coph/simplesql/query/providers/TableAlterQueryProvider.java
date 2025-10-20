@@ -11,7 +11,11 @@ import dev.coph.simpleutilities.check.Check;
  * and compatibility assessment for the database driver.
  */
 public abstract class TableAlterQueryProvider implements QueryProvider {
-
+    /**
+     * The name of the table to be altered.
+     * This variable holds the target table's name for constructing and executing SQL ALTER TABLE queries.
+     * It is expected to be set before generating the SQL string.
+     */
     protected String table;
 
     /**
@@ -33,11 +37,21 @@ public abstract class TableAlterQueryProvider implements QueryProvider {
         return "ALTER TABLE " + table + " " + getAlterTableString(query) + ";";
     }
 
-
+    /**
+     * Retrieves the name of the table to be altered.
+     *
+     * @return the name of the table as a String
+     */
     public String table() {
         return this.table;
     }
 
+    /**
+     * Sets the name of the table to be altered.
+     *
+     * @param table the name of the table to be altered
+     * @return the current instance of {@code TableAlterQueryProvider} for method chaining
+     */
     public TableAlterQueryProvider table(String table) {
         this.table = table;
         return this;

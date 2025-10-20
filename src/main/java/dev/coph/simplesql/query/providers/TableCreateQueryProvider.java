@@ -15,7 +15,11 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.StringJoiner;
 
-
+/**
+ * The TableCreateQueryProvider class is responsible for constructing and generating SQL queries
+ * for creating database tables, including specifying columns, constraints, and additional table options.
+ * It provides a fluent interface for customizing various aspects of the table creation process.
+ */
 public class TableCreateQueryProvider implements QueryProvider {
 
     private final List<Column> columns = new ArrayList<>();
@@ -94,6 +98,14 @@ public class TableCreateQueryProvider implements QueryProvider {
         return sql.toString();
     }
 
+    /**
+     * Renders a list of SQL constraints based on the provided query, driver type, and implicit primary keys.
+     *
+     * @param query the {@link Query} object containing the context and data for the SQL generation
+     * @param driver the {@link DriverType} indicating the SQL dialect to be used
+     * @param implicitPk a list of column names that form an implicit primary key
+     * @return a list of strings representing the rendered SQL constraints
+     */
     private List<String> renderConstraints(Query query, DriverType driver, List<String> implicitPk) {
         List<String> out = new ArrayList<>();
 
@@ -342,13 +354,13 @@ public class TableCreateQueryProvider implements QueryProvider {
     }
 
     /**
-     * Adds a column to the table creation query with the specified parameters.
-     * If the column is of type PRIMARY_KEY, it is set as the primary key and added to the columns list.
+     * Adds a column to the table schema being defined.
      *
-     * @param key                     the name of the column
-     * @param dataType                the data type of the column
-     * @param dataTypeParameterObject an optional parameter object associated with the data type
-     * @param columnType              the
+     * @param key the name of the column to be added.
+     * @param dataType the data type of the column.
+     * @param dataTypeParameterObject an additional parameter object for configuring the column's data type.
+     * @param columnType the type of the column such as PRIMARY_KEY or a regular column.
+     * @return the current instance of TableCreateQueryProvider to allow method chaining.
      */
     public TableCreateQueryProvider column(
             String key, DataType dataType, Object dataTypeParameterObject, ColumnType columnType) {
@@ -393,12 +405,13 @@ public class TableCreateQueryProvider implements QueryProvider {
     /**
      * Adds a column definition to the table creation query.
      *
-     * @param key                     the name of the column to be added
-     * @param dataType                the data type of the column
-     * @param unsignedState           the unsigned state of the column
-     * @param dataTypeParameterObject additional parameters for the column's data type
-     * @param columnType              the type of the column (e.g., PRIMARY_KEY, NORMAL)
-     * @param notNull                 whether the column should have
+     * @param key The name of the column.
+     * @param dataType The data type of the column.
+     * @param unsignedState Indicates whether the column is unsigned (for numerical types).
+     * @param dataTypeParameterObject Additional parameters for the column's data type (if applicable).
+     * @param columnType The type of the column (e.g., PRIMARY_KEY, FOREIGN_KEY, etc.).
+     * @param notNull Specifies whether the column should be marked as NOT NULL.
+     * @return The updated {@code TableCreateQueryProvider} instance for method chaining.
      */
     public TableCreateQueryProvider column(
             String key,

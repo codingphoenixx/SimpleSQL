@@ -13,6 +13,12 @@ import dev.coph.simplesql.utils.test.Test;
 
 import java.util.List;
 
+/**
+ * Implementation of the Test interface that handles the creation and deletion of
+ * database tables for test purposes. This class defines the logic for creating
+ * two tables with specific columns, primary keys, and constraints, subsequently
+ * verifying their creation, and finally dropping those tables as part of cleanup.
+ */
 public class TableCreateRequestTest implements Test {
 
     @Override

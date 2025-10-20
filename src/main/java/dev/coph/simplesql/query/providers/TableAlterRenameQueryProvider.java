@@ -50,6 +50,15 @@ public class TableAlterRenameQueryProvider extends TableAlterQueryProvider {
         return this;
     }
 
+    /**
+     * Sets the action to be executed after the query is run.
+     * This action is represented as a {@code RunnableAction<Boolean>} and can include logic
+     * that leverages the success or failure of the query execution.
+     *
+     * @param actionAfterQuery the {@code RunnableAction<Boolean>} to execute post-query. The Boolean parameter
+     *                         represents the result of the query execution (e.g., success or failure).
+     * @return the current instance of {@code TableAlterRenameQueryProvider} to allow method chaining.
+     */
     public TableAlterRenameQueryProvider actionAfterQuery(RunnableAction<Boolean> actionAfterQuery) {
         this.actionAfterQuery = actionAfterQuery;
         return this;
