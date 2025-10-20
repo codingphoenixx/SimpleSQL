@@ -11,11 +11,34 @@ public record SimpleResultSet(ResultSet resultSet) {
         return this;
     }
 
+    public SimpleResultSet next(ResultSetConsumer consumer, ExceptionConsumer exceptionConsumer) throws SQLException {
+        if (resultSet.next()) {
+            try {
+                consumer.accept(resultSet);
+            } catch (Throwable e) {
+                exceptionConsumer.accept(e);
+            }
+        }
+        return this;
+    }
+
     public SimpleResultSet next(ResultSetConsumer consumer, EmptyResultSetConsumer emptyConsumer) throws SQLException {
         if (resultSet.next())
             consumer.accept(resultSet);
         else
-            emptyConsumer.accept(resultSet);
+            emptyConsumer.accept();
+        return this;
+    }
+
+    public SimpleResultSet next(ResultSetConsumer consumer, EmptyResultSetConsumer emptyConsumer, ExceptionConsumer exceptionConsumer) throws SQLException {
+        try {
+            if (resultSet.next())
+                consumer.accept(resultSet);
+            else
+                emptyConsumer.accept();
+        } catch (Exception e) {
+            exceptionConsumer.accept(e);
+        }
         return this;
     }
 
@@ -31,6 +54,20 @@ public record SimpleResultSet(ResultSet resultSet) {
         return this;
     }
 
+    public SimpleResultSet forEach(ResultSetConsumer consumer, ExceptionConsumer exceptionConsumer) throws SQLException {
+
+        while (resultSet.next()) {
+            try {
+                consumer.accept(resultSet);
+            } catch (Exception e) {
+                exceptionConsumer.accept(e);
+            }
+        }
+
+        return this;
+    }
+
+
     public SimpleResultSet forEach(ResultSetConsumer consumer, EmptyResultSetConsumer emptyConsumer) throws SQLException {
         int count = 0;
 
@@ -44,7 +81,24 @@ public record SimpleResultSet(ResultSet resultSet) {
         }
 
         if (count == 0)
-            emptyConsumer.accept(resultSet);
+            emptyConsumer.accept();
+        return this;
+    }
+
+    public SimpleResultSet forEach(ResultSetConsumer consumer, EmptyResultSetConsumer emptyConsumer, ExceptionConsumer exceptionConsumer) throws SQLException {
+        int count = 0;
+
+        while (resultSet.next()) {
+            try {
+                consumer.accept(resultSet);
+            } catch (Exception e) {
+                exceptionConsumer.accept(e);
+            }
+            count++;
+        }
+
+        if (count == 0)
+            emptyConsumer.accept();
         return this;
     }
 
@@ -84,7 +138,11 @@ public record SimpleResultSet(ResultSet resultSet) {
     }
 
     public interface EmptyResultSetConsumer {
-        void accept(ResultSet resultSet) throws SQLException;
+        void accept() throws SQLException;
+    }
+
+    public interface ExceptionConsumer {
+        void accept(Throwable e);
     }
 
     public interface ResultSetConsumer {
