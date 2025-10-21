@@ -170,7 +170,7 @@ public record DataType(boolean canHaveObject, boolean requireObject, boolean can
                                     .collect(Collectors.joining(", "))
                     ).append(")");
         }
-        String unsignedSuffix = unsigned.equals(UnsignedState.ACTIVE) && canBeUnsigned ? " UNSIGNED" : "";
+        String unsignedSuffix = unsigned != null && unsigned.equals(UnsignedState.ACTIVE) && canBeUnsigned ? " UNSIGNED" : "";
         return new StringBuilder()
                 .append(name)
                 .append(canHaveObject() && value != (requireObject ? 0 : null) ? "(" + value + ")" + unsignedSuffix : unsignedSuffix);
