@@ -31,7 +31,7 @@ public class TableAlterModifyTypeQueryProvider extends TableAlterQueryProvider {
         DriverType driver =
                 query.databaseAdapter() != null ? query.databaseAdapter().driverType() : null;
 
-        String typeSql = dataType.toSQL(dataTypeParameter, unsigned).toString();
+        String typeSql = dataType.toSQL(query,dataTypeParameter, unsigned).toString();
 
         return switch (driver) {
             case MYSQL, MARIADB -> "MODIFY COLUMN " + columnName + " " + typeSql;

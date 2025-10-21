@@ -387,7 +387,7 @@ public class Column {
         if (dataType.requireObject()) {
             Check.ifNull(dataTypeParamenterObject, "dataTypeParameterObject");
         }
-        StringBuilder column = new StringBuilder(key).append(" ").append(dataType.toSQL(dataTypeParamenterObject, unsigned));
+        StringBuilder column = new StringBuilder(key).append(" ").append(dataType.toSQL(query, dataTypeParamenterObject, unsigned));
 
         if (notNull) {
             column.append(" NOT NULL");

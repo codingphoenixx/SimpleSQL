@@ -1,5 +1,9 @@
 package dev.coph.simplesql.database.attributes;
 
+import dev.coph.simplesql.driver.DriverType;
+import dev.coph.simplesql.query.Query;
+import dev.coph.simplesql.utils.DatabaseCheck;
+
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
@@ -123,6 +127,43 @@ public record DataType(boolean canHaveObject, boolean requireObject, boolean can
     public static final DataType ENUM = new DataType(true, true, false, "ENUM");
 
     /**
+     * Represents the SQL TINYBLOB data type.
+     * <p>
+     * The TINYBLOB data type is used to store very small binary objects with a maximum storage
+     * capacity of 255 bytes. It is a BLOB (Binary Large Object) type specifically designed for
+     * storing binary data, such as images, multimedia, or other non-text files, in a compact
+     * format.
+     */
+    public static final DataType TINYBLOB = new DataType(false, false, false, "TINYBLOB");
+
+    /**
+     * Represents the SQL "BLOB" data type.
+     * <p>
+     * BLOB, short for Binary Large Object, is a data type used to store large binary data such as images, multimedia, or other binary files.
+     * This variable is an immutable and predefined instance of the DataType class with specific behaviors and characteristics
+     * tailored for the SQL BLOB type.
+     */
+    public static final DataType BLOB = new DataType(false, false, false, "BLOB");
+
+    /**
+     * Represents the SQL MEDIUMBLOB data type within the {@code DataType} schema definition.
+     * MEDIUMBLOB is a binary large object (BLOB) data type that can store variable-length binary data
+     * with a maximum size of 16,777,215 bytes (16MB). It is typically used to store large binary data
+     * such as images or files. This data type does not support unsigned values, does not have
+     * an associated object, and does not require an associated object.
+     */
+    public static final DataType MEDIUMBLOB = new DataType(false, false, false, "MEDIUMBLOB");
+
+    /**
+     * Represents the SQL data type LONGBLOB, commonly used in SQL databases to store
+     * large binary objects such as files, images, or other types of data.
+     * <p>
+     * This data type is designed for handling extremely large amounts of binary data
+     * with a maximum length of 4GB, as supported by the SQL LONGBLOB type.
+     */
+    public static final DataType LONGBLOB = new DataType(false, false, false, "LONGBLOB");
+
+    /**
      * Represents a data type in a SQL schema. This class defines various attributes and behavior
      * for different SQL data types, allowing for handling SQL-compatible operations and definitions.
      *
@@ -144,6 +185,7 @@ public record DataType(boolean canHaveObject, boolean requireObject, boolean can
      * This method generates a SQL-compatible StringBuilder representation for the data type
      * based on the provided value and unsigned state.
      *
+     * @param query
      * @param value    The value to be used in the SQL definition, relevant for ENUM types or
      *                 data types that can have an associated object.
      * @param unsigned The unsigned state of the data type. Determines if the data type
@@ -154,7 +196,11 @@ public record DataType(boolean canHaveObject, boolean requireObject, boolean can
      * the type's characteristics.
      * @throws IllegalArgumentException If the data type is ENUM and the provided value is null.
      */
-    public StringBuilder toSQL(Object value, UnsignedState unsigned) {
+    public StringBuilder toSQL(Query query, Object value, UnsignedState unsigned) {
+        if (name.equals("BLOB") || name.equals("TINYBLOB") || name.equals("MEDIUMBLOB") || name.equals("LONGBLOB"))
+            DatabaseCheck.unsupportedDriver(query.databaseAdapter().driverType(), DriverType.POSTGRESQL);
+
+
         if (name.equals("ENUM")) {
             if (value == null) {
                 throw new IllegalArgumentException("ENUM data type requires a non-null value");
