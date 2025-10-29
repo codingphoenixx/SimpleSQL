@@ -131,7 +131,7 @@ public class InsertQueryProvider implements QueryProvider {
         this.boundParams = List.copyOf(params);
         return sql.toString();
     }
-
+//TODO: Update only columns
     @Override
     public List<Object> parameters() {
         return boundParams != null ? boundParams : List.of();
