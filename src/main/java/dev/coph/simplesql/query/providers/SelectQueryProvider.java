@@ -114,7 +114,14 @@ public class SelectQueryProvider implements QueryProvider {
         }
 
         sql.append(";");
-
+        
+        for (int i = 0, paramsSize = params.size(); i < paramsSize; i++) {
+            Object p = params.get(i);
+            if (p == null) {
+                throw new IllegalArgumentException("Parameter list contains null value at slot %s".formatted(i + 1));
+            }
+        }
+        
         this.boundParams = List.copyOf(params);
         return sql.toString();
     }
