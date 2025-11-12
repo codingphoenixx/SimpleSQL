@@ -5,8 +5,8 @@ import dev.coph.simplesql.adapter.DatabaseAdapter;
 import dev.coph.simplesql.database.attributes.DataType;
 import dev.coph.simplesql.driver.DriverType;
 import dev.coph.simplesql.query.Query;
+import dev.coph.simplesql.query.QueryProvider;
 import dev.coph.simplesql.query.providers.SelectQueryProvider;
-import dev.coph.simplesql.query.providers.TableCreateQueryProvider;
 import dev.coph.simplesql.utils.test.Test;
 
 import java.util.List;
@@ -31,7 +31,7 @@ public class InsertRequestTest implements Test {
     }
 
     @Override
-    public List<TableCreateQueryProvider> setup(DriverType driverType) {
+    public List<QueryProvider> setup(DriverType driverType) {
         return List.of(
                 Query.tableCreate().column(COLUMN_NAME, DataType.INTEGER)
         );

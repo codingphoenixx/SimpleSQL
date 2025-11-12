@@ -63,7 +63,9 @@ public enum Operator {
      * to filter results that explicitly have a non-null value for the specified column.
      */
     IS_NOT_NULL("IS NOT NULL", false),
-    ;
+    IN("IN", false),
+    NOT_IN("NOT IN", false),
+    BETWEEN("BETWEEN", false);
 
     /**
      * Represents the operator used for comparison or logical conditions in a query.

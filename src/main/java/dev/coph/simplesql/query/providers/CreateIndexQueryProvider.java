@@ -217,6 +217,9 @@ public class CreateIndexQueryProvider implements QueryProvider {
             case GREATER_EQUALS -> ">=";
             case LESS_THAN -> "<";
             case LESS_EQUALS -> "<=";
+            case IN -> "IN";
+            case NOT_IN -> "NOT IN";
+            case BETWEEN -> "BETWEEN";
             case IS_NULL, IS_NOT_NULL -> throw new IllegalStateException("NULL handled separately");
         };
     }

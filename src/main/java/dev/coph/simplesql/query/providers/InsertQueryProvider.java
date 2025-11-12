@@ -139,7 +139,6 @@ public class InsertQueryProvider implements QueryProvider {
         return sql.toString();
     }
 
-    //TODO: Update only columns
     @Override
     public List<Object> parameters() {
         return boundParams != null ? boundParams : List.of();

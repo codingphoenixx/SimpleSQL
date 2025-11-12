@@ -114,14 +114,14 @@ public class SelectQueryProvider implements QueryProvider {
         }
 
         sql.append(";");
-        
+
         for (int i = 0, paramsSize = params.size(); i < paramsSize; i++) {
             Object p = params.get(i);
             if (p == null) {
                 throw new IllegalArgumentException("Parameter list contains null value at slot %s".formatted(i + 1));
             }
         }
-        
+
         this.boundParams = List.copyOf(params);
         return sql.toString();
     }
@@ -188,23 +188,66 @@ public class SelectQueryProvider implements QueryProvider {
             if (!first) {
                 sb.append(c.type() == Condition.Type.AND ? " AND " : " OR ");
             }
-            if (c.not()) sb.append("NOT ");
-
-            String column = c.key();
-            Operator op = c.operator();
-            Object value = c.value();
-
-            switch (op) {
-                case IS_NULL -> sb.append(column).append(" IS NULL");
-                case IS_NOT_NULL -> sb.append(column).append(" IS NOT NULL");
-                default -> {
-                    sb.append(column).append(" ").append(op.operator()).append(" ?");
-                    params.add(value);
-                }
-            }
+            appendCondition(sb, c, params);
             first = false;
         }
         return sb.toString();
+    }
+
+    private void appendCondition(StringBuilder sb, Condition c, List<Object> params) {
+        if (c.not()) sb.append("NOT ");
+
+        if (c.isGroup()) {
+            sb.append("(");
+            List<Condition> children = c.children();
+            Iterator<Condition> it = children.iterator();
+            boolean first = true;
+            while (it.hasNext()) {
+                Condition child = it.next();
+                if (!first) {
+                    sb.append(child.type() == Condition.Type.AND ? " AND " : " OR ");
+                }
+                appendCondition(sb, child, params);
+                first = false;
+            }
+            sb.append(")");
+            return;
+        }
+
+        String column = c.key();
+        Operator op = c.operator();
+        Object value = c.value();
+
+        switch (op) {
+            case IS_NULL -> sb.append(column).append(" IS NULL");
+            case IS_NOT_NULL -> sb.append(column).append(" IS NOT NULL");
+            case IN, NOT_IN -> {
+                if (!(value instanceof Collection<?> col) || col.isEmpty()) {
+                    throw new IllegalArgumentException(op + " requires non-empty Collection");
+                }
+                sb.append(column).append(" ").append(op.operator()).append(" (");
+                boolean first = true;
+                for (Object v : col) {
+                    if (!first) sb.append(", ");
+                    sb.append("?");
+                    params.add(v);
+                    first = false;
+                }
+                sb.append(")");
+            }
+            case BETWEEN -> {
+                if (!(value instanceof List<?> list) || list.size() != 2) {
+                    throw new IllegalArgumentException("BETWEEN requires List of size 2");
+                }
+                sb.append(column).append(" BETWEEN ? AND ?");
+                params.add(list.get(0));
+                params.add(list.get(1));
+            }
+            default -> {
+                sb.append(column).append(" ").append(op.operator()).append(" ?");
+                params.add(value);
+            }
+        }
     }
 
     /**
@@ -435,6 +478,16 @@ public class SelectQueryProvider implements QueryProvider {
         return this;
     }
 
+    public SelectQueryProvider conditionGroup(Condition.Type type, boolean not, Condition... conditions) {
+        condition(Condition.group(type, not, Arrays.asList(conditions)));
+        return this;
+    }
+
+    public SelectQueryProvider conditionGroup(Condition.Type type, Condition... conditions) {
+        condition(Condition.group(type, false, Arrays.asList(conditions)));
+        return this;
+    }
+
     /**
      * Adds a column key to the list of column keys for the query and returns the current instance.
      *
@@ -446,6 +499,19 @@ public class SelectQueryProvider implements QueryProvider {
         this.columnKeys.add(columnKey);
         return this;
     }
+
+    /**
+     * Specifies the columns to be included in the query by their keys.
+     *
+     * @param columnKeys the keys of the columns to be included in the query
+     * @return the current instance of {@code SelectQueryProvider} for method chaining
+     */
+    public SelectQueryProvider columns(String... columnKeys) {
+        if (this.columnKeys == null) this.columnKeys = new ArrayList<>();
+        this.columnKeys.addAll(Arrays.asList(columnKeys));
+        return this;
+    }
+
 
     /**
      * Sets the maximum number of rows to be returned by the query.

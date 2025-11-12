@@ -4,6 +4,9 @@ import dev.coph.simplelogger.Logger;
 import dev.coph.simplesql.adapter.DatabaseAdapter;
 import dev.coph.simplesql.database.attributes.DeleteMethode;
 import dev.coph.simplesql.query.Query;
+import dev.coph.simplesql.query.QueryProvider;
+import dev.coph.simplesql.query.providers.InsertQueryProvider;
+import dev.coph.simplesql.query.providers.SelectQueryProvider;
 import dev.coph.simplesql.query.providers.TableCreateQueryProvider;
 import dev.coph.simplesql.query.providers.TableDropQueryProvider;
 import dev.coph.simplesql.utils.test.implementations.InsertRequestTest;
@@ -37,9 +40,17 @@ public class Tester {
 
         query.executeQuery(tableDropQueryProvider);
 
-        List<TableCreateQueryProvider> tableCreateQueryProviders = test.setup(databaseAdapter.driverType());
-        for (TableCreateQueryProvider provider : tableCreateQueryProviders) {
-            provider.table(TABLE_NAME);
+        List<QueryProvider> tableCreateQueryProviders = test.setup(databaseAdapter.driverType());
+        for (QueryProvider provider : tableCreateQueryProviders) {
+            if (provider instanceof TableCreateQueryProvider tableCreateQueryProvider) {
+                tableCreateQueryProvider.table(TABLE_NAME);
+            }
+            if (provider instanceof InsertQueryProvider insertQueryProvider) {
+                insertQueryProvider.table(TABLE_NAME);
+            }
+            if (provider instanceof SelectQueryProvider selectQueryProvider) {
+                selectQueryProvider.table(TABLE_NAME);
+            }
             query.queries(provider);
         }
         query.execute();
