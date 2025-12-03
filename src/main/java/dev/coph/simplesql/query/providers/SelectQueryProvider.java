@@ -235,6 +235,13 @@ public class SelectQueryProvider implements QueryProvider {
                 }
                 sb.append(")");
             }
+            case LIKE -> {
+                if (value == null) {
+                    throw new IllegalArgumentException("LIKE requires a non-null value");
+                }
+                sb.append(column).append(" LIKE ?");
+                params.add(value);
+            }
             case BETWEEN -> {
                 if (!(value instanceof List<?> list) || list.size() != 2) {
                     throw new IllegalArgumentException("BETWEEN requires List of size 2");

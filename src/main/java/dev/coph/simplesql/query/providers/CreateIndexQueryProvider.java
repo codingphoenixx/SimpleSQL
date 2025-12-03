@@ -220,6 +220,7 @@ public class CreateIndexQueryProvider implements QueryProvider {
             case IN -> "IN";
             case NOT_IN -> "NOT IN";
             case BETWEEN -> "BETWEEN";
+            case LIKE -> "LIKE";
             case IS_NULL, IS_NOT_NULL -> throw new IllegalStateException("NULL handled separately");
         };
     }

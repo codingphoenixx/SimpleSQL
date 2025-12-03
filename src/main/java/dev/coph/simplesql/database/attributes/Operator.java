@@ -65,7 +65,13 @@ public enum Operator {
     IS_NOT_NULL("IS NOT NULL", false),
     IN("IN", false),
     NOT_IN("NOT IN", false),
-    BETWEEN("BETWEEN", false);
+    BETWEEN("BETWEEN", false),
+    /**
+     * Represents the SQL pattern matching operator "LIKE".
+     * Used for wildcard searches with '%' and '_' characters.
+     * Value does not need to be a number.
+     */
+    LIKE("LIKE", false);
 
     /**
      * Represents the operator used for comparison or logical conditions in a query.

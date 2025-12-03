@@ -4,7 +4,7 @@ plugins {
 }
 
 group = 'dev.coph'
-version = '4.0.0-rc17'
+version = '4.0.0-rc18'
 
 repositories {
     maven {
