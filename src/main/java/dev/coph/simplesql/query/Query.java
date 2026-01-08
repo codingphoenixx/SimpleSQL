@@ -217,7 +217,7 @@ public class Query {
                         succeeded = true;
                     }
                 } catch (SQLException e) {
-                    e.printStackTrace();
+                    logger.error("Error executing query: " + generateSQLString, e);
                     succeeded = false;
                 }
                 for (QueryProvider query : queries) {

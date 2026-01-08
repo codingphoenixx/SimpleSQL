@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'dev.coph'
-version = '3.2.0'
+version = '3.3.0'
 
 repositories {
     maven {
@@ -16,17 +16,17 @@ repositories {
 }
 
 dependencies {
-    implementation 'com.zaxxer:HikariCP:6.3.3'
+    implementation 'com.zaxxer:HikariCP:7.0.2'
 
-    implementation "org.xerial:sqlite-jdbc:3.50.3.0"
-    implementation 'com.mysql:mysql-connector-j:9.4.0'
-    implementation 'org.mariadb.jdbc:mariadb-java-client:3.5.6'
+    implementation "org.xerial:sqlite-jdbc:3.51.1.0"
+    implementation 'com.mysql:mysql-connector-j:9.5.0'
+    implementation 'org.mariadb.jdbc:mariadb-java-client:3.5.7'
 
     compileOnly 'org.projectlombok:lombok:1.18.42'
     annotationProcessor 'org.projectlombok:lombok:1.18.42'
 
-    compileOnly "dev.coph:simplelogger:3.1.0"
-    compileOnly "dev.coph:simpleutilities:3.5.0"
+    compileOnly "dev.coph:simplelogger:3.2.1"
+    compileOnly "dev.coph:simpleutilities:3.10.0"
 }
 
 javadoc {

@@ -1,5 +1,6 @@
 package dev.coph.simplesql;
 
+import dev.coph.simplelogger.GenericLogger;
 import dev.coph.simplelogger.Logger;
 import dev.coph.simplesql.adapter.DatabaseAdapter;
 import dev.coph.simplesql.database.attributes.SelectFunction;
@@ -32,7 +33,8 @@ public class Main {
      * @param args command-line arguments passed during application execution
      */
     public static void main(String[] args) {
-        Logger.instance();
+        GenericLogger.instance();
+
         System.out.println("--------------------------------------- MARIADB ------------------------------------------");
         startMariaDB();
         System.out.println("--------------------------------------- SQLITE ------------------------------------------");

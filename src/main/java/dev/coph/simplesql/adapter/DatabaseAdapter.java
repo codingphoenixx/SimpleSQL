@@ -5,7 +5,9 @@ import com.zaxxer.hikari.HikariDataSource;
 import dev.coph.simplelogger.Logger;
 import dev.coph.simplesql.driver.DriverType;
 import dev.coph.simplesql.exception.DriverNotLoadedException;
+import dev.coph.simplesql.utils.StringEscapeUtils;
 import dev.coph.simpleutilities.check.Check;
+import org.sqlite.util.StringUtils;
 
 import java.io.File;
 
@@ -49,6 +51,7 @@ public class DatabaseAdapter {
     boolean connected = false;
 
     public Logger logger;
+
     /**
      * Constructs a new instance of the DatabaseAdapter class, configuring the JDBC connection parameters
      * and properties based on the provided driver type, host, port, database name, credentials, or SQLite file path.
@@ -62,7 +65,7 @@ public class DatabaseAdapter {
      * @param sqliteFile the SQLite database file to connect to (used only for SQLITE driver type)
      */
     private DatabaseAdapter(DriverType driverType, String host, int port, String database, String user, String password, File sqliteFile) {
-        this.logger = new Logger("SimpleSQL - Database");
+        this.logger = Logger.of("SimpleSQL - " + driverType.readableName() + " Database");
         this.connected = false;
         this.driverType = driverType;
         this.hikariConfig = new HikariConfig();
