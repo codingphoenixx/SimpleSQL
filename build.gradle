@@ -5,7 +5,7 @@ plugins {
 }
 
 group = 'dev.coph'
-version = '3.0.0'
+version = '3.1.0'
 
 repositories {
     maven {
@@ -25,8 +25,8 @@ dependencies {
     compileOnly 'org.projectlombok:lombok:1.18.42'
     annotationProcessor 'org.projectlombok:lombok:1.18.42'
 
-    implementation "dev.coph:simplelogger:2.2.0"
-    implementation "dev.coph:simpleutilities:3.5.0"
+    compileOnly "dev.coph:simplelogger:3.1.0"
+    compileOnly "dev.coph:simpleutilities:3.5.0"
 }
 
 javadoc {

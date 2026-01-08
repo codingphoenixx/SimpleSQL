@@ -32,7 +32,7 @@ public class Main {
      * @param args command-line arguments passed during application execution
      */
     public static void main(String[] args) {
-        Logger.getInstance();
+        Logger.instance();
         System.out.println("--------------------------------------- MARIADB ------------------------------------------");
         startMariaDB();
         System.out.println("--------------------------------------- SQLITE ------------------------------------------");

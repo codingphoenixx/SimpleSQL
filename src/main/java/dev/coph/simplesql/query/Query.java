@@ -195,7 +195,7 @@ public class Query {
                     return;
                 }
                 var statement = connection.prepareStatement(generateSQLString);
-                Logger.getInstance().log(Logger.LogLevel.DEBUG, "Executing query: " + generateSQLString);
+                Logger.debug("Executing query: " + generateSQLString);
                 try {
                     if (queryProvider instanceof SelectQueryProvider selectRequest) {
                         ResultSet resultSet = statement.executeQuery();
@@ -231,7 +231,7 @@ public class Query {
                             System.out.println("Generated SQL-String is null. Ignoring request.");
                             continue;
                         }
-                        Logger.getInstance().log(Logger.LogLevel.DEBUG, "Executing query: " + generateSQLString);
+                        Logger.debug( "Executing query: " + generateSQLString);
                         statement.addBatch(generateSQLString);
                     } catch (Exception e) {
                         e.printStackTrace();
