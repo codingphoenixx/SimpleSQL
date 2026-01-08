@@ -1,5 +1,7 @@
 package dev.coph.simplesql.database;
 
+import dev.coph.simplelogger.LogLevel;
+import dev.coph.simplelogger.Logger;
 import dev.coph.simplesql.adapter.DatabaseAdapter;
 import dev.coph.simplesql.database.attributes.ColumnType;
 import dev.coph.simplesql.database.attributes.DataType;
@@ -76,6 +78,7 @@ public class Column {
      * @return a string representation of the column definition in SQL format, or null in case of unsupported configurations
      */
     public String toString(Query query) {
+        Logger logger = query.databaseAdapter().logger;
         Check.ifNull(key, "column-key");
         Check.ifNull(dataType, "datatype");
         if (dataType.requireObject()) {
@@ -94,12 +97,12 @@ public class Column {
                 }
                 if (query.databaseAdapter().driverType().equals(DriverType.MYSQL) || query.databaseAdapter().driverType().equals(DriverType.MARIADB)) {
                     if (!dataType.equals(DataType.TINYTEXT) && !dataType.equals(DataType.INTEGER) && !dataType.equals(DataType.BIGINT)) {
-                        System.out.println("ERROR: You cannot set an autoincrement to a non int value. Setting it to default primary key.");
+                        logger.log(LogLevel.WARNING,"You cannot set an autoincrement to a non int value. Setting it to default primary key.");
                         columnType = ColumnType.PRIMARY_KEY;
                     }
                 } else if (query.databaseAdapter().driverType().equals(DriverType.SQLITE)) {
                     if (!dataType.equals(DataType.INTEGER)) {
-                        System.out.println("ERROR: You cannot set an autoincrement to a non integer. Setting it to default primary key.");
+                        logger.log(LogLevel.WARNING,"You cannot set an autoincrement to a non integer. Setting it to default primary key.");
                         columnType = ColumnType.PRIMARY_KEY;
                     }
                 }

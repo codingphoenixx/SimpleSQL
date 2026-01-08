@@ -1,5 +1,6 @@
 package dev.coph.simplesql.query;
 
+import dev.coph.simplelogger.LogLevel;
 import dev.coph.simplelogger.Logger;
 import dev.coph.simplesql.adapter.DatabaseAdapter;
 import dev.coph.simplesql.exception.RequestNotExecutableException;
@@ -37,7 +38,10 @@ public class Query {
      */
     public Query(DatabaseAdapter databaseAdapter) {
         this.databaseAdapter = databaseAdapter;
+        this.logger = databaseAdapter.logger;
     }
+
+    private final Logger logger;
 
     /**
      * The {@code databaseAdapter} field provides access to the underlying database connection
@@ -188,14 +192,15 @@ public class Query {
             if (queries.size() == 1) {
                 QueryProvider queryProvider = queries.get(0);
                 if (!queryProvider.compatibility().isCompatible(databaseAdapter.driverType())) {
-                    throw new UnsupportedOperationException("The current request is not supported by the database driver. Failing request. Please check the documentation for supported database operations and try again with a compatible request.");                }
+                    throw new UnsupportedOperationException("The current request is not supported by the database driver. Failing request. Please check the documentation for supported database operations and try again with a compatible request.");
+                }
                 String generateSQLString = queryProvider.generateSQLString(this);
                 if (generateSQLString == null) {
-                    System.out.println("Generated SQL-String is null. Canceling request.");
+                    logger.log(LogLevel.INFO, "Generated SQL-String is null. Canceling request.");
                     return;
                 }
                 var statement = connection.prepareStatement(generateSQLString);
-                Logger.debug("Executing query: " + generateSQLString);
+                logger.log(LogLevel.DEBUG, "Executing query: " + generateSQLString);
                 try {
                     if (queryProvider instanceof SelectQueryProvider selectRequest) {
                         ResultSet resultSet = statement.executeQuery();
@@ -228,10 +233,10 @@ public class Query {
                         }
                         String generateSQLString = queryProvider.generateSQLString(this);
                         if (generateSQLString == null) {
-                            System.out.println("Generated SQL-String is null. Ignoring request.");
+                            logger.log(LogLevel.INFO, "Generated SQL-String is null. Ignoring request.");
                             continue;
                         }
-                        Logger.debug( "Executing query: " + generateSQLString);
+                        logger.log(LogLevel.DEBUG, "Executing query: " + generateSQLString);
                         statement.addBatch(generateSQLString);
                     } catch (Exception e) {
                         e.printStackTrace();
