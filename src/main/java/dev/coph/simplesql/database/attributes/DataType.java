@@ -1,5 +1,7 @@
 package dev.coph.simplesql.database.attributes;
 
+import javax.xml.crypto.Data;
+
 /**
  * Represents a data type that can be used in database schema definitions or SQL queries.
  * The `DataType` class defines various common database column types, each with specific
@@ -88,6 +90,24 @@ public class DataType {
      * A time. Format: hh:mm:ss. The supported range is from '-838:59:59' to '838:59:59'
      */
     public static final DataType TIME = new DataType(false, false, "TIME");
+
+    /**
+     * Represents the TINYBLOB data type, which is a very small binary large object capable of storing binary data
+     * up to a maximum size of 255 bytes.
+     */
+    public static final DataType TINYBLOB = new DataType(false, false, "TINYBLOB");
+    /**
+     * Represents the BLOB data type, which is a binary large object capable of storing binary data up to 65,535 bytes.
+     */
+    public static final DataType BLOB = new DataType(false, false, "BLOB");
+    /**
+     * Represents the MEDIUMBLOB data type, which is a binary large object capable of storing binary data up to 16,777,215 bytes.
+     */
+    public static final DataType MEDIUMBLOB = new DataType(false, false, "MEDIUMBLOB");
+    /**
+     * Represents the LONGBLOB data type, which is a binary large object capable of storing binary data up to 4,294,967,295 bytes.
+     */
+    public static final DataType LONGBLOB = new DataType(false, false, "LONGBLOB");
 
     /**
      * Indicates whether this DataType instance can associate with an object value.
