@@ -42,7 +42,7 @@ public class SelectQueryProvider implements QueryProvider {
     private Group group;
     private RunnableAction<SimpleResultSet> resultActionAfterQuery;
     private RunnableAction<Boolean> actionAfterQuery;
-    private ResultSet resultSet;
+    private SimpleResultSet simpleResultSet;
     private List<Object> boundParams = List.of();
 
     @Override
@@ -57,6 +57,8 @@ public class SelectQueryProvider implements QueryProvider {
 
         DriverType driver =
                 query.databaseAdapter() != null ? query.databaseAdapter().driverType() : null;
+
+        if (driver == null) throw new IllegalStateException("Database adapter is null");
 
         StringBuilder sql = new StringBuilder("SELECT ");
         List<Object> params = new ArrayList<>();
@@ -85,7 +87,7 @@ public class SelectQueryProvider implements QueryProvider {
             }
         }
 
-        if (whereConditions != null && !whereConditions.isEmpty()) {
+        if (!whereConditions.isEmpty()) {
             sql.append(" WHERE ");
             sql.append(buildConditions(whereConditions.iterator(), params));
         }
@@ -124,6 +126,16 @@ public class SelectQueryProvider implements QueryProvider {
 
         this.boundParams = List.copyOf(params);
         return sql.toString();
+    }
+
+    @Override
+    public List<Object> parameters() {
+        return boundParams != null ? boundParams : List.of();
+    }
+
+    @Override
+    public RunnableAction<Boolean> actionAfterQuery() {
+        return actionAfterQuery;
     }
 
     /**
@@ -362,16 +374,6 @@ public class SelectQueryProvider implements QueryProvider {
         }
     }
 
-    @Override
-    public List<Object> parameters() {
-        return boundParams != null ? boundParams : List.of();
-    }
-
-    @Override
-    public RunnableAction<Boolean> actionAfterQuery() {
-        return actionAfterQuery;
-    }
-
     /**
      * Sets a custom action to be executed after the query is completed. The specified action is
      * represented as a {@code RunnableAction<Boolean>} and can be used to define post-query logic.
@@ -450,17 +452,6 @@ public class SelectQueryProvider implements QueryProvider {
     }
 
     /**
-     * Adds a condition to the list of where conditions for the query.
-     *
-     * @param condition the condition to be added to the query. If null, the condition will not be added.
-     * @return the current instance of {@code SelectQueryProvider} to allow method chaining.
-     */
-    public SelectQueryProvider condition(Condition condition) {
-        if (condition != null) this.whereConditions.add(condition);
-        return this;
-    }
-
-    /**
      * Adds a condition to the query with the specified column and value.
      *
      * @param column the name of the column to apply the condition to
@@ -487,6 +478,17 @@ public class SelectQueryProvider implements QueryProvider {
 
     public SelectQueryProvider conditionGroup(Condition.Type type, boolean not, Condition... conditions) {
         condition(Condition.group(type, not, Arrays.asList(conditions)));
+        return this;
+    }
+
+    /**
+     * Adds a condition to the list of where conditions for the query.
+     *
+     * @param condition the condition to be added to the query. If null, the condition will not be added.
+     * @return the current instance of {@code SelectQueryProvider} to allow method chaining.
+     */
+    public SelectQueryProvider condition(Condition condition) {
+        if (condition != null) this.whereConditions.add(condition);
         return this;
     }
 
@@ -575,8 +577,8 @@ public class SelectQueryProvider implements QueryProvider {
      * @param resultSet the ResultSet object to be set
      * @return the current instance of SelectQueryProvider
      */
-    public SelectQueryProvider resultSet(ResultSet resultSet) {
-        this.resultSet = resultSet;
+    public SelectQueryProvider simpleResultSet(SimpleResultSet resultSet) {
+        this.simpleResultSet = resultSet;
         return this;
     }
 
@@ -712,20 +714,8 @@ public class SelectQueryProvider implements QueryProvider {
      *
      * @return the current ResultSet object.
      */
-    public ResultSet resultSet() {
-        return this.resultSet;
-    }
-
-    /**
-     * Creates and returns a new instance of SimpleResultSet based on the existing ResultSet.
-     * Throws a NullPointerException if the ResultSet is not initialized.
-     *
-     * @return a new instance of SimpleResultSet constructed using the existing ResultSet
-     * @throws NullPointerException if the underlying ResultSet is null
-     */
     public SimpleResultSet simpleResultSet() {
-        if (resultSet == null) throw new NullPointerException("ResultSet is null");
-        return new SimpleResultSet(resultSet());
+        return this.simpleResultSet;
     }
 
     /**

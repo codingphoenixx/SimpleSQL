@@ -1,5 +1,7 @@
 package dev.coph.simplesql;
 
+import dev.coph.simplelogger.GenericLogger;
+import dev.coph.simplelogger.LogLevel;
 import dev.coph.simplelogger.Logger;
 import dev.coph.simplesql.adapter.DatabaseAdapter;
 import dev.coph.simplesql.driver.DriverType;
@@ -12,8 +14,9 @@ import java.io.IOException;
 public class Main {
 
     public static void main(String[] args) {
-        Logger.instance().logLevel(Logger.LogLevel.DEBUG);
-        GenericLogger.instance();
+        GenericLogger logger = GenericLogger.instance();
+        logger.consoleLogLevel(LogLevel.DEBUG);
+        logger.fileLogLevel(LogLevel.DEBUG);
 
         System.out.println("--------------------------------------- MARIADB ------------------------------------------");
         startMariaDB();

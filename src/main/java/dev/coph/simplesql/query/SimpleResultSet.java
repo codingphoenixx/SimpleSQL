@@ -9,7 +9,7 @@ import java.sql.SQLException;
  * This class is designed to simplify result set iteration and processing operations
  * using functional programming patterns.
  */
-public record SimpleResultSet(ResultSet resultSet) {
+public record SimpleResultSet(Query query, ResultSet resultSet) {
 
     /**
      * Advances the underlying ResultSet to the next row and applies the given consumer to it.
@@ -99,7 +99,7 @@ public record SimpleResultSet(ResultSet resultSet) {
             try {
                 consumer.accept(resultSet);
             } catch (Exception e) {
-                e.printStackTrace();
+                query.databaseAdapter().logger.error("Error occurred while processing result set row", e);
             }
         }
         return this;
@@ -145,7 +145,7 @@ public record SimpleResultSet(ResultSet resultSet) {
             try {
                 consumer.accept(resultSet);
             } catch (Exception e) {
-                e.printStackTrace();
+                query.databaseAdapter().logger.error("Error occurred while processing result set row", e);
             }
             count++;
         }
@@ -249,7 +249,7 @@ public record SimpleResultSet(ResultSet resultSet) {
     public interface EmptyResultSetConsumer {
         /**
          * Defines the action to be executed when a ResultSet is empty.
-         *
+         * <p>
          * The accept method is designed to handle the scenario where a database query yields no results.
          * Implementations of this method can provide custom logic to handle such cases, ensuring appropriate
          * behavior when there are no rows available in the underlying ResultSet.

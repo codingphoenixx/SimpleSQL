@@ -1,5 +1,6 @@
 package dev.coph.simplesql.utils.test.implementations;
 
+import dev.coph.simplelogger.Logger;
 import dev.coph.simplesql.adapter.DatabaseAdapter;
 import dev.coph.simplesql.database.attributes.ColumnType;
 import dev.coph.simplesql.database.attributes.CreateMethode;
@@ -21,6 +22,7 @@ import java.util.List;
  * verifying their creation, and finally dropping those tables as part of cleanup.
  */
 public class TableCreateRequestTest implements Test {
+    private final Logger logger = Logger.of("Test - Table Create");
 
     @Override
     public String name() {
@@ -47,7 +49,7 @@ public class TableCreateRequestTest implements Test {
                 .primaryKey(List.of("col_key", "col_key2"));
         new Query(databaseAdapter).executeQuery(provider, provider2);
 
-        System.out.println("Successfully created tables");
+        logger.info("Successfully created tables");
         TableDropQueryProvider drop = Query.tableDrop().table("test").deleteMethode(DeleteMethode.IF_EXISTS);
         TableDropQueryProvider drop2 = Query.tableDrop().table("test2").deleteMethode(DeleteMethode.IF_EXISTS);
         new Query(databaseAdapter).executeQuery(drop, drop2);

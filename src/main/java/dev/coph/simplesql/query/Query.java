@@ -1,6 +1,5 @@
 package dev.coph.simplesql.query;
 
-import dev.coph.simplelogger.LogLevel;
 import dev.coph.simplelogger.Logger;
 import dev.coph.simplesql.adapter.DatabaseAdapter;
 import dev.coph.simplesql.exception.RequestNotExecutableException;
@@ -30,18 +29,7 @@ import java.util.concurrent.CompletableFuture;
  * - {@code queries}: A collection of queries to be executed.<br>
  */
 public class Query {
-    /**
-     * Constructor for the Query class that initializes it with a given DatabaseAdapter instance.
-     *
-     * @param databaseAdapter the DatabaseAdapter instance to be used for database operations
-     */
-    public Query(DatabaseAdapter databaseAdapter) {
-        this.databaseAdapter = databaseAdapter;
-        this.logger = databaseAdapter.logger;
-    }
-
     private final Logger logger;
-
     /**
      * The {@code databaseAdapter} field provides access to the underlying database connection
      * and configuration through the {@link DatabaseAdapter} class.
@@ -109,7 +97,6 @@ public class Query {
     private boolean preserveQueriesAfterExecution = false;
     private boolean useTransaction = true;
 
-
     /**
      * Constructor for the Query class that initializes it with a given DatabaseAdapter instance.
      *
@@ -117,6 +104,7 @@ public class Query {
      */
     public Query(DatabaseAdapter databaseAdapter) {
         this.databaseAdapter = databaseAdapter;
+        this.logger = databaseAdapter.logger;
     }
 
     /**
@@ -329,6 +317,20 @@ public class Query {
     }
 
     /**
+     * Executes the provided queries by adding them to the query list and then initiating execution.
+     *
+     * @param queries an array of {@link QueryProvider} objects to be executed.
+     *                Must not be null or empty.
+     * @return the current {@link Query} instance after executing the queries.
+     */
+    public Query executeQuery(QueryProvider... queries) {
+        Check.ifNullOrEmptyMap(queries, "Query");
+        this.queries.addAll(Arrays.asList(queries));
+        execute();
+        return this;
+    }
+
+    /**
      * Executes the query using the configured database adapter. The execution can be
      * done synchronously or asynchronously, based on the `async` flag. If executed
      * asynchronously, the execution will happen in a separate thread.
@@ -349,20 +351,6 @@ public class Query {
             executed = true;
         }
         if (!preserveQueriesAfterExecution) queries.clear();
-        return this;
-    }
-
-    /**
-     * Executes the provided queries by adding them to the query list and then initiating execution.
-     *
-     * @param queries an array of {@link QueryProvider} objects to be executed.
-     *                Must not be null or empty.
-     * @return the current {@link Query} instance after executing the queries.
-     */
-    public Query executeQuery(QueryProvider... queries) {
-        Check.ifNullOrEmptyMap(queries, "Query");
-        this.queries.addAll(Arrays.asList(queries));
-        execute();
         return this;
     }
 
@@ -421,7 +409,7 @@ public class Query {
 
                     String sql = queryProvider.generateSQLString(this);
                     if (sql == null) {
-                        Logger.instance().log(Logger.LogLevel.ERROR, "Generated SQL-String is null. Canceling request");
+                        logger.error("Generated SQL-String is null. Canceling request");
                         if (useTransaction)
                             connection.rollback();
                         return;
@@ -429,14 +417,15 @@ public class Query {
 
                     try (var ps = connection.prepareStatement(sql)) {
                         queryProvider.bindParameters(ps);
-                        Logger.instance().log(Logger.LogLevel.DEBUG, "Executing query: " + sql);
+                        logger.debug("Executing query: " + sql);
 
                         if (queryProvider instanceof SelectQueryProvider selectRequest) {
                             try (ResultSet rs = ps.executeQuery()) {
-                                selectRequest.resultSet(rs);
+                                SimpleResultSet srs = new SimpleResultSet(this, rs);
+                                selectRequest.simpleResultSet(srs);
                                 succeeded = true;
                                 if (selectRequest.resultActionAfterQuery() != null) {
-                                    selectRequest.resultActionAfterQuery().run(new SimpleResultSet(rs));
+                                    selectRequest.resultActionAfterQuery().run(srs);
                                 }
                             }
                         } else if (queryProvider instanceof UpdateQueryProvider) {
@@ -447,8 +436,7 @@ public class Query {
                             succeeded = true;
                         }
                     } catch (Exception e) {
-                        Logger.instance();
-                        Logger.error("Failed to execute query: " + sql, e);
+                        logger.error("Failed to execute query: " + sql, e);
                         throw e;
                     }
 
@@ -479,7 +467,7 @@ public class Query {
                             }
                             String sql = qp.generateSQLString(this);
                             if (sql == null) {
-                                System.out.println("Generated SQL-String is null. Ignoring request.");
+                                logger.debug("Generated SQL-String is null. Ignoring request.");
                                 if (qp.actionAfterQuery() != null) qp.actionAfterQuery().run(false);
                                 continue;
                             }
@@ -490,7 +478,7 @@ public class Query {
                                 batchBuckets.computeIfAbsent(sql, Bucket::new).providers.add(qp);
                             }
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            logger.error("Failed to generate SQL for query: " + qp, e);
                             if (qp.actionAfterQuery() != null) {
                                 qp.actionAfterQuery().run(false);
                             }
@@ -501,15 +489,14 @@ public class Query {
 
                     for (Bucket bucket : batchBuckets.values()) {
                         String sql = bucket.sql;
-                        Logger.instance().log(Logger.LogLevel.DEBUG,
-                                "Executing batch for SQL: " + sql + " with size " + bucket.providers.size());
+                        logger.debug("Executing batch for SQL: " + sql + " with size " + bucket.providers.size());
                         try (var ps = connection.prepareStatement(sql)) {
                             for (QueryProvider qp : bucket.providers) {
                                 try {
                                     qp.bindParameters(ps);
                                     ps.addBatch();
                                 } catch (Exception e) {
-                                    e.printStackTrace();
+                                    logger.error("Failed to bind parameters for query: " + qp, e);
                                     allOk = false;
                                     if (qp.actionAfterQuery() != null) qp.actionAfterQuery().run(false);
                                 }
@@ -520,14 +507,14 @@ public class Query {
                                     if (qp.actionAfterQuery() != null) qp.actionAfterQuery().run(true);
                                 }
                             } catch (SQLException e) {
-                                e.printStackTrace();
+                                logger.error("Failed to execute batch for SQL: " + sql, e);
                                 allOk = false;
                                 for (QueryProvider qp : bucket.providers) {
                                     if (qp.actionAfterQuery() != null) qp.actionAfterQuery().run(false);
                                 }
                             }
                         } catch (SQLException e) {
-                            e.printStackTrace();
+                            logger.error("Failed to prepare batch for SQL: " + sql, e);
                             allOk = false;
                             for (QueryProvider qp : bucket.providers) {
                                 if (qp.actionAfterQuery() != null) qp.actionAfterQuery().run(false);
@@ -538,24 +525,25 @@ public class Query {
                     for (QueryProvider qp : selectProviders) {
                         String sql = qp.generateSQLString(this);
                         if (sql == null) {
-                            System.out.println("Generated SQL-String is null. Ignoring request.");
+                            logger.warn("Generated SQL-String is null. Ignoring request.");
                             if (qp.actionAfterQuery() != null) qp.actionAfterQuery().run(false);
                             allOk = false;
                             continue;
                         }
-                        Logger.instance().log(Logger.LogLevel.DEBUG, "Executing query: " + sql);
+                        logger.debug("Executing query: " + sql);
                         try (var ps = connection.prepareStatement(sql)) {
                             qp.bindParameters(ps);
                             SelectQueryProvider select = (SelectQueryProvider) qp;
                             try (ResultSet rs = ps.executeQuery()) {
-                                select.resultSet(rs);
+                                SimpleResultSet srs = new SimpleResultSet(this, rs);
+                                select.simpleResultSet(srs);
                                 if (select.resultActionAfterQuery() != null) {
-                                    select.resultActionAfterQuery().run(new SimpleResultSet(rs));
+                                    select.resultActionAfterQuery().run(srs);
                                 }
                                 if (qp.actionAfterQuery() != null) qp.actionAfterQuery().run(true);
                             }
                         } catch (Exception e) {
-                            e.printStackTrace();
+                            logger.error("Failed to execute query: " + sql, e);
                             allOk = false;
                             if (qp.actionAfterQuery() != null) qp.actionAfterQuery().run(false);
                         }

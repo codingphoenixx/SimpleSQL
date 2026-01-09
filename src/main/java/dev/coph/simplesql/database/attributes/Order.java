@@ -77,6 +77,7 @@ public class Order {
      * @return a HashMap containing the field names as keys and their sorting directions as values
      */
     public HashMap<String, Direction> orderRules() {
+        if (orderRules == null) orderRules = new HashMap<>();
         return this.orderRules;
     }
 
