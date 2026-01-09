@@ -162,11 +162,11 @@ public class TruncateQueryProvider implements QueryProvider {
      * The IdentityMode enum represents the behavior of an identity column in a database
      * table when a truncate operation is performed. Identity columns are typically used
      * to auto-generate unique values for each row.
-     *
+     * <p>
      * This enum defines two modes:
      * - RESTART: Resets the identity value to its original seed upon truncation.
      * - CONTINUE: Keeps the current identity value without resetting it after truncation.
-     *
+     * <p>
      * These modes allow for fine-grained control over how identity columns behave
      * in conjunction with truncate operations, depending on the database's capabilities
      * and the application's requirements.
@@ -175,7 +175,7 @@ public class TruncateQueryProvider implements QueryProvider {
         /**
          * Represents the mode where the identity value of a database column is
          * reset to its original seed upon a truncate operation.
-         *
+         * <p>
          * This behavior is useful for scenarios where the application requires
          * a fresh set of identity values, starting from the initial seed after
          * truncating the table's content.
@@ -185,7 +185,7 @@ public class TruncateQueryProvider implements QueryProvider {
          * Represents the mode where the identity value of a database column continues
          * incrementing from its current value, without being reset, after a truncate
          * operation is performed on the table.
-         *
+         * <p>
          * This behavior is useful for scenarios where the application requires the identity
          * values to remain consistent and avoid restarting, preserving the sequence of
          * auto-generated values.

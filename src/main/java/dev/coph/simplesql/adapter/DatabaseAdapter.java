@@ -5,9 +5,7 @@ import com.zaxxer.hikari.HikariDataSource;
 import dev.coph.simplelogger.Logger;
 import dev.coph.simplesql.driver.DriverType;
 import dev.coph.simplesql.exception.DriverNotLoadedException;
-import dev.coph.simplesql.utils.StringEscapeUtils;
 import dev.coph.simpleutilities.check.Check;
-import org.sqlite.util.StringUtils;
 
 import java.io.File;
 
@@ -32,6 +30,17 @@ public class DatabaseAdapter {
      */
     private final HikariConfig hikariConfig;
     /**
+     * A {@code Logger} instance utilized for logging messages and events within the
+     * {@code DatabaseAdapter} class. This logger provides essential logging functionality
+     * to capture informational, warning, and error messages during database operations,
+     * such as connection setup, error handling, and runtime diagnostics.
+     * <p>
+     * The {@code Logger} is intended to assist developers and administrators in monitoring
+     * the behavior of the {@code DatabaseAdapter}, enabling easier troubleshooting and
+     * detailed insight into the system's operation.
+     */
+    public Logger logger;
+    /**
      * Indicates whether the database connection has been successfully established.
      * The value is {@code true} if the database is connected and {@code false} otherwise.
      * Used internally to track the current state of the connection.
@@ -49,8 +58,6 @@ public class DatabaseAdapter {
      * reusable connections.
      */
     private HikariDataSource dataSource;
-
-    public Logger logger;
 
     /**
      * Constructs a new instance of the DatabaseAdapter class, configuring the JDBC connection parameters

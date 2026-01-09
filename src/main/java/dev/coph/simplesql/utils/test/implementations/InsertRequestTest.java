@@ -21,6 +21,8 @@ import java.util.List;
  * selection query.
  */
 public class InsertRequestTest implements Test {
+    private final Logger logger = Logger.of("Test - Insert");
+
     private final String COLUMN_NAME = "number";
     private final int COLUMN_VALUE = 42;
 
@@ -47,7 +49,7 @@ public class InsertRequestTest implements Test {
                 .entry(COLUMN_NAME, COLUMN_VALUE)
                 .actionAfterQuery(success -> {
                     if (!success) {
-                        Logger.debug("Not succeeded");
+                        logger.debug("Not succeeded");
                     }
                 });
         Query query = new Query(databaseAdapter).executeQuery(insert);

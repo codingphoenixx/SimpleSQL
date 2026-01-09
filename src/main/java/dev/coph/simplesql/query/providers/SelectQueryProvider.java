@@ -11,7 +11,6 @@ import dev.coph.simplesql.utils.DatabaseCheck;
 import dev.coph.simpleutilities.action.RunnableAction;
 import dev.coph.simpleutilities.check.Check;
 
-import java.sql.ResultSet;
 import java.util.*;
 
 /**
@@ -476,6 +475,14 @@ public class SelectQueryProvider implements QueryProvider {
         return this;
     }
 
+    /**
+     * Adds a grouping of conditions to the query based on the specified type, negation, and conditions provided.
+     *
+     * @param type       the type of condition group (e.g., AND, OR) to be added.
+     * @param not        whether the condition group should be negated.
+     * @param conditions the conditions to include in the group.
+     * @return the updated instance of {@code SelectQueryProvider}.
+     */
     public SelectQueryProvider conditionGroup(Condition.Type type, boolean not, Condition... conditions) {
         condition(Condition.group(type, not, Arrays.asList(conditions)));
         return this;
@@ -484,14 +491,21 @@ public class SelectQueryProvider implements QueryProvider {
     /**
      * Adds a condition to the list of where conditions for the query.
      *
-     * @param condition the condition to be added to the query. If null, the condition will not be added.
-     * @return the current instance of {@code SelectQueryProvider} to allow method chaining.
+     * @param condition the condition to be added; if null, it will be ignored
+     * @return the updated SelectQueryProvider instance
      */
     public SelectQueryProvider condition(Condition condition) {
         if (condition != null) this.whereConditions.add(condition);
         return this;
     }
 
+    /**
+     * Adds a group of conditions to the query using the specified condition type.
+     *
+     * @param type       the logical type of the condition group (e.g., AND, OR).
+     * @param conditions the conditions to include in the group.
+     * @return the current instance of {@code SelectQueryProvider} for method chaining.
+     */
     public SelectQueryProvider conditionGroup(Condition.Type type, Condition... conditions) {
         condition(Condition.group(type, false, Arrays.asList(conditions)));
         return this;

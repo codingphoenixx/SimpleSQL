@@ -63,8 +63,38 @@ public enum Operator {
      * to filter results that explicitly have a non-null value for the specified column.
      */
     IS_NOT_NULL("IS NOT NULL", false),
+    /**
+     * Represents the "IN" operator, typically used to check whether a value exists
+     * within a specified set of values.
+     * <p>
+     * This operator is often employed in query-building or condition expressions
+     * to assert membership of a value in a collection of predefined values.
+     * <p>
+     * For example, when constructing SQL-like conditions, the "IN" operator checks
+     * if a column's value is present within a given list of values.
+     */
     IN("IN", false),
+    /**
+     * Represents the "NOT IN" operator, typically used in conditional expressions
+     * to determine if a specific value is not part of a provided set of values.
+     * <p>
+     * For example, this operator can be applied in query-building contexts to filter
+     * results where a column's value does not match any of the values in a given set.
+     * <p>
+     * The `needToBeANumber` parameter indicates whether this operator requires the operand
+     * to be numeric. In the case of "NOT IN", operands are generally not restricted to numbers
+     * and can represent various data types such as strings, dates, or others, depending
+     * on context.
+     */
     NOT_IN("NOT IN", false),
+    /**
+     * Represents the "BETWEEN" operator, which is used to specify a range condition.
+     * This operator evaluates whether a given value falls within the specified range
+     * (inclusive of the boundary values).
+     * <p>
+     * This operator does not require the operands to be numeric; however, the specific
+     * implementation or usage context may impose additional constraints.
+     */
     BETWEEN("BETWEEN", false),
     /**
      * Represents the SQL pattern matching operator "LIKE".

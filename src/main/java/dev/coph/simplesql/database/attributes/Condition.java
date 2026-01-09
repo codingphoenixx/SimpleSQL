@@ -100,26 +100,64 @@ public class Condition {
         this.operator = operator;
         this.groupConditions = null;
     }
+
+    /**
+     * Constructs a Condition object with the specified type, negation flag, and list of child conditions.
+     *
+     * @param type      The type of the condition. If null, the default type will be Type.AND.
+     * @param not       A flag indicating whether this condition is negated.
+     * @param children  The list of child conditions associated with this condition.
+     */
     private Condition(Type type, boolean not, List<Condition> children) {
         this.type = (type != null) ? type : Type.AND;
         this.not = not;
         this.groupConditions = new ArrayList<>(children);
     }
 
+    /**
+     * Creates and returns a grouped condition by combining multiple child conditions.
+     * A group condition can optionally have a logical negation applied.
+     *
+     * @param type The type of the condition determining how the grouped conditions should be processed.
+     * @param not A boolean indicating whether the entire group condition should be logically negated.
+     * @param children A list of child conditions to be grouped. Must contain at least one condition.
+     * @return A new Condition object representing the grouped condition.
+     * @throws IllegalArgumentException If the provided list of child conditions is empty.
+     * @throws NullPointerException If the provided list of child conditions is null.
+     */
     public static Condition group(Type type, boolean not, List<Condition> children) {
         Check.ifNull(children, "children");
         if (children.isEmpty()) throw new IllegalArgumentException("Group requires at least one child condition");
         return new Condition(type, not, children);
     }
 
+    /**
+     * Combines multiple conditions using a logical AND operation.
+     *
+     * @param children an array of conditions to be combined
+     * @return a new Condition representing the logical AND of the provided conditions
+     */
     public static Condition and(Condition... children) {
         return group(Type.AND, false, Arrays.asList(children));
     }
 
+    /**
+     * Combines multiple conditions using a logical OR operator.
+     * This method groups the provided conditions and evaluates to true if at least one of them is true.
+     *
+     * @param children an array of {@link Condition} objects to be combined using OR logic
+     * @return a new {@link Condition} representing the logical OR of the provided conditions
+     */
     public static Condition or(Condition... children) {
         return group(Type.OR, false, Arrays.asList(children));
     }
 
+    /**
+     * Creates a new condition that negates the given child condition.
+     *
+     * @param child the condition to be negated; must not be null
+     * @return a new condition representing the negation of the provided child condition
+     */
     public static Condition not(Condition child) {
         return group(Type.AND, true, Collections.singletonList(child));
     }
@@ -161,10 +199,21 @@ public class Condition {
 
         return queryKey + " " + operator.operator() + " " + queryValue;
     }
+
+    /**
+     * Determines if the current object meets the criteria to be considered a group.
+     *
+     * @return true if the groupConditions is not null, indicating the object is a group; false otherwise.
+     */
     public boolean isGroup() {
         return groupConditions != null;
     }
 
+    /**
+     * Retrieves the list of child conditions associated with this group.
+     *
+     * @return a list of Condition objects representing the child conditions.
+     */
     public List<Condition> children() {
         return groupConditions;
     }

@@ -23,7 +23,7 @@ public enum DriverType {
      * Represents the Postgresql database driver.
      * This constant holds the class name of the Postgresql JDBC driver.
      */
-    POSTGRESQL("org.postgresql.Driver"),
+    POSTGRESQL("org.postgresql.Driver", "PostgreSQL"),
     /**
      * Represents the SQLite database driver.
      * This constant holds the class name of the SQLite JDBC driver.
@@ -64,6 +64,11 @@ public enum DriverType {
         return this.driver;
     }
 
+    /**
+     * Retrieves the human-readable name of the database driver associated with the current {@code DriverType}.
+     *
+     * @return a descriptive, user-friendly name of the database driver as a {@code String}
+     */
     public String readableName() {
         return this.readableName;
     }

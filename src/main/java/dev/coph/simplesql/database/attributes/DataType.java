@@ -129,54 +129,30 @@ public record DataType(boolean canHaveObject, boolean requireObject, boolean can
     /**
      * Represents the BINARY data type, which is a fixed-length binary string.
      */
-    public static final DataType BINARY = new DataType(true, true, "BINARY");
+    public static final DataType BINARY = new DataType(true, true, false, "BINARY");
     /**
      * Represents the VARBINARY data type, which is a variable-length binary string.
      */
-    public static final DataType VARBINARY = new DataType(true, true, "VARBINARY");
+    public static final DataType VARBINARY = new DataType(true, true, false, "VARBINARY");
 
     /**
      * Represents the TINYBLOB data type, which is a very small binary large object capable of storing binary data
      * up to a maximum size of 255 bytes.
      */
-    public static final DataType TINYBLOB = new DataType(false, false, "TINYBLOB");
+    public static final DataType TINYBLOB = new DataType(false, false, false, "TINYBLOB");
     /**
      * Represents the BLOB data type, which is a binary large object capable of storing binary data up to 65,535 bytes.
      */
-    public static final DataType BLOB = new DataType(false, false, "BLOB");
+    public static final DataType BLOB = new DataType(false, false, false, "BLOB");
     /**
      * Represents the MEDIUMBLOB data type, which is a binary large object capable of storing binary data up to 16,777,215 bytes.
      */
-    public static final DataType MEDIUMBLOB = new DataType(false, false, "MEDIUMBLOB");
+    public static final DataType MEDIUMBLOB = new DataType(false, false, false, "MEDIUMBLOB");
     /**
      * Represents the LONGBLOB data type, which is a binary large object capable of storing binary data up to 4,294,967,295 bytes.
      */
-    public static final DataType LONGBLOB = new DataType(false, false, "LONGBLOB");
+    public static final DataType LONGBLOB = new DataType(false, false, false, "LONGBLOB");
 
-    /**
-     * Indicates whether this DataType instance can associate with an object value.
-     *
-     * This field determines if the corresponding data type is capable of handling
-     * objects as valid values, which might influence how data is represented or
-     * processed in SQL-related operations.
-     */
-    private final boolean canHaveObject;
-    /**
-     * Represents whether a {@code DataType} strictly requires an associated object value.
-     *
-     * This field determines if it is mandatory for a data type to be paired with a non-null object
-     * when performing operations such as validation or SQL generation.
-     *
-     * For example, certain data types like {@code VARCHAR} or {@code CHAR} might require an object value
-     * for processing, whereas others like {@code BOOLEAN} or {@code INTEGER} might not.
-     */
-    private final boolean requireObject;
-    /**
-     * Represents the name of the data type. This is a mandatory identifier for a
-     * specific data type used in SQL-related operations or database interactions.
-     * The value of this field is immutable once assigned.
-     */
-    private final String name;
 
     @Override
     public String toString() {
@@ -184,23 +160,19 @@ public record DataType(boolean canHaveObject, boolean requireObject, boolean can
     }
 
     /**
-     * Converts the current data type representation to its corresponding SQL definition.
-     * This method generates a SQL-compatible StringBuilder representation for the data type
-     * based on the provided value and unsigned state.
+     * Converts this DataType instance to its equivalent SQL representation based on the given parameters.
      *
-     * @param query
-     * @param value    The value to be used in the SQL definition, relevant for ENUM types or
-     *                 data types that can have an associated object.
-     * @param unsigned The unsigned state of the data type. Determines if the data type
-     *                 should include an "UNSIGNED" modifier in its SQL representation.
-     * @return A StringBuilder object representing the SQL definition of the data type.
-     * If the type is ENUM, the SQL definition includes the enum values. For other
-     * types, the definition may include the value or unsigned modifier based on
-     * the type's characteristics.
-     * @throws IllegalArgumentException If the data type is ENUM and the provided value is null.
+     * @param query   The query context in which this DataType is being used. This is used for retrieving
+     *                database adapter information, such as the driver type.
+     * @param value   The value to be included in the SQL representation. For certain data types like
+     *                ENUM, this value must not be null.
+     * @param unsigned   The unsigned state of this DataType. If specified as UnsignedState.ACTIVE and
+     *                the DataType supports unsigned values, the SQL representation includes the UNSIGNED suffix.
+     * @return A StringBuilder containing the SQL representation of this DataType.
+     * @throws IllegalArgumentException If the ENUM data type is used with a null value.
      */
     public StringBuilder toSQL(Query query, Object value, UnsignedState unsigned) {
-        if (name.equals("BLOB") || name.equals("TINYBLOB") || name.equals("MEDIUMBLOB") || name.equals("LONGBLOB"))
+        if (name.equals("BLOB") || name.equals("TINYBLOB") || name.equals("MEDIUMBLOB") || name.equals("LONGBLOB") || name.equals("BINARY") || name.equals("VARBINARY"))
             DatabaseCheck.unsupportedDriver(query.databaseAdapter().driverType(), DriverType.POSTGRESQL);
 
 

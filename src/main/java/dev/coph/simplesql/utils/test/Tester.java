@@ -16,12 +16,25 @@ import dev.coph.simplesql.utils.test.implementations.TableCreateRequestTest;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * The Tester class is responsible for managing and executing a series of database-related tests.
+ * It provides functionality for setting up the required database environment for each test,
+ * executing the tests, and logging the results.
+ */
 public class Tester {
+    private final Logger logger = Logger.of("Tester");
+
     private final String TABLE_NAME = "test";
     private final ArrayList<Test> tests = new ArrayList<>();
 
     private final DatabaseAdapter databaseAdapter;
 
+    /**
+     * Initializes the Tester with the specified database adapter and prepares the tests to be executed.
+     * The database adapter is used to interact with the database during test execution.
+     *
+     * @param databaseAdapter the DatabaseAdapter instance used for database interaction
+     */
     public Tester(DatabaseAdapter databaseAdapter) {
         this.databaseAdapter = databaseAdapter;
 
@@ -57,11 +70,27 @@ public class Tester {
 
     }
 
+    /**
+     * Executes a series of predefined tests, logs their results, and reports any exceptions encountered
+     * during execution. Each test is set up individually before being executed against the configured
+     * database adapter.
+     *<p>
+     * The method performs the following steps for each test:<br>
+     * 1. Logs the start of the test setup process.<br>
+     * 2. Invokes the {@code setupForTest} method to configure the database environment needed for the test.<br>
+     * 3. Logs the commencement of test execution, including the test name and database driver type.<br>
+     * 4. Executes the test logic using the provided database adapter.<br>
+     * 5. Logs the outcome of the test, reporting success or failure.<br>
+     * 6. If the test fails, logs any exceptions encountered during execution.<br>
+     *<p>
+     * This method leverages the {@code Logger} instance to provide clear visibility into the
+     * test execution process, including system state and errors.
+     */
     public void runTests() {
         for (Test test : tests) {
-            Logger.info("Setting up for Test '%s'...".formatted(test.name()));
+            logger.info("Setting up for Test '%s'...".formatted(test.name()));
             setupForTest(test);
-            Logger.info("Start Test '%s' with Driver %s".formatted(test.name(), databaseAdapter.driverType().name()));
+            logger.info("Start Test '%s' with Driver %s".formatted(test.name(), databaseAdapter.driverType().name()));
             boolean succeeded;
             Exception ex = null;
             try {
@@ -71,11 +100,11 @@ public class Tester {
                 succeeded = false;
             }
             if (succeeded) {
-                Logger.success("Test '%s' succeeded".formatted(test.name()));
+                logger.success("Test '%s' succeeded".formatted(test.name()));
             } else {
-                Logger.error("Test '%s' failed".formatted(test.name()));
+                logger.error("Test '%s' failed".formatted(test.name()));
                 if (ex != null)
-                    ex.printStackTrace();
+                    logger.error(ex);
             }
         }
 
