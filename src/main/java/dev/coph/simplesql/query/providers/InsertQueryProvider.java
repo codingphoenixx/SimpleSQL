@@ -11,40 +11,32 @@ import dev.coph.simpleutilities.check.Check;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.StringJoiner;
 
 /**
- * The {@code InsertQueryProvider} class is responsible for constructing and generating
- * SQL INSERT statements. It supports various INSERT methods such as standard INSERT,
- * INSERT with IGNORE, and INSERT with ON DUPLICATE KEY UPDATE. These operations can
- * be tailored to handle different data insertion use cases.
- * <p>
- * This class implements the {@link QueryProvider} interface, enabling the generation of
- * SQL query strings for database operations.
+ * A class that provides functionality to build and generate SQL INSERT queries.
+ * It implements the {@code QueryProvider} interface, allowing for customizable
+ * and parameterized query generation based on different database adapter types.
  */
 public class InsertQueryProvider implements QueryProvider {
 
-    /**
-     * The name of the table that should be deleted.
-     */
     private String table;
 
-    /**
-     * The entries which will be written to the Database.
-     */
     private List<QueryEntry> entries;
 
     private RunnableAction<Boolean> actionAfterQuery;
-    /**
-     * Method which will be used for inserting the value.
-     */
+
     private InsertMethode insertMethode = InsertMethode.INSERT;
+    private List<String> conflictColumns;
+    private List<Object> boundParams = List.of();
 
     /**
-     * Adds an entry which will be written to the Database.
+     * Adds a new column-value pair to the insert query.
+     * This method allows chaining to add multiple entries.
      *
-     * @param column Name of the column
-     * @param value  Value that will be inserted
-     * @return {@link InsertQueryProvider} for chaining.
+     * @param column the name of the column to which the value will be assigned
+     * @param value  the value to be assigned to the specified column
+     * @return the current {@code InsertQueryProvider} instance for method chaining
      */
     public InsertQueryProvider entry(String column, Object value) {
         if (entries == null) {
@@ -54,6 +46,13 @@ public class InsertQueryProvider implements QueryProvider {
         return this;
     }
 
+    /**
+     * Sets the action to be executed after the query is run.
+     *
+     * @param actionAfterQuery the {@code RunnableAction<Boolean>} to be performed after the query execution,
+     *                         where the Boolean parameter represents the success or failure of the query
+     * @return the current {@code InsertQueryProvider} instance for method chaining
+     */
     public InsertQueryProvider actionAfterQuery(RunnableAction<Boolean> actionAfterQuery) {
         this.actionAfterQuery = actionAfterQuery;
         return this;
@@ -69,15 +68,17 @@ public class InsertQueryProvider implements QueryProvider {
         Check.ifNullOrEmptyMap(entries, "entries");
         Check.ifNullOrEmptyMap(table, "tablename");
 
-        StringBuilder sql = new StringBuilder("INSERT ");
+        List<Object> params = new ArrayList<>();
+        DriverType driver = query.databaseAdapter() != null ? query.databaseAdapter().driverType() : null;
+
+        StringBuilder sql = new StringBuilder();
+
+        sql.append("INSERT ");
 
         if (insertMethode.equals(InsertMethode.INSERT_IGNORE)) {
-            if (query.databaseAdapter() == null) {
-                return null;
-            }
-            if (query.databaseAdapter().driverType().equals(DriverType.MYSQL) || query.databaseAdapter().driverType().equals(DriverType.MARIADB)) {
+            if (driver == DriverType.MYSQL || driver == DriverType.MARIADB) {
                 sql.append("IGNORE ");
-            } else if (query.databaseAdapter().driverType().equals(DriverType.SQLITE)) {
+            } else if (driver == DriverType.SQLITE) {
                 sql.append("OR IGNORE ");
             }
         }
@@ -85,28 +86,62 @@ public class InsertQueryProvider implements QueryProvider {
 
         sql.append("INTO ").append(table);
 
-        StringBuilder columString = null;
-        StringBuilder objectString = null;
-        for (QueryEntry entry : entries) {
-            if (columString == null) {
-                columString = new StringBuilder(entry.columName());
-            } else {
-                columString.append(", ").append(entry.columName());
+        StringJoiner colJoin = new StringJoiner(", ");
+        for (QueryEntry e : entries) {
+            colJoin.add(e.columName());
+        }
+        sql.append(" (").append(colJoin).append(") ");
+
+        StringJoiner phJoin = new StringJoiner(", ");
+        for (QueryEntry e : entries) {
+            phJoin.add("?");
+            params.add(e.value());
+        }
+        sql.append("VALUES (").append(phJoin).append(")");
+
+
+        if (insertMethode == InsertMethode.INSERT_OR_UPDATE) {
+            if (driver == DriverType.MYSQL || driver == DriverType.MARIADB) {
+                sql.append(" ON DUPLICATE KEY UPDATE ");
+                StringJoiner updJoin = new StringJoiner(", ");
+                for (QueryEntry e : entries) {
+                    updJoin.add(e.columName() + " = VALUES(" + e.columName() + ")");
+                }
+                sql.append(updJoin);
+            } else if (driver == DriverType.POSTGRESQL || driver == DriverType.SQLITE) {
+                Check.ifNullOrEmptyMap(conflictColumns, "conflictColumns");
+                sql.append(" ON CONFLICT (");
+                sql.append(String.join(", ", conflictColumns));
+                sql.append(") DO UPDATE SET ");
+                StringJoiner updJoin = new StringJoiner(", ");
+                for (QueryEntry e : entries) {
+                    String excluded = (driver == DriverType.POSTGRESQL) ? "EXCLUDED" : "excluded";
+                    updJoin.add(e.columName() + " = " + excluded + "." + e.columName());
+                }
+                sql.append(updJoin);
             }
-            if (objectString == null) {
-                objectString = new StringBuilder(entry.sqlValue());
-            } else {
-                objectString.append(", ").append(entry.sqlValue());
+        } else if (insertMethode == InsertMethode.INSERT_IGNORE) {
+            if (driver == DriverType.POSTGRESQL && conflictColumns != null && !conflictColumns.isEmpty()) {
+                sql.append(" ON CONFLICT (").append(String.join(", ", conflictColumns)).append(") DO NOTHING");
             }
         }
-        sql.append("(").append(columString).append(") VALUES (").append(objectString).append(")");
-
-        if (insertMethode.equals(InsertMethode.INSERT_OR_UPDATE))
-            sql.append(generateOnDuplicateString());
 
         sql.append(";");
 
+        for (int i = 0, paramsSize = params.size(); i < paramsSize; i++) {
+            Object p = params.get(i);
+            if (p == null) {
+                throw new IllegalArgumentException("Parameter list contains null value at slot %s".formatted(i + 1));
+            }
+        }
+        
+        this.boundParams = List.copyOf(params);
         return sql.toString();
+    }
+
+    @Override
+    public List<Object> parameters() {
+        return boundParams != null ? boundParams : List.of();
     }
 
     @Override
@@ -115,58 +150,57 @@ public class InsertQueryProvider implements QueryProvider {
     }
 
     /**
-     * Generates the sql string for insert with duplicated key for executing
+     * Sets the columns to be used for conflict resolution in the insert query.
      *
-     * @return the sql string
+     * @param cols a list of column names to be included for conflict resolution.
+     *             If the provided list is null or empty, no conflict columns will be considered.
+     * @return the current {@code InsertQueryProvider} instance for method chaining.
      */
-    private StringBuilder generateOnDuplicateString() {
-        StringBuilder sql = new StringBuilder(" ON DUPLICATE KEY UPDATE ");
-
-        StringBuilder insertString = null;
-        for (QueryEntry entry : entries) {
-            if (insertString == null) {
-                insertString = new StringBuilder(entry.columName()).append(" = ").append(entry.sqlValue());
-            } else {
-                insertString.append(", ").append(entry.columName()).append(" = ").append(entry.sqlValue());
-            }
+    public InsertQueryProvider conflictColumns(List<String> cols) {
+        if (cols == null || cols.isEmpty()) {
+            this.conflictColumns = null;
+        } else {
+            this.conflictColumns = new ArrayList<>(cols);
         }
-        return sql.append(insertString);
+        return this;
     }
 
     /**
-     * Retrieves the name of the table associated with the query provider.
+     * Retrieves the name of the table associated with this query provider.
      *
-     * @return the name of the table
+     * @return the table name as a String
      */
     public String table() {
         return this.table;
     }
 
     /**
-     * Retrieves the list of entries that represent the column-value pairs
-     * to be included in an SQL insert operation.
+     * Retrieves the list of {@code QueryEntry} objects associated with the current
+     * {@code InsertQueryProvider}. These entries define the column-value pairs
+     * to be used in the insert query.
      *
-     * @return a list of {@link QueryEntry} objects representing the entries
+     * @return a {@code List} of {@code QueryEntry} objects representing the column-value pairs
      */
     public List<QueryEntry> entries() {
         return this.entries;
     }
 
     /**
-     * Retrieves the current {@link InsertMethode} that defines the strategy
-     * for SQL INSERT operations.
+     * Retrieves the current {@code InsertMethode} configuration.
+     * This defines the strategy for the SQL INSERT operation, such as
+     * standard insertion, insertion with conflict handling, or ignoring duplicates.
      *
-     * @return the current {@link InsertMethode} used for SQL insert strategies
+     * @return the {@code InsertMethode} currently set for this query provider
      */
     public InsertMethode insertMethode() {
         return this.insertMethode;
     }
 
     /**
-     * Sets the name of the table to be used in the SQL insert operation.
+     * Sets the name of the table to be used in the query.
      *
-     * @param table the name of the table to which data will be inserted
-     * @return the {@link InsertQueryProvider} instance for method chaining
+     * @param table the name of the table as a String
+     * @return the current {@code InsertQueryProvider} instance for method chaining
      */
     public InsertQueryProvider table(String table) {
         this.table = table;
@@ -174,11 +208,12 @@ public class InsertQueryProvider implements QueryProvider {
     }
 
     /**
-     * Sets the {@link InsertMethode} to define the strategy for SQL INSERT operations
-     * and returns the current {@link InsertQueryProvider} instance for chaining.
+     * Sets the {@code InsertMethode} to be used for this query provider.
+     * The {@code InsertMethode} defines the strategy for the SQL INSERT operation,
+     * such as standard insertion, insertion with conflict handling, or ignoring duplicates.
      *
-     * @param insertMethode the {@link InsertMethode} to be used for SQL INSERT operations
-     * @return the {@link InsertQueryProvider} instance for method chaining
+     * @param insertMethode the {@code InsertMethode} to be set for this query provider
+     * @return the current {@code InsertQueryProvider} instance for method chaining
      */
     public InsertQueryProvider insertMethode(InsertMethode insertMethode) {
         this.insertMethode = insertMethode;

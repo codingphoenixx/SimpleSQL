@@ -1,94 +1,109 @@
 package dev.coph.simplesql.query.providers;
 
 import dev.coph.simplesql.database.attributes.DataType;
-import dev.coph.simplesql.driver.DriverCompatibility;
+import dev.coph.simplesql.database.attributes.UnsignedState;
+import dev.coph.simplesql.driver.DriverType;
+import dev.coph.simplesql.exception.FeatureNotSupportedException;
 import dev.coph.simplesql.query.Query;
 import dev.coph.simpleutilities.action.RunnableAction;
 import dev.coph.simpleutilities.check.Check;
 
 /**
- * TableAlterModifyTypeQueryProvider is a specific implementation of the TableAlterQueryProvider
- * for generating SQL "ALTER TABLE" queries to modify the data type of an existing column in a table.
- * It provides the logic to construct the "MODIFY COLUMN" clause with the new data type and its
- * parameters when required by the specified DataType.
- * <p>
- * The class supports fluent and chainable setter methods, allowing configuration of its properties
- * in a streamlined manner.
- * <p>
- * Key properties include:
- * - dataType: Specifies the new data type for the column.
- * - dataTypeParameter: Optional parameter required for certain DataType values.
- * - columnName: The name of the target column to be modified.
- * <p>
- * This class utilizes the DataType class to define and validate the structure of the data type.
- * <p>
- * The getAlterTableString method implements the specific logic for generating the "MODIFY COLUMN"
- * SQL clause and ensures all required properties are valid and non-null before constructing the query.
+ * A query provider implementation for altering table structures by modifying the type of a column.
+ * Provides support for constructing SQL strings for "ALTER TABLE MODIFY COLUMN" operations
+ * with additional configurations like data type, unsigned state, and PostgreSQL-specific clauses.
  */
 public class TableAlterModifyTypeQueryProvider extends TableAlterQueryProvider {
 
-    /**
-     * The datatype of the database column.
-     */
     private DataType dataType;
-
-    /**
-     * The parameter with is required for some {@link DataType}.
-     */
     private Object dataTypeParameter;
-
-    /**
-     * The name of the column with will be modified.
-     */
+    private UnsignedState unsigned = UnsignedState.INACTIVE;
     private String columnName;
     private RunnableAction<Boolean> actionAfterQuery;
 
-    @Override
-    public DriverCompatibility compatibility() {
-        return driverType -> true;
-    }
+    private String postgresUsingExpression;
 
     @Override
     public String getAlterTableString(Query query) {
         Check.ifNullOrEmptyMap(dataType, "dataType");
         Check.ifNullOrEmptyMap(columnName, "columnName");
 
-        return "MODIFY COLUMN " + columnName + " " + dataType.toSQL(dataTypeParameter);
+        DriverType driver =
+                query.databaseAdapter() != null ? query.databaseAdapter().driverType() : null;
+
+        String typeSql = dataType.toSQL(query,dataTypeParameter, unsigned).toString();
+
+        return switch (driver) {
+            case MYSQL, MARIADB -> "MODIFY COLUMN " + columnName + " " + typeSql;
+            case POSTGRESQL -> {
+                StringBuilder sb = new StringBuilder();
+                sb.append("ALTER COLUMN ").append(columnName).append(" TYPE ").append(typeSql);
+                if (postgresUsingExpression != null && !postgresUsingExpression.isBlank()) {
+                    sb.append(" USING ").append(postgresUsingExpression);
+                }
+                yield sb.toString();
+            }
+            case SQLITE -> {
+                throw new FeatureNotSupportedException(driver);
+            }
+        };
     }
 
     /**
-     * Retrieves the data type of the database column that is to be modified.
+     * Retrieves the current data type associated with this query provider.
      *
-     * @return the current {@link DataType} representing the new data type of the column.
+     * @return the data type of the column being modified by the query
      */
     public DataType dataType() {
         return this.dataType;
     }
 
     /**
-     * Retrieves the optional parameter associated with the data type of the database column.
-     * Some data types may require a specific parameter (e.g., precision, length).
+     * Retrieves the parameter value associated with the data type being modified.
      *
-     * @return the current parameter for the data type of the column, or null if no parameter is set.
+     * @return the parameter object related to the column's data type
      */
     public Object dataTypeParameter() {
         return this.dataTypeParameter;
     }
 
     /**
-     * Retrieves the name of the column to be modified in the "ALTER TABLE" SQL query.
+     * Retrieves the name of the column associated with the query provider.
      *
-     * @return the name of the column as a String.
+     * @return the name of the column being modified or referenced
      */
     public String columnName() {
         return this.columnName;
     }
 
     /**
-     * Sets the data type for the column to be modified in the "ALTER TABLE" SQL query.
+     * Retrieves the unsigned state associated with the column or query configuration.
      *
-     * @param dataType The {@link DataType} specifying the new data type of the column.
-     * @return The current instance of {@code TableAlterModifyTypeQueryProvider} for method chaining.
+     * @return the unsigned state of the column, indicating if it is unsigned
+     */
+    public UnsignedState unsigned() {
+        return unsigned;
+    }
+
+    /**
+     * Sets the unsigned state for the column or configuration being modified.
+     * The unsigned state specifies whether the column is unsigned (e.g., for numeric types).
+     *
+     * @param unsigned the {@code UnsignedState} representing the unsigned configuration
+     *                 of the column, either {@code ACTIVE} or {@code INACTIVE}
+     * @return the current instance of {@code TableAlterModifyTypeQueryProvider} for chaining further modifications
+     */
+    public TableAlterModifyTypeQueryProvider unsigned(UnsignedState unsigned) {
+        this.unsigned = unsigned;
+        return this;
+    }
+
+    /**
+     * Sets the data type for the column being modified in the query.
+     * This specifies the new data type that the column should have after the query executes.
+     *
+     * @param dataType the {@code DataType} representing the new data type for the column
+     * @return the current instance of {@code TableAlterModifyTypeQueryProvider} for chaining further modifications
      */
     public TableAlterModifyTypeQueryProvider dataType(DataType dataType) {
         this.dataType = dataType;
@@ -96,11 +111,11 @@ public class TableAlterModifyTypeQueryProvider extends TableAlterQueryProvider {
     }
 
     /**
-     * Sets the parameter associated with the data type of the database column to be modified.
-     * Some data types may require specific parameters, such as precision or length.
+     * Sets the parameter value for the data type being modified in the query.
+     * This parameter provides additional configuration or details for the column's data type.
      *
-     * @param dataTypeParameter The parameter for the new data type of the column.
-     * @return The current instance of {@code TableAlterModifyTypeQueryProvider} for method chaining.
+     * @param dataTypeParameter the parameter object associated with the data type of the column being modified
+     * @return the current instance of {@code TableAlterModifyTypeQueryProvider} for chaining further modifications
      */
     public TableAlterModifyTypeQueryProvider dataTypeParameter(Object dataTypeParameter) {
         this.dataTypeParameter = dataTypeParameter;
@@ -108,17 +123,38 @@ public class TableAlterModifyTypeQueryProvider extends TableAlterQueryProvider {
     }
 
     /**
-     * Sets the name of the column to be modified in the "ALTER TABLE" SQL query.
+     * Sets the name of the column to be modified or referenced in the query.
      *
-     * @param columnName The name of the column as a String.
-     * @return The current instance of {@code TableAlterModifyTypeQueryProvider} for method chaining.
+     * @param columnName the name of the column being modified
+     * @return the current instance of {@code TableAlterModifyTypeQueryProvider} for chaining further modifications
      */
     public TableAlterModifyTypeQueryProvider columnName(String columnName) {
         this.columnName = columnName;
         return this;
     }
 
-    public TableAlterModifyTypeQueryProvider actionAfterQuery(RunnableAction<Boolean> actionAfterQuery) {
+    /**
+     * Sets a PostgreSQL-specific "USING" expression to be included in the query.
+     * The "USING" clause is typically used in PostgreSQL during type conversions or modifications
+     * to specify how existing column values should be transformed to the new type.
+     *
+     * @param expr the expression to be used in the PostgreSQL "USING" clause
+     * @return the current instance of {@code TableAlterModifyTypeQueryProvider} for chaining further modifications
+     */
+    public TableAlterModifyTypeQueryProvider postgresUsingExpression(String expr) {
+        this.postgresUsingExpression = expr;
+        return this;
+    }
+
+    /**
+     * Sets an action to be executed after the query is run.
+     * This action will typically take a {@code Boolean} parameter indicating the success or failure of the query.
+     *
+     * @param actionAfterQuery the {@code RunnableAction<Boolean>} representing the action to execute post-query
+     * @return the current instance of {@code TableAlterModifyTypeQueryProvider} for chaining further modifications
+     */
+    public TableAlterModifyTypeQueryProvider actionAfterQuery(
+            dev.coph.simpleutilities.action.RunnableAction<Boolean> actionAfterQuery) {
         this.actionAfterQuery = actionAfterQuery;
         return this;
     }

@@ -1,31 +1,20 @@
 package dev.coph.simplesql.database.attributes;
 
-import lombok.experimental.Accessors;
-
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * Represents a grouping mechanism used in a query, combining keys and conditions
- * for generating SQL "GROUP BY" and "HAVING" clauses.
- * This class allows for defining grouping keys and applying conditions
- * to further filter the grouped data.
+ * The Group class is used to represent a SQL GROUP BY clause along with its associated
+ * HAVING conditions. It allows defining grouping keys as well as conditions that can
+ * be applied to the grouped data.
+ * <p>
+ * The class provides methods to add grouping keys, define conditions, and construct
+ * the SQL representation of the GROUP BY clause.
  */
 public class Group {
-    /**
-     * A set of unique keys used to represent or identify specific entries
-     * within a group. These keys are used for query or matching purposes
-     * and can be dynamically modified during runtime.
-     */
+
     private Set<String> keys = new HashSet<>();
-    /**
-     * Represents a collection of conditions that define the constraints or criteria
-     * for selecting rows in a query. Each condition in this set specifies a logical and/or
-     * comparison operation to be applied during query execution.
-     *
-     * This set is primarily used to aggregate multiple conditions which can be logically
-     * combined (e.g., using "AND" or "OR") to form complex query criteria.
-     */
+
     private Set<Condition> conditions = new HashSet<>();
 
     @Override
@@ -44,9 +33,12 @@ public class Group {
     }
 
     /**
-     * Parsed the conditions to a string for executing
+     * Parses the conditions stored in the group and concatenates them into a single string
+     * representation. The method handles multiple conditions, combining them with appropriate
+     * logical operators (AND/OR) and considering any NOT modifiers.
      *
-     * @return the sql string
+     * @return A string representation of the combined conditions stored in the group.
+     * If no conditions are present, an empty string is returned.
      */
     private String parseCondition() {
         if (conditions.isEmpty())
@@ -65,11 +57,11 @@ public class Group {
     }
 
     /**
-     * Parses the set of keys from the Group object and returns them as a single, comma-separated string.
-     * If the set is empty, an empty string is returned. If there is only one key, it is returned directly.
-     * If there are multiple keys, they are concatenated with a comma and space.
+     * Parses the keys stored in the set and concatenates them into a single string representation.
+     * If there is only one key, it will return that key directly.
+     * For multiple keys, they are joined with a comma separator.
      *
-     * @return a comma-separated string of keys or an empty string if no keys are present
+     * @return A comma-separated string of keys. If no keys are present, an empty string is returned.
      */
     private String parseKeys() {
         if (keys.isEmpty())
@@ -88,22 +80,23 @@ public class Group {
     }
 
     /**
-     * Adds a key to the group for query or matching purposes.
+     * Adds the specified key to the group and returns the current instance of the Group.
      *
      * @param key The key to be added to the group.
-     * @return {@link Group} for method chaining.
+     * @return The current instance of the Group with the newly added key.
      */
     public Group key(String key) {
         keys.add(key);
         return this;
     }
 
-
     /**
-     * Adds and condition that a row must match in order to get selected.
+     * Adds a condition to the current group and returns the updated instance of the group.
+     * If the set of conditions is not initialized, it initializes the set before adding
+     * the specified condition.
      *
-     * @param condition The condition
-     * @return {@link Group} for chaining.
+     * @param condition The condition to be added to the group. Must not be null.
+     * @return The current instance of the Group with the newly added condition.
      */
     public Group condition(Condition condition) {
         if (conditions == null) {
@@ -114,11 +107,13 @@ public class Group {
     }
 
     /**
-     * Adds and condition that a row must match in order to get selected. By column key and value.
+     * Adds a condition to the current group using the specified key and value, and returns
+     * the updated instance of the group. If the set of conditions is not initialized, it
+     * initializes the set before adding the condition.
      *
-     * @param key   The key of the column for the condition
-     * @param value The value of the row that must match with the given row key
-     * @return {@link Group} for chaining.
+     * @param key   The key associated with the condition. Must not be null or empty.
+     * @param value The value associated with the condition. Can be any object, including null.
+     * @return The current instance of the Group with the newly added condition.
      */
     public Group condition(String key, Object value) {
         if (conditions == null) {
@@ -129,13 +124,14 @@ public class Group {
     }
 
     /**
-     * Adds a condition to the query specifying that a row must match based on the given key, value, and operator.
-     * This method allows for the inclusion of complex conditions by combining a key, value, and a specific operator.
+     * Adds a condition to the current group using the specified key, operator, and value,
+     * and returns the updated instance of the group. If the set of conditions is not initialized,
+     * it initializes the set before adding the condition.
      *
-     * @param key      The name of the column that the condition will apply to.
-     * @param value    The value that the column's data will be compared against.
-     * @param operator The operator used for comparison.
-     * @return {@link Group} for chaining.
+     * @param key      The key associated with the condition. Must not be null or empty.
+     * @param operator The operator to be used in the condition. Must not be null.
+     * @param value    The value associated with the condition. Can be any object, including null.
+     * @return The current instance of the Group with the newly added condition.
      */
     public Group condition(String key, Operator operator, Object value) {
         if (conditions == null) {
@@ -146,29 +142,30 @@ public class Group {
     }
 
     /**
-     * Retrieves the set of keys associated with the group.
+     * Retrieves the set of keys associated with the current group.
      *
-     * @return a set of strings representing the keys in the group.
+     * @return A set of strings representing the keys in the group.
+     * If no keys are present, an empty set is returned.
      */
     public Set<String> keys() {
         return this.keys;
     }
 
     /**
-     * Retrieves the set of conditions associated with this group. These conditions represent
-     * the logical constraints or filters used in a query to determine selection criteria for rows.
+     * Retrieves the set of conditions associated with the current group.
      *
-     * @return a set of {@link Condition} objects representing the conditions in the group.
+     * @return A set of conditions representing the conditions in the group.
+     * If no conditions are present, an empty set is returned.
      */
     public Set<Condition> conditions() {
         return this.conditions;
     }
 
     /**
-     * Sets the keys for the group.
+     * Sets the keys for the current group.
      *
-     * @param keys A set of strings representing the keys to be assigned to the group.
-     * @return The current {@link Group} instance for method chaining.
+     * @param keys The set of keys to associate with the group. Cannot be null.
+     * @return The current instance of the Group with the updated keys.
      */
     public Group keys(Set<String> keys) {
         this.keys = keys;
@@ -176,12 +173,12 @@ public class Group {
     }
 
     /**
-     * Assigns a set of {@link Condition} objects to the group, replacing the existing conditions.
-     * This method is typically used to define or update the query conditions associated with the group.
+     * Sets the conditions for the current group and returns the updated instance
+     * of the group. The existing set of conditions will be replaced with the
+     * provided set.
      *
-     * @param conditions the set of {@link Condition} objects to be assigned to the group.
-     *                   Each condition represents a filter or constraint used in a query.
-     * @return the current {@link Group} instance for method chaining.
+     * @param conditions The set of conditions to associate with the group. Cannot be null.
+     * @return The current instance of the Group with the updated conditions.
      */
     public Group conditions(Set<Condition> conditions) {
         this.conditions = conditions;

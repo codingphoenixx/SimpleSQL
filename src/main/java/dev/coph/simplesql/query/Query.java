@@ -1,6 +1,5 @@
 package dev.coph.simplesql.query;
 
-import dev.coph.simplelogger.LogLevel;
 import dev.coph.simplelogger.Logger;
 import dev.coph.simplesql.adapter.DatabaseAdapter;
 import dev.coph.simplesql.exception.RequestNotExecutableException;
@@ -10,8 +9,7 @@ import dev.coph.simpleutilities.check.Check;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -31,18 +29,7 @@ import java.util.concurrent.CompletableFuture;
  * - {@code queries}: A collection of queries to be executed.<br>
  */
 public class Query {
-    /**
-     * Constructor for the Query class that initializes it with a given DatabaseAdapter instance.
-     *
-     * @param databaseAdapter the DatabaseAdapter instance to be used for database operations
-     */
-    public Query(DatabaseAdapter databaseAdapter) {
-        this.databaseAdapter = databaseAdapter;
-        this.logger = databaseAdapter.logger;
-    }
-
     private final Logger logger;
-
     /**
      * The {@code databaseAdapter} field provides access to the underlying database connection
      * and configuration through the {@link DatabaseAdapter} class.
@@ -57,45 +44,6 @@ public class Query {
      * provides the necessary resources (e.g., data source) for executing SQL operations.
      */
     private final DatabaseAdapter databaseAdapter;
-
-    /**
-     * Indicates whether the query execution should be performed asynchronously.
-     * <p>
-     * When set to `true`, the queries will be executed asynchronously in a separate thread,
-     * leveraging a CompletableFuture mechanism. When set to `false`, the execution will
-     * occur synchronously in the main thread.
-     * <p>
-     * This flag affects the behavior of the {@code execute} method in the {@code Query} class.
-     * By default, the value is set to `false`, meaning synchronous execution.
-     */
-    private boolean async = false;
-
-    /**
-     * Indicates whether the execution of the queries associated with this Query
-     * instance was successful. This value is set to {@code false} before an
-     * execution attempt and updated to {@code true} if the queries execute
-     * successfully.
-     * <p>
-     * This flag is used to monitor the completion status of query execution,
-     * whether executed synchronously or asynchronously.
-     * <p>
-     * Default value is {@code false}.
-     */
-    private boolean executed = false;
-
-    /**
-     * Represents the success status of the most recent query execution.
-     * This variable tracks whether the queries executed in the current or previous
-     * operation within the {@code Query} class completed successfully.
-     * <p>
-     * The value is set to {@code false} at the start of each execution and updated
-     * upon completion based on the success or failure of the operation.
-     * It is primarily used to determine whether subsequent actions or workflows
-     * should proceed depending on the result of the SQL query execution.
-     */
-    private boolean succeeded = false;
-
-
     /**
      * A list containing all the SQL queries associated with the current Query instance.
      * Each entry in the list implements the {@link QueryProvider} interface, which
@@ -111,169 +59,53 @@ public class Query {
      * This field plays a primary role in SQL command preparation and submission
      * to the underlying database system.
      */
-    private ArrayList<QueryProvider> queries = new ArrayList<>();
-
-
+    private final ArrayList<QueryProvider> queries = new ArrayList<>();
     /**
-     * Executes the query using the configured database adapter. The execution can be
-     * done synchronously or asynchronously, based on the `async` flag. If executed
-     * asynchronously, the execution will happen in a separate thread.
-     *
-     * @return the current Query instance after execution, allowing for method chaining.
-     */
-    public Query execute() {
-        Check.ifNull(databaseAdapter, "Database Adapter");
-        executed = false;
-        succeeded = false;
-        if (async) {
-            CompletableFuture.runAsync(() -> {
-                executeDirectly();
-                executed = true;
-            });
-        } else {
-            executeDirectly();
-            executed = true;
-        }
-        return this;
-    }
-
-    /**
-     * Executes the provided queries by adding them to the query list and then initiating execution.
-     *
-     * @param queries an array of {@link QueryProvider} objects to be executed.
-     *                Must not be null or empty.
-     * @return the current {@link Query} instance after executing the queries.
-     */
-    public Query executeQuery(QueryProvider... queries) {
-        Check.ifNullOrEmptyMap(queries, "Query");
-        Arrays.stream(queries).forEach(query -> this.queries.add(query));
-        execute();
-        return this;
-    }
-
-    /**
-     * Executes a list of SQL queries directly against the database.
-     * This method handles both single-query and batch-query execution.
-     * <br>
-     * The method enforces the following:<br>
-     * - Verifies the query list is not empty.<br>
-     * - Ensures an active database connection is established; if not, throws an IllegalStateException.<br>
-     * <br><br>
-     * For single-query execution:<br>
-     * - Prepares the SQL string from the first query in the list.<br>
-     * - Supports different execution flows based on the query type:<br>
-     * - If the query is a select query, it executes and processes the result set with optional
-     * post-query actions provided by the query object.
-     * - If the query is an update query, it executes the update statement.<br>
-     * - For other query types, it executes the query directly.<br>
-     * - Sets whether execution was successful via the `succeeded` flag.<br>
-     * <br><br>
-     * For batch-query execution:<br>
-     * - Iterates through the query list, generating SQL strings for each query and adding them to a batch.<br>
-     * - Executes the batch of queries as a single transaction.<br>
-     * - Handles exceptions and sets the `succeeded` flag accordingly.<br>
-     * <br><br>
-     * Notes:<br>
-     * - SQL strings that cannot be generated or are `null` are ignored for execution.<br>
-     * - Output messages inform about ignored queries or any errors encountered.<br>
-     * - Exceptions during execution result in the `succeeded` flag being set to false,
-     * and in the case of a non-recoverable error, a RequestNotExecutableException is thrown.<br>
-     * <br>
-     * The method operates under the assumption that the provided `databaseAdapter` is properly initialized
-     * and the `queries` list consists of appropriate `QueryProvider` instances.
-     */
-    private void executeDirectly() {
-        if (queries.isEmpty())
-            return;
-        if (!databaseAdapter.connected())
-            throw new IllegalStateException("The connection to the database was not established");
-
-        try (Connection connection = databaseAdapter.dataSource().getConnection()) {
-            if (queries.size() == 1) {
-                QueryProvider queryProvider = queries.get(0);
-                if (!queryProvider.compatibility().isCompatible(databaseAdapter.driverType())) {
-                    throw new UnsupportedOperationException("The current request is not supported by the database driver. Failing request. Please check the documentation for supported database operations and try again with a compatible request.");
-                }
-                String generateSQLString = queryProvider.generateSQLString(this);
-                if (generateSQLString == null) {
-                    logger.log(LogLevel.INFO, "Generated SQL-String is null. Canceling request.");
-                    return;
-                }
-                var statement = connection.prepareStatement(generateSQLString);
-                logger.log(LogLevel.DEBUG, "Executing query: " + generateSQLString);
-                try {
-                    if (queryProvider instanceof SelectQueryProvider selectRequest) {
-                        ResultSet resultSet = statement.executeQuery();
-                        selectRequest.resultSet(resultSet);
-                        succeeded = true;
-                        if (selectRequest.resultActionAfterQuery() != null) {
-                            selectRequest.resultActionAfterQuery().run(new SimpleResultSet(resultSet));
-                        }
-                    } else if (queryProvider instanceof UpdateQueryProvider) {
-                        statement.executeUpdate();
-                        succeeded = true;
-                    } else {
-                        statement.execute();
-                        succeeded = true;
-                    }
-                } catch (SQLException e) {
-                    logger.error("Error executing query: " + generateSQLString, e);
-                    succeeded = false;
-                }
-                for (QueryProvider query : queries) {
-                    if (query.actionAfterQuery() != null)
-                        query.actionAfterQuery().run(succeeded);
-                }
-            } else {
-                var statement = connection.createStatement();
-                for (QueryProvider queryProvider : queries) {
-                    try {
-                        if (!queryProvider.compatibility().isCompatible(databaseAdapter.driverType())) {
-                            throw new UnsupportedOperationException("The current request is not supported by the database driver. Failing request. Please check the documentation for supported database operations and try again with a compatible request.");
-                        }
-                        String generateSQLString = queryProvider.generateSQLString(this);
-                        if (generateSQLString == null) {
-                            logger.log(LogLevel.INFO, "Generated SQL-String is null. Ignoring request.");
-                            continue;
-                        }
-                        logger.log(LogLevel.DEBUG, "Executing query: " + generateSQLString);
-                        statement.addBatch(generateSQLString);
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                        succeeded = false;
-                    }
-                }
-                try {
-                    statement.executeBatch();
-                    succeeded = true;
-                } catch (SQLException e) {
-                    e.printStackTrace();
-                    succeeded = false;
-                }
-            }
-
-
-        } catch (Exception e) {
-            succeeded = false;
-            throw new RequestNotExecutableException(e);
-        }
-    }
-
-
-    /**
-     * Adds one or more {@code QueryProvider} objects to this {@code Query} instance.
+     * Indicates whether the query execution should be performed asynchronously.
      * <p>
-     * This method appends the provided {@link QueryProvider} objects to the internal
-     * list of queries that this {@code Query} instance will execute.
-     *
-     * @param queries One or more {@link QueryProvider} objects to be added.
-     * @return The current {@code Query} instance for method chaining.
+     * When set to `true`, the queries will be executed asynchronously in a separate thread,
+     * leveraging a CompletableFuture mechanism. When set to `false`, the execution will
+     * occur synchronously in the main thread.
+     * <p>
+     * This flag affects the behavior of the {@code execute} method in the {@code Query} class.
+     * By default, the value is set to `false`, meaning synchronous execution.
      */
-    public Query queries(QueryProvider... queries) {
-        this.queries.addAll(Arrays.asList(queries));
-        return this;
-    }
+    private boolean async = false;
+    /**
+     * Indicates whether the execution of the queries associated with this Query
+     * instance was successful. This value is set to {@code false} before an
+     * execution attempt and updated to {@code true} if the queries execute
+     * successfully.
+     * <p>
+     * This flag is used to monitor the completion status of query execution,
+     * whether executed synchronously or asynchronously.
+     * <p>
+     * Default value is {@code false}.
+     */
+    private boolean executed = false;
+    /**
+     * Represents the success status of the most recent query execution.
+     * This variable tracks whether the queries executed in the current or previous
+     * operation within the {@code Query} class completed successfully.
+     * <p>
+     * The value is set to {@code false} at the start of each execution and updated
+     * upon completion based on the success or failure of the operation.
+     * It is primarily used to determine whether subsequent actions or workflows
+     * should proceed depending on the result of the SQL query execution.
+     */
+    private boolean succeeded = false;
+    private boolean preserveQueriesAfterExecution = false;
+    private boolean useTransaction = true;
 
+    /**
+     * Constructor for the Query class that initializes it with a given DatabaseAdapter instance.
+     *
+     * @param databaseAdapter the DatabaseAdapter instance to be used for database operations
+     */
+    public Query(DatabaseAdapter databaseAdapter) {
+        this.databaseAdapter = databaseAdapter;
+        this.logger = databaseAdapter.logger;
+    }
 
     /**
      * Creates and returns a new instance of {@link DatabaseCreateQueryProvider}.
@@ -456,7 +288,6 @@ public class Query {
         return new TableDropQueryProvider();
     }
 
-
     /**
      * Creates and returns a new instance of {@link TruncateQueryProvider}.
      * <p>
@@ -483,6 +314,340 @@ public class Query {
      */
     public static UpdateQueryProvider update() {
         return new UpdateQueryProvider();
+    }
+
+    /**
+     * Executes the provided queries by adding them to the query list and then initiating execution.
+     *
+     * @param queries an array of {@link QueryProvider} objects to be executed.
+     *                Must not be null or empty.
+     * @return the current {@link Query} instance after executing the queries.
+     */
+    public Query executeQuery(QueryProvider... queries) {
+        Check.ifNullOrEmptyMap(queries, "Query");
+        this.queries.addAll(Arrays.asList(queries));
+        execute();
+        return this;
+    }
+
+    /**
+     * Executes the query using the configured database adapter. The execution can be
+     * done synchronously or asynchronously, based on the `async` flag. If executed
+     * asynchronously, the execution will happen in a separate thread.
+     *
+     * @return the current Query instance after execution, allowing for method chaining.
+     */
+    public Query execute() {
+        Check.ifNull(databaseAdapter, "Database Adapter");
+        executed = false;
+        succeeded = false;
+        if (async) {
+            CompletableFuture.runAsync(() -> {
+                executeDirectly();
+                executed = true;
+            });
+        } else {
+            executeDirectly();
+            executed = true;
+        }
+        if (!preserveQueriesAfterExecution) queries.clear();
+        return this;
+    }
+
+    /**
+     * Executes a list of SQL queries directly against the database.
+     * This method handles both single-query and batch-query execution.
+     * <br>
+     * The method enforces the following:<br>
+     * - Verifies the query list is not empty.<br>
+     * - Ensures an active database connection is established; if not, throws an IllegalStateException.<br>
+     * <br><br>
+     * For single-query execution:<br>
+     * - Prepares the SQL string from the first query in the list.<br>
+     * - Supports different execution flows based on the query type:<br>
+     * - If the query is a select query, it executes and processes the result set with optional
+     * post-query actions provided by the query object.
+     * - If the query is an update query, it executes the update statement.<br>
+     * - For other query types, it executes the query directly.<br>
+     * - Sets whether execution was successful via the `succeeded` flag.<br>
+     * <br><br>
+     * For batch-query execution:<br>
+     * - Iterates through the query list, generating SQL strings for each query and adding them to a batch.<br>
+     * - Executes the batch of queries as a single transaction.<br>
+     * - Handles exceptions and sets the `succeeded` flag accordingly.<br>
+     * <br><br>
+     * Notes:<br>
+     * - SQL strings that cannot be generated or are `null` are ignored for execution.<br>
+     * - Output messages inform about ignored queries or any errors encountered.<br>
+     * - Exceptions during execution result in the `succeeded` flag being set to false,
+     * and in the case of a non-recoverable error, a RequestNotExecutableException is thrown.<br>
+     * <br>
+     * The method operates under the assumption that the provided `databaseAdapter` is properly initialized
+     * and the `queries` list consists of appropriate `QueryProvider` instances.
+     */
+    private void executeDirectly() {
+        if (queries.isEmpty()) return;
+        if (!databaseAdapter.connected()) {
+            throw new IllegalStateException("The connection to the database was not established");
+        }
+
+        try (Connection connection = databaseAdapter.dataSource().getConnection()) {
+            boolean originalAutoCommit = connection.getAutoCommit();
+            if (useTransaction)
+                connection.setAutoCommit(false);
+            succeeded = false;
+
+            try {
+                if (queries.size() == 1) {
+                    QueryProvider queryProvider = queries.get(0);
+                    if (!queryProvider.compatibility().isCompatible(databaseAdapter.driverType())) {
+                        throw new UnsupportedOperationException(
+                                "The current request is not supported by the database driver. Failing request. " +
+                                        "Please check the documentation for supported database operations and try again with a compatible request."
+                        );
+                    }
+
+                    String sql = queryProvider.generateSQLString(this);
+                    if (sql == null) {
+                        logger.error("Generated SQL-String is null. Canceling request");
+                        if (useTransaction)
+                            connection.rollback();
+                        return;
+                    }
+
+                    try (var ps = connection.prepareStatement(sql)) {
+                        queryProvider.bindParameters(ps);
+                        logger.debug("Executing query: " + sql);
+
+                        if (queryProvider instanceof SelectQueryProvider selectRequest) {
+                            try (ResultSet rs = ps.executeQuery()) {
+                                SimpleResultSet srs = new SimpleResultSet(this, rs);
+                                selectRequest.simpleResultSet(srs);
+                                succeeded = true;
+                                if (selectRequest.resultActionAfterQuery() != null) {
+                                    selectRequest.resultActionAfterQuery().run(srs);
+                                }
+                            }
+                        } else if (queryProvider instanceof UpdateQueryProvider) {
+                            ps.executeUpdate();
+                            succeeded = true;
+                        } else {
+                            ps.execute();
+                            succeeded = true;
+                        }
+                    } catch (Exception e) {
+                        logger.error("Failed to execute query: " + sql, e);
+                        throw e;
+                    }
+
+                    if (queryProvider.actionAfterQuery() != null) {
+                        queryProvider.actionAfterQuery().run(succeeded);
+                    }
+
+                } else {
+                    class Bucket {
+                        final String sql;
+                        final List<QueryProvider> providers = new ArrayList<>();
+
+                        Bucket(String sql) {
+                            this.sql = sql;
+                        }
+                    }
+
+                    Map<String, Bucket> batchBuckets = new LinkedHashMap<>();
+                    List<QueryProvider> selectProviders = new ArrayList<>();
+
+                    for (QueryProvider qp : queries) {
+                        try {
+                            if (!qp.compatibility().isCompatible(databaseAdapter.driverType())) {
+                                throw new UnsupportedOperationException(
+                                        "The current request is not supported by the database driver. Failing request. " +
+                                                "Please check the documentation for supported database operations and try again with a compatible request."
+                                );
+                            }
+                            String sql = qp.generateSQLString(this);
+                            if (sql == null) {
+                                logger.debug("Generated SQL-String is null. Ignoring request.");
+                                if (qp.actionAfterQuery() != null) qp.actionAfterQuery().run(false);
+                                continue;
+                            }
+
+                            if (qp instanceof SelectQueryProvider) {
+                                selectProviders.add(qp);
+                            } else {
+                                batchBuckets.computeIfAbsent(sql, Bucket::new).providers.add(qp);
+                            }
+                        } catch (Exception e) {
+                            logger.error("Failed to generate SQL for query: " + qp, e);
+                            if (qp.actionAfterQuery() != null) {
+                                qp.actionAfterQuery().run(false);
+                            }
+                        }
+                    }
+
+                    boolean allOk = true;
+
+                    for (Bucket bucket : batchBuckets.values()) {
+                        String sql = bucket.sql;
+                        logger.debug("Executing batch for SQL: " + sql + " with size " + bucket.providers.size());
+                        try (var ps = connection.prepareStatement(sql)) {
+                            for (QueryProvider qp : bucket.providers) {
+                                try {
+                                    qp.bindParameters(ps);
+                                    ps.addBatch();
+                                } catch (Exception e) {
+                                    logger.error("Failed to bind parameters for query: " + qp, e);
+                                    allOk = false;
+                                    if (qp.actionAfterQuery() != null) qp.actionAfterQuery().run(false);
+                                }
+                            }
+                            try {
+                                ps.executeBatch();
+                                for (QueryProvider qp : bucket.providers) {
+                                    if (qp.actionAfterQuery() != null) qp.actionAfterQuery().run(true);
+                                }
+                            } catch (SQLException e) {
+                                logger.error("Failed to execute batch for SQL: " + sql, e);
+                                allOk = false;
+                                for (QueryProvider qp : bucket.providers) {
+                                    if (qp.actionAfterQuery() != null) qp.actionAfterQuery().run(false);
+                                }
+                            }
+                        } catch (SQLException e) {
+                            logger.error("Failed to prepare batch for SQL: " + sql, e);
+                            allOk = false;
+                            for (QueryProvider qp : bucket.providers) {
+                                if (qp.actionAfterQuery() != null) qp.actionAfterQuery().run(false);
+                            }
+                        }
+                    }
+
+                    for (QueryProvider qp : selectProviders) {
+                        String sql = qp.generateSQLString(this);
+                        if (sql == null) {
+                            logger.warn("Generated SQL-String is null. Ignoring request.");
+                            if (qp.actionAfterQuery() != null) qp.actionAfterQuery().run(false);
+                            allOk = false;
+                            continue;
+                        }
+                        logger.debug("Executing query: " + sql);
+                        try (var ps = connection.prepareStatement(sql)) {
+                            qp.bindParameters(ps);
+                            SelectQueryProvider select = (SelectQueryProvider) qp;
+                            try (ResultSet rs = ps.executeQuery()) {
+                                SimpleResultSet srs = new SimpleResultSet(this, rs);
+                                select.simpleResultSet(srs);
+                                if (select.resultActionAfterQuery() != null) {
+                                    select.resultActionAfterQuery().run(srs);
+                                }
+                                if (qp.actionAfterQuery() != null) qp.actionAfterQuery().run(true);
+                            }
+                        } catch (Exception e) {
+                            logger.error("Failed to execute query: " + sql, e);
+                            allOk = false;
+                            if (qp.actionAfterQuery() != null) qp.actionAfterQuery().run(false);
+                        }
+                    }
+
+                    succeeded = allOk;
+                }
+                if (useTransaction) {
+                    if (succeeded)
+                        connection.commit();
+                    else
+                        connection.rollback();
+                }
+            } catch (Exception e) {
+                try {
+                    if (useTransaction)
+                        connection.rollback();
+                } catch (Exception ignore) {
+                }
+                succeeded = false;
+                throw new RequestNotExecutableException(e);
+            } finally {
+                try {
+                    if (useTransaction)
+                        connection.setAutoCommit(originalAutoCommit);
+                } catch (Exception ignore) {
+                }
+            }
+
+        } catch (Exception e) {
+            succeeded = false;
+            throw new RequestNotExecutableException(e);
+        }
+    }
+
+
+    /**
+     * Adds one or more {@code QueryProvider} objects to this {@code Query} instance.
+     * <p>
+     * This method appends the provided {@link QueryProvider} objects to the internal
+     * list of queries that this {@code Query} instance will execute.
+     *
+     * @param queries One or more {@link QueryProvider} objects to be added.
+     * @return The current {@code Query} instance for method chaining.
+     */
+    public Query queries(QueryProvider... queries) {
+        this.queries.addAll(Arrays.asList(queries));
+        return this;
+    }
+
+    /**
+     * Adds a new query to the list of queries and returns the updated Query object.
+     *
+     * @param query the QueryProvider object to be added to the list of queries
+     * @return the updated Query object for method chaining
+     */
+    public Query query(QueryProvider query) {
+        this.queries.add(query);
+        return this;
+    }
+
+    /**
+     * Sets whether to use a transaction for the current query.
+     *
+     * @param use a boolean indicating whether to enable transaction (true) or disable it (false).
+     * @return the current Query instance for method chaining.
+     */
+    public Query useTransaction(boolean use) {
+        this.useTransaction = use;
+        return this;
+    }
+
+    /**
+     * Returns whether transactions are enabled or not.
+     *
+     * @return true if transactions are enabled, false otherwise
+     */
+    public boolean useTransaction() {
+        return useTransaction;
+    }
+
+    /**
+     * Configures whether queries should be preserved after execution.
+     * If set to true, the executed queries will be stored and remain accessible
+     * for inspection or debugging purposes.
+     *
+     * @param preserve a boolean indicating whether to preserve queries after execution.
+     *                 If true, queries will not be cleared after execution; otherwise,
+     *                 they will be cleared.
+     * @return the current Query instance with the updated configuration.
+     */
+    public Query preserveQueriesAfterExecution(boolean preserve) {
+        this.preserveQueriesAfterExecution = preserve;
+        return this;
+    }
+
+    /**
+     * Indicates whether queries should be preserved after execution.
+     * This method returns the state of the preserveQueriesAfterExecution flag.
+     *
+     * @return true if queries are preserved after execution, false otherwise
+     */
+    public boolean preserveQueriesAfterExecution() {
+        return preserveQueriesAfterExecution;
     }
 
     /**

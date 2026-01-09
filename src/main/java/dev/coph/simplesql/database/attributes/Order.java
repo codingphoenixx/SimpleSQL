@@ -1,51 +1,34 @@
 package dev.coph.simplesql.database.attributes;
 
 import dev.coph.simplesql.query.Query;
-import lombok.experimental.Accessors;
 
 import java.util.HashMap;
 
 /**
- * The {@code Order} class provides a mechanism for defining sorting rules for query results.
- * It allows you to specify fields and their sorting directions (ascending or descending)
- * that can then be converted into a SQL "ORDER BY" clause to structure a query's output.
- * This class ensures flexibility in configuring and retrieving sorting orders for dynamic query building.
+ * The Order class is responsible for defining sorting rules applied to queries.
+ * It facilitates constructing SQL-style ordering instructions for query results.
  */
 public class Order {
-    /**
-     * A mapping of field names to their corresponding sorting directions.
-     * This structure is used to maintain the ordering of query results by
-     * associating each field (represented as a string) with a {@link Direction}.
-     * <p>
-     * The {@link Direction} enum defines the sorting order, either ascending
-     * or descending, to be applied for each field in the query output.
-     * <p>
-     * Example scenarios for this variable include cases where query results
-     * need to be sorted based on one or more fields in a specific direction.
-     */
+
     private HashMap<String, Direction> orderRules;
 
     /**
-     * Default constructor for the {@link Order} class.
-     * Initializes an instance of the {@link Order} object that holds
-     * sorting rules for query results. This constructor sets up the
-     * necessary structures and allows for further configuration
-     * of sorting rules by adding {@link Direction}s mapped to specific fields.
+     * Constructs an empty Order instance.
+     * <p>
+     * This constructor initializes an Order object for defining sorting rules, where
+     * each rule specifies a field and its ordering direction (e.g., ascending or descending).
      */
     public Order() {
     }
 
     /**
-     * Adds a sorting rule by mapping a field key to a specified sorting direction.
-     * This method allows the configuration of sorting rules for query results, where
-     * a specific field can be set to sort in either ascending or descending order.
-     * <p>
-     * If the rule map is not initialized, it will be created during the method execution.
+     * Adds a sorting rule to the current Order instance by specifying a field and its direction.
+     * The rule is stored as a key-value pair where the key represents the field name, and the value
+     * is the sorting direction (e.g., ascending or descending).
      *
-     * @param key       the name of the field for which the sorting rule will be applied.
-     * @param direction the sorting direction to be applied for the specified field,
-     *                  either {@link Direction#ASCENDING} or {@link Direction#DESCENDING}.
-     * @return the current {@link Order} object for method chaining.
+     * @param key       the name of the field to be sorted
+     * @param direction the sorting direction, either {@code ASCENDING} or {@code DESCENDING}
+     * @return the updated Order instance with the new sorting rule included
      */
     public Order rule(String key, Direction direction) {
         if (orderRules == null)
@@ -55,15 +38,15 @@ public class Order {
     }
 
     /**
-     * Converts the order rules defined in the current {@link Order} instance into a SQL "ORDER BY" clause.
-     * This method generates a string representation of the sorting rules applied to a query,
-     * assembling them into a valid SQL format that can be appended to a query string.
+     * Generates a SQL-style ORDER BY clause based on the defined sorting rules.
+     * <p>
+     * The method concatenates field names and their respective sorting directions
+     * (ascending or descending) into a single ORDER BY statement suitable for query execution.
+     * If no sorting rules are defined, it returns an empty string.
      *
-     * @param query the {@link Query} object for which the "ORDER BY" clause is generated.
-     *              This parameter is not directly utilized in the method but represents
-     *              the query associated with the sorting rules.
-     * @return a string representing the SQL "ORDER BY" clause based on the sorting rules.
-     * If no rules are defined, an empty string is returned.
+     * @param query the query object used to define context for constructing the ORDER BY clause
+     * @return a string representing the ORDER BY clause based on the current sorting rules;
+     * an empty string if no sorting rules are available
      */
     public String toString(Query query) {
         if (orderRules == null || orderRules.isEmpty()) {
@@ -85,59 +68,65 @@ public class Order {
     }
 
     /**
-     * Retrieves the current set of sorting rules for the {@link Order} object.
-     * This method returns a mapping where each key represents a field, and the associated value
-     * indicates the sorting direction (either {@link Direction#ASCENDING} or {@link Direction#DESCENDING}).
+     * Retrieves the current sorting rules defined within the Order instance.
+     * <p>
+     * The sorting rules are represented as a mapping of field names (keys) to their corresponding
+     * sorting directions (values), such as ascending or descending. This method returns the rules
+     * stored in the current Order object.
      *
-     * @return a {@link HashMap} containing field names as keys and {@link Direction} as values,
-     * representing the defined sorting rules for query results. If no sorting rules are defined,
-     * an empty {@link HashMap} is returned.
+     * @return a HashMap containing the field names as keys and their sorting directions as values
      */
     public HashMap<String, Direction> orderRules() {
+        if (orderRules == null) orderRules = new HashMap<>();
         return this.orderRules;
     }
 
     /**
-     * The {@code Direction} enum represents the sorting order that can be applied
-     * to fields in a query. It defines two possible sorting directions: ascending
-     * and descending, represented by constants {@link Direction#ASCENDING} and
-     * {@link Direction#DESCENDING} respectively.
+     * Represents the direction of sorting order.
+     * <p>
+     * The {@code Direction} enum defines two possible values:
+     * {@code ASCENDING} and {@code DESCENDING}, which can be used to
+     * specify the order in which items should be sorted.
      */
     public enum Direction {
         /**
-         * Sort by the biggest first than the lowest. Z to A
+         * Indicates a descending sorting direction.
+         * <p>
+         * The {@code DESCENDING} constant is used to specify that items should be
+         * sorted in descending order, i.e., from highest to lowest or reverse
+         * alphabetical order.
+         * <p>
+         * It is represented internally by the string "DESC".
          */
         DESCENDING("DESC"),
         /**
-         * Sort by the smallest first than the highest. A to Z
+         * Indicates an ascending sorting direction.
+         * <p>
+         * The {@code ASCENDING} constant is used to specify that items should be
+         * sorted in ascending order, i.e., from lowest to highest or alphabetical order.
+         * <p>
+         * It is represented internally by the string "ASC".
          */
         ASCENDING("ASC");
 
-        /**
-         * Represents the SQL operator associated with a specific sorting direction.
-         * This variable stores the operator used in constructing SQL queries,
-         * such as "ASC" for ascending order or "DESC" for descending order.
-         * It is immutable and set during the initialization of a {@link Direction} instance.
-         */
+
         private final String operator;
 
         /**
-         * Constructs a {@code Direction} with the specified sorting operator.
-         * The operator represents the SQL clause associated with the sorting direction,
-         * such as "ASC" for ascending or "DESC" for descending.
+         * Constructs a Direction instance with a specified operator.
          *
-         * @param operator the SQL sorting operator corresponding to the direction
+         * @param operator the string representation of the sorting direction,
+         *                 such as "ASC" for ascending or "DESC" for descending
          */
         Direction(String operator) {
             this.operator = operator;
         }
 
         /**
-         * Retrieves the SQL sorting operator associated with the current {@code Direction} instance.
-         * The operator is a string that represents the sorting directive, such as "ASC" for ascending
-         * or "DESC" for descending, and is used in constructing SQL query clauses.
+         * Retrieves the string representation of the sorting direction associated with this instance.
+         * The string representation typically corresponds to predefined values such as "ASC" or "DESC".
          *
-         * @return the SQL sorting operator as a string
+         * @return the string representation of the sorting direction
          */
         public String operator() {
             return this.operator;

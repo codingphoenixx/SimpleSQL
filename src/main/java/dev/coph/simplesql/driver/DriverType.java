@@ -1,9 +1,10 @@
 package dev.coph.simplesql.driver;
+
 /**
  * The {@code DriverType} enum represents different types of database drivers supported
  * for establishing database connections. Each enum constant is associated with the
  * fully qualified class name of the JDBC driver.
- *
+ * <p>
  * This enum provides a way to manage available driver types and retrieve the
  * corresponding JDBC driver class names dynamically for connection configurations.
  */
@@ -18,6 +19,11 @@ public enum DriverType {
      * This constant holds the class name of the MariaDB JDBC driver.
      */
     MARIADB("org.mariadb.jdbc.Driver","MariaDB"),
+    /**
+     * Represents the Postgresql database driver.
+     * This constant holds the class name of the Postgresql JDBC driver.
+     */
+    POSTGRESQL("org.postgresql.Driver"),
     /**
      * Represents the SQLite database driver.
      * This constant holds the class name of the SQLite JDBC driver.

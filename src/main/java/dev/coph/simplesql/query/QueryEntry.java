@@ -2,39 +2,26 @@ package dev.coph.simplesql.query;
 
 
 import java.text.SimpleDateFormat;
-import java.time.OffsetDateTime;
-import java.time.ZoneId;
-import java.time.ZoneOffset;
-import java.time.format.DateTimeFormatter;
-import java.util.Date;
 
 /**
- * Represents a query entry for a SQL operation, consisting of a column name and a value.
- * Provides functionality to parse the value into a SQL-friendly format.
+ * Represents an entry in a query, used to define a column and its associated value.
+ * QueryEntry objects can be used in database operations or query-building logic.
  */
 public class QueryEntry {
-    private static SimpleDateFormat DATE_TIME_CONVERTER = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-    private static SimpleDateFormat DATE_CONVERTER = new SimpleDateFormat("yyyy-MM-dd");
+    private static final SimpleDateFormat DATE_TIME_CONVERTER = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private static final SimpleDateFormat DATE_CONVERTER = new SimpleDateFormat("yyyy-MM-dd");
 
-    /**
-     * The name of the database column associated with this query entry.
-     * Used to specify the target column for the provided value in SQL operations.
-     */
     private String columName;
-    /**
-     * The value to be associated with the specified database column in a SQL operation.
-     * Can represent various data types such as Boolean, Number, or String,
-     * which are parsed into corresponding SQL-safe formats when generating query statements.
-     */
+
     private Object value;
 
     private boolean rawValue = false;
 
     /**
-     * Constructs a QueryEntry with the specified column name and value.
+     * Constructs a new QueryEntry with the specified column name and value.
      *
-     * @param columName the name of the database column associated with this query entry
-     * @param value     the value to be associated with the specified column in a SQL operation
+     * @param columName the name of the column associated with this query entry
+     * @param value     the value to be associated with the specified column
      */
     public QueryEntry(String columName, Object value) {
         this.columName = columName;
@@ -43,80 +30,30 @@ public class QueryEntry {
 
     /**
      * Default constructor for the QueryEntry class.
-     * Initializes an empty QueryEntry without a column name or value.
-     * The column name and value can be set later using appropriate setter methods.
+     * Initializes an instance of QueryEntry with no parameters.
      */
     public QueryEntry() {
     }
 
     /**
-     * Converts the stored value into a SQL-compatible string representation.
-     * The value is formatted based on its type, ensuring proper handling
-     * of Boolean, Number, and String types for safe inclusion in SQL queries.
+     * Retrieves the value of the rawValue flag.
+     * The rawValue flag indicates whether the associated value
+     * should be treated as a raw (unprocessed) value in queries
+     * or database operations.
      *
-     * @return a SQL-safe string representation of the stored value
-     */
-    public String sqlValue() {
-        return parseSQLValue(value, rawValue());
-    }
-
-    /**
-     * Parses the given value into a SQL-compatible string representation.
-     * The method handles different data types such as Boolean, Number, and others,
-     * and converts them into appropriate formats for safe inclusion in SQL queries.
-     *
-     * @param value    the value to be parsed into a SQL-compatible string.
-     *                 Supported types include Boolean, Number, and other generic objects.
-     * @param rawValue if the value should be treated as a finished parsed value.
-     * @return a SQL-safe string representation of the provided value. For Boolean values,
-     * it returns '1' for true and '0' for false. For Number values, it returns
-     * the number as a string. For other objects, it returns the string wrapped
-     * in single quotes.
-     */
-    public static String parseSQLValue(Object value, boolean rawValue) {
-        if(value == null)
-            return "NULL";
-
-        if (value != null && value instanceof Boolean bool) {
-            if (bool)
-                return "'1'";
-            else
-                return "'0'";
-        }
-        if (value != null && value instanceof Number number)
-            return number.toString();
-
-        if(value != null && value instanceof Enum<?> enumValue)
-            return "'%s'".formatted(enumValue.name());
-
-        if (value != null && value instanceof Date date)
-            return "'%s'".formatted(DATE_TIME_CONVERTER.format(date));
-
-        if(value != null && value instanceof OffsetDateTime odt)
-            return "'%s'".formatted(odt.atZoneSameInstant(ZoneOffset.UTC).toLocalDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
-
-        if (rawValue)
-            return value.toString();
-
-        return "'%s'".formatted(value);
-    }
-
-
-    /**
-     * Indicates whether the raw value is used for this QueryEntry.
-     *
-     * @return true if the raw value is used, false otherwise
+     * @return true if the value should be treated as raw; false otherwise
      */
     public boolean rawValue() {
         return rawValue;
     }
 
     /**
-     * Sets the raw value flag for this QueryEntry and returns the updated instance.
+     * Sets the rawValue flag for the current QueryEntry instance.
+     * The rawValue flag indicates whether the associated value should
+     * be treated as a raw (unprocessed) value in queries or database operations.
      *
-     * @param rawValue a boolean indicating whether the value should be treated as raw
-     *                 (pre-parsed or in its native SQL-compatible format).
-     * @return the updated QueryEntry instance with the raw value flag set to the specified value
+     * @param rawValue a boolean flag indicating whether the value should be treated as raw
+     * @return the current QueryEntry instance with the updated rawValue flag
      */
     public QueryEntry rawValue(boolean rawValue) {
         this.rawValue = rawValue;
@@ -124,28 +61,28 @@ public class QueryEntry {
     }
 
     /**
-     * Retrieves the name of the database column associated with this QueryEntry.
+     * Retrieves the name of the column associated with this query entry.
      *
-     * @return the column name as a string
+     * @return the column name as a String
      */
     public String columName() {
         return this.columName;
     }
 
     /**
-     * Retrieves the value associated with this QueryEntry.
+     * Retrieves the value associated with this QueryEntry instance.
      *
-     * @return the value object associated with the query entry
+     * @return the value associated with this QueryEntry, which can be of any object type
      */
     public Object value() {
         return this.value;
     }
 
     /**
-     * Sets the column name for the QueryEntry and returns the updated instance.
+     * Sets the name of the column associated with this query entry.
      *
-     * @param columName the name of the database column to be associated with this query entry
-     * @return the updated QueryEntry instance with the specified column name
+     * @param columName the name of the column to be associated with this query entry
+     * @return the current QueryEntry instance with the updated column name
      */
     public QueryEntry columName(String columName) {
         this.columName = columName;
@@ -153,10 +90,11 @@ public class QueryEntry {
     }
 
     /**
-     * Sets the value associated with this QueryEntry and returns the updated instance.
+     * Sets the value associated with this QueryEntry instance.
+     * This method allows updating or defining the value to be stored in the QueryEntry.
      *
-     * @param value the value to be associated with this QueryEntry
-     * @return the updated QueryEntry instance with the specified value
+     * @param value the value to be associated with this QueryEntry, can be of any object type
+     * @return the current QueryEntry instance with the updated value
      */
     public QueryEntry value(Object value) {
         this.value = value;

@@ -32,6 +32,12 @@ public class DatabaseAdapter {
      */
     private final HikariConfig hikariConfig;
     /**
+     * Indicates whether the database connection has been successfully established.
+     * The value is {@code true} if the database is connected and {@code false} otherwise.
+     * Used internally to track the current state of the connection.
+     */
+    boolean connected = false;
+    /**
      * A private instance of HikariDataSource used as the data source for managing
      * database connections in the application. This data source provides connection
      * pooling to optimize resource usage and improve performance when interacting with
@@ -43,12 +49,6 @@ public class DatabaseAdapter {
      * reusable connections.
      */
     private HikariDataSource dataSource;
-    /**
-     * Indicates whether the database connection has been successfully established.
-     * The value is {@code true} if the database is connected and {@code false} otherwise.
-     * Used internally to track the current state of the connection.
-     */
-    boolean connected = false;
 
     public Logger logger;
 

@@ -1,98 +1,98 @@
 package dev.coph.simplesql.query.providers;
 
-import dev.coph.simplesql.driver.DriverCompatibility;
+import dev.coph.simplesql.driver.DriverType;
+import dev.coph.simplesql.exception.FeatureNotSupportedException;
 import dev.coph.simplesql.query.Query;
+import dev.coph.simplesql.utils.DatabaseCheck;
 import dev.coph.simpleutilities.action.RunnableAction;
 import dev.coph.simpleutilities.check.Check;
 
 /**
- * Provides functionality to generate SQL "ALTER TABLE" queries for dropping columns, indexes, or primary keys
- * from a database table. It extends the {@link TableAlterQueryProvider} to reuse shared table alteration logic.
+ * A concrete implementation of {@link TableAlterQueryProvider} for generating SQL queries
+ * to drop columns or primary keys from database tables. This class supports different database
+ * drivers and ensures the compatibility of the generated SQL queries.
  * <p>
- * This class allows the specification of a drop type, indicating whether the action is for a column, index,
- * or primary key. For column and index drop operations, the name of the target column or index must also
- * be provided.
+ * The main functionality includes:
+ * - Dropping columns from a table.
+ * - Dropping primary keys from a table.
+ * - Driver-specific SQL syntax generation for the "ALTER TABLE" operation.
+ * <p>
+ * Note that this provider uses compatible drivers as per the implementation and throws exceptions
+ * for unsupported drivers.
  */
 public class TableAlterDropColumnQueryProvider extends TableAlterQueryProvider {
 
-    /**
-     * Action will drop the named column.
-     */
-    public static final int COLUMN_DROP_TYPE = 1;
-    /**
-     * Action will drop the column with the named index.
-     */
-    public static final int INDEX_DROP_TYPE = 2;
-    /**
-     * Action will drop the primary key attribute and its provided features.
-     */
-    public static final int PRIMARY_KEY_DROP_TYPE = 3;
-    /**
-     * Represents the type of drop operation to be performed in an "ALTER TABLE" SQL query.
-     * The value of this variable determines whether the operation involves dropping a column,
-     * an index, or a primary key. It is used to construct the appropriate SQL statement based
-     * on the specified action.
-     * <p>
-     * Valid values for this variable are:
-     * - {@link #COLUMN_DROP_TYPE} (1): Indicates the action will drop a column.
-     * - {@link #INDEX_DROP_TYPE} (2): Indicates the action will drop an index.
-     * - {@link #PRIMARY_KEY_DROP_TYPE} (3): Indicates the action will drop the primary key.
-     * <p>
-     * The variable must be set to one of the predefined valid constants before query execution.
-     * If it is not set or holds an invalid value, the query construction may fail or throw
-     * an appropriate exception.
-     * <p>
-     * Default value is {@link Integer#MIN_VALUE}, which signifies that no drop type
-     * has been specified.
-     */
-    private int dropType = Integer.MIN_VALUE;
-    /**
-     * Represents the name of the database object (e.g., column or index) to be dropped during
-     * the execution of an "ALTER TABLE" SQL query. The value of this variable is expected
-     * to be set when the operation involves dropping a column or index, as determined
-     * by the configured drop type.
-     * <p>
-     * This variable works alongside {@code dropType} to determine the context of the drop
-     * operation, specifying the exact object to be removed when the drop type is either
-     * {@link #COLUMN_DROP_TYPE} or {@link #INDEX_DROP_TYPE}.
-     * <p>
-     * It must be provided and not left empty or null for valid execution of the SQL query
-     * in such cases.
-     */
+    private DropType dropType;
     private String dropObjectName;
+    private String constraintName;
     private RunnableAction<Boolean> actionAfterQuery;
 
     @Override
-    public DriverCompatibility compatibility() {
-        return driverType -> true;
+    public String getAlterTableString(Query query) {
+        Check.ifNull(dropType, "dropType");
+
+        DriverType driver =
+                query.databaseAdapter() != null ? query.databaseAdapter().driverType() : null;
+
+        DatabaseCheck.missingDriver(driver);
+        DatabaseCheck.unsupportedDriver(driver, DriverType.SQLITE);
+
+        return switch (dropType) {
+            case PRIMARY_KEY -> dropPrimaryKey(query, driver);
+            case COLUMN -> dropColumn(query, driver);
+        };
     }
 
-    @Override
-    public String getAlterTableString(Query query) {
-        Check.ifIntMinValue(dropType, "dropType");
-        if (dropType == PRIMARY_KEY_DROP_TYPE) {
-            return "DROP PRIMARY KEY";
-        }
+    /**
+     * Generates the SQL command to drop a primary key depending on the database driver type.
+     *
+     * @param query  the query object containing additional context or details for the operation
+     * @param driver the database driver type for which the SQL command is being generated
+     * @return the SQL command as a string to drop the primary key
+     * @throws FeatureNotSupportedException if the operation is not supported for the given driver type
+     */
+    private String dropPrimaryKey(Query query, DriverType driver) {
+        return switch (driver) {
+            case MYSQL, MARIADB -> "DROP PRIMARY KEY";
+            case POSTGRESQL -> {
+                if (constraintName == null || constraintName.isBlank()) {
+                    throw new FeatureNotSupportedException(driver);
+                }
+                yield "DROP CONSTRAINT " + constraintName;
+            }
+            default -> throw new FeatureNotSupportedException(driver);
+        };
+    }
+
+    /**
+     * Generates the SQL command to drop a column depending on the database driver type.
+     *
+     * @param query  the query object containing additional context or details for the operation
+     * @param driver the database driver type for which the SQL command is being generated
+     * @return the SQL command as a string to drop the specified column
+     * @throws FeatureNotSupportedException if the operation is not supported for the given driver type
+     */
+    private String dropColumn(Query query, DriverType driver) {
         Check.ifNullOrEmptyMap(dropObjectName, "dropObjectName");
-        if (dropType != 1 && dropType != 2) {
-            throw new IllegalArgumentException("Drop type not found.");
-        }
-        return "DROP " + (dropType == COLUMN_DROP_TYPE ? "COLUMN " : "INDEX ") + dropObjectName;
+        return switch (driver) {
+            case MYSQL, MARIADB, POSTGRESQL -> "DROP COLUMN " + dropObjectName;
+            default -> throw new FeatureNotSupportedException(driver);
+        };
     }
 
     /**
      * Retrieves the type of drop operation to be performed.
-     * This method returns an integer representing the type of drop action,
-     * which may relate to columns, indexes, or primary keys based on the implementation.
      *
-     * @return an integer representing the drop type.
+     * @return the {@code DropType} indicating the type of drop operation, such as
+     * COLUMN or PRIMARY_KEY.
      */
-    public int dropType() {
+    public DropType dropType() {
         return this.dropType;
     }
 
     /**
-     * Retrieves the name of the object to be dropped.
+     * Retrieves the name of the object to be dropped in the SQL operation, such as a column
+     * or a constraint. This value is used when constructing the corresponding SQL query.
      *
      * @return the name of the object to be dropped as a string
      */
@@ -101,22 +101,32 @@ public class TableAlterDropColumnQueryProvider extends TableAlterQueryProvider {
     }
 
     /**
-     * Sets the type of the drop operation to be performed.
-     * The drop type determines the specific type of object to be dropped,
-     * such as a column, an index, or a primary key.
+     * Retrieves the name of the constraint associated with the current operation.
      *
-     * @param dropType an integer representing the drop type
-     * @return the current instance of {@code TableAlterDropColumnQueryProvider} for method chaining
+     * @return the name of the constraint as a string
      */
-    public TableAlterDropColumnQueryProvider dropType(int dropType) {
+    public String constraintName() {
+        return this.constraintName;
+    }
+
+    /**
+     * Sets the type of drop operation to be performed using this provider instance.
+     *
+     * @param dropType the {@code DropType} representing the type of drop operation,
+     *                 such as COLUMN or PRIMARY_KEY
+     * @return the current instance of {@code TableAlterDropColumnQueryProvider}
+     * for method chaining
+     */
+    public TableAlterDropColumnQueryProvider dropType(DropType dropType) {
         this.dropType = dropType;
         return this;
     }
 
     /**
-     * Specifies the name of the object to be dropped in the alter table query.
+     * Sets the name of the object to be dropped in the SQL operation. This could represent
+     * a column name, constraint name, or other database object relevant to the alter table query.
      *
-     * @param dropObjectName the name of the object to be dropped
+     * @param dropObjectName the name of the object to be dropped as a string
      * @return the current instance of {@code TableAlterDropColumnQueryProvider} for method chaining
      */
     public TableAlterDropColumnQueryProvider dropObjectName(String dropObjectName) {
@@ -124,6 +134,27 @@ public class TableAlterDropColumnQueryProvider extends TableAlterQueryProvider {
         return this;
     }
 
+    /**
+     * Sets the name of the constraint associated with the current operation. This value
+     * will be used when constructing the corresponding SQL query.
+     *
+     * @param constraintName the name of the constraint as a string
+     * @return the current instance of {@code TableAlterDropColumnQueryProvider} for method chaining
+     */
+    public TableAlterDropColumnQueryProvider constraintName(String constraintName) {
+        this.constraintName = constraintName;
+        return this;
+    }
+
+    /**
+     * Sets the action to be executed after the query is run.
+     *
+     * @param actionAfterQuery the {@code RunnableAction<Boolean>} to be executed
+     *                         post-query, where the Boolean parameter represents
+     *                         the success or failure of the query
+     * @return the current instance of {@code TableAlterDropColumnQueryProvider}
+     * for method chaining
+     */
     public TableAlterDropColumnQueryProvider actionAfterQuery(RunnableAction<Boolean> actionAfterQuery) {
         this.actionAfterQuery = actionAfterQuery;
         return this;
@@ -132,5 +163,37 @@ public class TableAlterDropColumnQueryProvider extends TableAlterQueryProvider {
     @Override
     public RunnableAction<Boolean> actionAfterQuery() {
         return actionAfterQuery;
+    }
+
+    /**
+     * Represents the types of drop operations that can be performed
+     * in an SQL alter table query.
+     * <p>
+     * This enum provides two specific types:
+     * - COLUMN: Indicates a column drop operation in the table.
+     * - PRIMARY_KEY: Indicates a primary key drop operation in the table.
+     * <p>
+     * It is used within the context of constructing SQL queries, allowing
+     * differentiation between dropping table columns and dropping primary keys.
+     */
+    public enum DropType {
+        /**
+         * Represents a drop operation for a column in an SQL alter table query.
+         * <p>
+         * The COLUMN constant is used to specify that a particular drop operation
+         * is targeting a column within a table. It is a member of the {@link DropType}
+         * enum, which differentiates between column-specific and primary key-specific
+         * drop operations in SQL queries.
+         */
+        COLUMN,
+        /**
+         * Represents a drop operation for a primary key in an SQL alter table query.
+         * <p>
+         * The PRIMARY_KEY constant is part of the {@link DropType} enum and is used
+         * to specify that a particular drop operation is targeting the primary key of
+         * a table. This helps differentiate primary key-specific operations from other
+         * types of drop operations, such as dropping columns.
+         */
+        PRIMARY_KEY
     }
 }

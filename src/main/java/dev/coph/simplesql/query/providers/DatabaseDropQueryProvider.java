@@ -5,45 +5,24 @@ import dev.coph.simplesql.driver.DriverCompatibility;
 import dev.coph.simplesql.driver.DriverType;
 import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.query.QueryProvider;
+import dev.coph.simplesql.utils.DatabaseCheck;
 import dev.coph.simpleutilities.action.RunnableAction;
 import dev.coph.simpleutilities.check.Check;
 
 /**
- * The DatabaseDropQueryProvider class is responsible for generating SQL strings for
- * dropping a database. It implements the QueryProvider interface and provides
- * a mechanism to construct SQL DROP DATABASE queries.
- * <p>
- * This class allows customization of the drop operation using the `DeleteMethode`
- * enum, which determines whether or not to include the "IF EXISTS" condition.
- * It also ensures that a database name is provided before generating the SQL string.
- * Note that SQLite does not support dropping databases; attempting to do so
- * will throw an UnsupportedOperationException.
+ * A provider class that generates SQL queries for dropping databases. This class
+ * implements the {@link QueryProvider} interface and provides functionality for
+ * constructing {@code DROP DATABASE} SQL statements. It supports configuring
+ * deletion methods and executing actions after the query execution.
  */
 public class DatabaseDropQueryProvider implements QueryProvider {
 
-    /**
-     * Represents the name of the database to be dropped.
-     * This field is required when constructing SQL `DROP DATABASE` queries.
-     * It must be set to a non-null, non-empty value before generating the SQL query.
-     */
     private String database;
 
-    /**
-     * Specifies the deletion method to be used when performing database operations
-     * that involve removing entities or schemas.
-     * <p>
-     * This field utilizes the {@link DeleteMethode} enum, which provides strategies
-     * such as {@code DEFAULT} for unguarded deletions or {@code IF_EXISTS} to ensure
-     * the entity exists before deletion. The choice of deletion method can influence
-     * the generated SQL query behavior and provides flexibility in handling database
-     * deletions.
-     * <p>
-     * The default value is {@code DeleteMethode.DEFAULT}, ensuring straightforward
-     * deletion without additional existence checks.
-     */
     private DeleteMethode deleteMethode = DeleteMethode.DEFAULT;
 
     private RunnableAction<Boolean> actionAfterQuery;
+
 
     @Override
     public DriverCompatibility compatibility() {
@@ -53,8 +32,27 @@ public class DatabaseDropQueryProvider implements QueryProvider {
     @Override
     public String generateSQLString(Query query) {
         Check.ifNull(database, "database name");
-        return "DROP DATABASE %s%s".formatted((deleteMethode == DeleteMethode.IF_EXISTS ? "IF EXISTS " : ""), database);
+
+        DriverType driver =
+                query.databaseAdapter() != null ? query.databaseAdapter().driverType() : null;
+
+        DatabaseCheck.missingDriver(driver);
+        DatabaseCheck.unsupportedDriver(driver, DriverType.SQLITE);
+
+
+        StringBuilder sql = new StringBuilder();
+
+        sql.append("DROP DATABASE ");
+        if (deleteMethode == DeleteMethode.IF_EXISTS) {
+            sql.append("IF EXISTS ");
+        }
+        sql.append(database);
+        sql.append(";");
+
+
+        return sql.toString();
     }
+
 
     @Override
     public RunnableAction<Boolean> actionAfterQuery() {
@@ -62,27 +60,12 @@ public class DatabaseDropQueryProvider implements QueryProvider {
     }
 
     /**
-     * Retrieves the name of the database to be dropped.
+     * Sets the action to be executed after the query is run.
      *
-     * @return the name of the database as a String
+     * @param actionAfterQuery the {@code RunnableAction<Boolean>} to be executed post-query,
+     *                         where the Boolean parameter represents the success or failure of the query
+     * @return the current instance of {@code DatabaseDropQueryProvider} for method chaining
      */
-    public String database() {
-        return this.database;
-    }
-
-    /**
-     * Retrieves the deletion method to be used when constructing SQL drop operations.
-     * This method returns an instance of the {@link DeleteMethode} enum, which defines
-     * the strategy for deletion, such as whether to delete unconditionally or to
-     * include a conditional check (e.g., "IF EXISTS").
-     *
-     * @return the current deletion method as a {@link DeleteMethode}
-     */
-    public DeleteMethode deleteMethode() {
-        return this.deleteMethode;
-    }
-
-
     public DatabaseDropQueryProvider actionAfterQuery(RunnableAction<Boolean> actionAfterQuery) {
         this.actionAfterQuery = actionAfterQuery;
         return this;
@@ -91,8 +74,8 @@ public class DatabaseDropQueryProvider implements QueryProvider {
     /**
      * Sets the name of the database to be dropped.
      *
-     * @param database The name of the database to be dropped.
-     * @return {@link DatabaseDropQueryProvider} for chaining, allowing further customization of the query.
+     * @param database the name of the database to drop
+     * @return the current instance of {@code DatabaseDropQueryProvider} for method chaining
      */
     public DatabaseDropQueryProvider database(String database) {
         this.database = database;
@@ -100,14 +83,39 @@ public class DatabaseDropQueryProvider implements QueryProvider {
     }
 
     /**
-     * Sets the deletion method to be used when constructing SQL drop operations.
+     * Configures the deletion method to be used when generating SQL queries for dropping databases.
+     * If the provided {@code deleteMethode} parameter is null, the default deletion method
+     * ({@code DeleteMethode.DEFAULT}) is used.
      *
-     * @param deleteMethode the {@link DeleteMethode} instance specifying the strategy for deletion,
-     *                      such as unconditional deletion or conditional deletion (e.g., "IF EXISTS").
-     * @return the {@link DatabaseDropQueryProvider} instance, allowing method chaining for query customization.
+     * @param deleteMethode the deletion method to be used. Accepts an instance of {@code DeleteMethode}:
+     *                      {@code IF_EXISTS} for conditional deletion if the database exists, or
+     *                      {@code DEFAULT} for unguarded deletion.
+     * @return the current instance of {@code DatabaseDropQueryProvider} for method chaining
      */
     public DatabaseDropQueryProvider deleteMethode(DeleteMethode deleteMethode) {
-        this.deleteMethode = deleteMethode;
+        this.deleteMethode = deleteMethode != null ? deleteMethode : DeleteMethode.DEFAULT;
         return this;
     }
+
+    /**
+     * Retrieves the name of the database associated with this query provider.
+     *
+     * @return the name of the database as a {@code String}
+     */
+    public String database() {
+        return this.database;
+    }
+
+    /**
+     * Retrieves the current deletion method configured in the DatabaseDropQueryProvider.
+     * The deletion method defines the behavior or conditions to be applied during
+     * database delete operations.
+     *
+     * @return the configured {@code DeleteMethode} for this instance, which may be
+     * one of the predefined strategies such as {@code DEFAULT} or {@code IF_EXISTS}.
+     */
+    public DeleteMethode deleteMethode() {
+        return this.deleteMethode;
+    }
+
 }

@@ -1,68 +1,41 @@
 package dev.coph.simplesql.database.attributes;
 
-import lombok.experimental.Accessors;
 
 /**
- * Represents a SQL LIMIT clause generator that is used to control the number of rows
- * returned by a query and to specify an optional starting row (OFFSET).
- *
- * This class supports the fluent API style where methods can be chained to configure
- * the limit and offset values directly. It also provides support for generating
- * the SQL representation of the LIMIT and OFFSET clauses.
+ * Represents a limit and offset configuration typically used for pagination
+ * in database queries. This class allows setting and retrieving the limit
+ * (maximum number of records) and offset (starting position for the records).
  */
 public class Limit {
-    /**
-     * Specifies the maximum number of rows to be returned in the SQL query.
-     * This value controls the "LIMIT" clause of the SQL statement, which determines
-     * how many rows will be included in the result set.
-     *
-     * A value of 0 or a negative value may generally indicate no limitation on the number
-     * of rows to be returned, though this behavior depends on the SQL dialect used.
-     */
+
     private int limit;
-    /**
-     * Represents the offset value used to specify the starting point of rows
-     * in a SQL query when using an "OFFSET" clause.
-     *
-     * The offset determines how many rows should be skipped before rows are returned.
-     * A value of -1 typically signifies that no offset is applied.
-     */
-    private Offset offset = null;
-
-
-    @Override
-    public String toString() {
-        return " LIMIT " + limit + (offset != null ? offset.toString() : "");
-    }
+    private int offset = 0;
 
     /**
-     * Retrieves the maximum number of rows to be returned in the SQL query.
-     * This value represents the "LIMIT" clause of the SQL statement.
+     * Retrieves the maximum number of records (limit) set for pagination or query configuration.
      *
-     * @return the maximum number of rows (limit) for the SQL query.
+     * @return the limit value representing the maximum number of records to retrieve
      */
     public int limit() {
         return this.limit;
     }
 
     /**
-     * Retrieves the {@link Offset} instance representing the SQL OFFSET clause.
-     * This object holds the specified offset value, indicating the number of rows
-     * to be skipped in the query's result set.
+     * Retrieves the offset value, which indicates the starting position
+     * for records in a paginated or limited query.
      *
-     * @return the current {@link Offset} instance, or {@code null} if no offset
-     *         has been set.
+     * @return the offset value representing the number of records to skip
+     * before starting to return results
      */
-    public Offset offset() {
+    public int offset() {
         return this.offset;
     }
 
     /**
-     * Sets the maximum number of rows to be returned in the SQL query.
+     * Sets the limit (maximum number of records) for pagination or query configuration.
      *
-     * @param limit the maximum number of rows to be returned; a non-negative integer.
-     *              A value of 0 or negative may indicate no limitation depending on the SQL dialect used.
-     * @return the current {@link Limit} instance for method chaining.
+     * @param limit the maximum number of records to be retrieved
+     * @return the current instance of the Limit class, allowing for method chaining
      */
     public Limit limit(int limit) {
         this.limit = limit;
@@ -70,32 +43,15 @@ public class Limit {
     }
 
     /**
-     * Sets the offset value for the SQL query by accepting an {@link Offset} instance.
-     * This determines how many rows to skip before returning results, corresponding
-     * to the SQL "OFFSET" clause.
+     * Sets the offset, which indicates the starting position for records in a
+     * paginated or limited query.
      *
-     * @param offset the {@link Offset} instance representing the number of rows to skip.
-     *               Typically, this value is a non-negative integer. Negative values
-     *               may result in no offset being applied, depending on the SQL dialect.
-     * @return the current {@code Limit} instance for method chaining.
+     * @param offset the number of records to skip before starting to return results
+     * @return the current instance of the Limit class, allowing for method chaining
      */
-    public Limit offset(Offset offset) {
+    public Limit offset(int offset) {
         this.offset = offset;
         return this;
     }
 
-    /**
-     * Sets the offset value to specify the starting point of rows in a SQL query
-     * when using an "OFFSET" clause. This determines how many rows should be
-     * skipped before rows are returned.
-     *
-     * @param offset the number of rows to skip, typically a non-negative integer.
-     *               A negative value may indicate no offset is applied, depending
-     *               on the SQL dialect.
-     * @return the current {@code Limit} instance for method chaining.
-     */
-    public Limit offset(int offset) {
-        this.offset = new Offset(offset);
-        return this;
-    }
 }

@@ -1,7 +1,5 @@
 package dev.coph.simplesql.database.attributes;
 
-import lombok.Getter;
-import lombok.experimental.Accessors;
 
 /**
  * Represents different SQL aggregation or selection functions that can be applied
@@ -35,7 +33,7 @@ public enum SelectFunction {
      * When used in a database query, this function will modify the
      * output of the specified column by changing all uppercase letters
      * to their corresponding lowercase equivalents.
-     *
+     * <p>
      * This function is particularly useful for case-insensitive comparisons
      * or for standardizing text data in query results.
      */
@@ -45,7 +43,7 @@ public enum SelectFunction {
      * When applied in a database query, this function alters the
      * output of the specified column by changing all lowercase letters
      * to their corresponding uppercase equivalents.
-     *
+     * <p>
      * This function is particularly useful for case-insensitive comparisons,
      * standardizing text data in query results, or formatting data for presentation purposes.
      */

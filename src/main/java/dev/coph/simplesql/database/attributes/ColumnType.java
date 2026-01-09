@@ -1,6 +1,5 @@
 package dev.coph.simplesql.database.attributes;
 
-import dev.coph.simplesql.adapter.DatabaseAdapter;
 import dev.coph.simplesql.driver.DriverType;
 import dev.coph.simplesql.query.Query;
 
@@ -41,18 +40,18 @@ public enum ColumnType {
      * @param query the query object that includes information about the database adapter and driver type,
      *              used to determine the specific string representation of the enumeration value.
      * @return the string representation of the enumeration, which may vary depending on the database type
-     *         or driver adapter provided in the query.
+     * or driver adapter provided in the query.
      */
     public String toString(Query query) {
-        if(query.databaseAdapter() == null)
+        if (query.databaseAdapter() == null)
             return this.name().replaceAll("_", " ");
 
-        if(query.databaseAdapter().driverType().equals(DriverType.MYSQL) || query.databaseAdapter().driverType().equals(DriverType.MARIADB)){
-            if(this == PRIMARY_KEY_AUTOINCREMENT){
+        if (query.databaseAdapter().driverType().equals(DriverType.MYSQL) || query.databaseAdapter().driverType().equals(DriverType.MARIADB)) {
+            if (this == PRIMARY_KEY_AUTOINCREMENT) {
                 return "PRIMARY KEY AUTO_INCREMENT";
             }
-        }else if(query.databaseAdapter().driverType().equals(DriverType.SQLITE)){
-            if(this == PRIMARY_KEY_AUTOINCREMENT){
+        } else if (query.databaseAdapter().driverType().equals(DriverType.SQLITE)) {
+            if (this == PRIMARY_KEY_AUTOINCREMENT) {
                 return "PRIMARY KEY AUTOINCREMENT";
             }
         }

@@ -2,7 +2,7 @@ package dev.coph.simplesql.exception;
 
 /**
  * An exception thrown to indicate that a request could not be executed.
- *
+ * <p>
  * This runtime exception is typically used in scenarios where an operation
  * cannot proceed due to unforeseen constraints or issues during execution.
  * The underlying cause of the exception is provided to describe the specific

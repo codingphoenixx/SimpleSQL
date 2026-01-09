@@ -1,14 +1,11 @@
 package dev.coph.simplesql.database;
 
-import dev.coph.simplelogger.LogLevel;
-import dev.coph.simplelogger.Logger;
-import dev.coph.simplesql.adapter.DatabaseAdapter;
 import dev.coph.simplesql.database.attributes.ColumnType;
 import dev.coph.simplesql.database.attributes.DataType;
+import dev.coph.simplesql.database.attributes.UnsignedState;
 import dev.coph.simplesql.driver.DriverType;
 import dev.coph.simplesql.query.Query;
 import dev.coph.simpleutilities.check.Check;
-import lombok.experimental.Accessors;
 
 
 /**
@@ -63,65 +60,16 @@ public class Column {
      */
     private Object defaultValue;
 
+    private UnsignedState unsigned = UnsignedState.INACTIVE;
+
     /**
      * Indicates whether the column should enforce a NOT NULL constraint.
      * If set to true, the column cannot contain null values.
      */
     private boolean notNull;
 
-    /**
-     * Generates a string representation of the column definition using the provided query context.
-     * The generated string outlines the column attributes such as key, data type, constraints,
-     * and default value, based on the column's configuration and the supported database features.
-     *
-     * @param query the query context providing database-specific details and configurations for the column
-     * @return a string representation of the column definition in SQL format, or null in case of unsupported configurations
-     */
-    public String toString(Query query) {
-        Logger logger = query.databaseAdapter().logger;
-        Check.ifNull(key, "column-key");
-        Check.ifNull(dataType, "datatype");
-        if (dataType.requireObject()) {
-            Check.ifNull(dataTypeParamenterObject, "dataTypeParameterObject");
-        }
-        StringBuilder column = new StringBuilder(key).append(" ").append(dataType.toSQL(dataTypeParamenterObject));
+    private String defaultExpression;
 
-        if (notNull) {
-            column.append(" NOT NULL");
-        }
-
-        if (columnType != null && columnType != ColumnType.DEFAULT) {
-            if (columnType.equals(ColumnType.PRIMARY_KEY_AUTOINCREMENT)) {
-                if (query.databaseAdapter() == null) {
-                    return null;
-                }
-                if (query.databaseAdapter().driverType().equals(DriverType.MYSQL) || query.databaseAdapter().driverType().equals(DriverType.MARIADB)) {
-                    if (!dataType.equals(DataType.TINYTEXT) && !dataType.equals(DataType.INTEGER) && !dataType.equals(DataType.BIGINT)) {
-                        logger.log(LogLevel.WARNING,"You cannot set an autoincrement to a non int value. Setting it to default primary key.");
-                        columnType = ColumnType.PRIMARY_KEY;
-                    }
-                } else if (query.databaseAdapter().driverType().equals(DriverType.SQLITE)) {
-                    if (!dataType.equals(DataType.INTEGER)) {
-                        logger.log(LogLevel.WARNING,"You cannot set an autoincrement to a non integer. Setting it to default primary key.");
-                        columnType = ColumnType.PRIMARY_KEY;
-                    }
-                }
-            }
-            column.append(" ").append(columnType.toString(query));
-        }
-
-        if (defaultValue != null) {
-            column.append(" DEFAULT '").append((defaultValue instanceof Boolean bool ? (bool ? 1 : 0) : defaultValue)).append("'");
-
-        }
-
-        return column.toString();
-    }
-
-    @Override
-    public String toString() {
-        return null;
-    }
 
     /**
      * Default constructor for the Column class.
@@ -145,6 +93,20 @@ public class Column {
     }
 
     /**
+     * Represents a column definition with a key, data type, and unsigned state.
+     *
+     * @param key      the unique identifier for the column
+     * @param dataType the data type of the column
+     * @param unsigned the unsigned state of the column
+     */
+    public Column(String key, DataType dataType, UnsignedState unsigned) {
+        this.key = key;
+        this.dataType = dataType;
+        this.unsigned = unsigned;
+    }
+
+
+    /**
      * Constructs a Column instance with the specified key, data type,
      * and an additional parameter object associated with the data type.
      *
@@ -155,6 +117,21 @@ public class Column {
     public Column(String key, DataType dataType, Object dataTypeParamenterObject) {
         this.key = key;
         this.dataType = dataType;
+        this.dataTypeParamenterObject = dataTypeParamenterObject;
+    }
+
+    /**
+     * Constructs a Column object with the specified parameters.
+     *
+     * @param key                      The name or identifier of the column.
+     * @param dataType                 The data type of the column.
+     * @param unsigned                 The unsigned state of the column, indicating whether it is unsigned.
+     * @param dataTypeParamenterObject An additional parameter object for the data type when needed.
+     */
+    public Column(String key, DataType dataType, UnsignedState unsigned, Object dataTypeParamenterObject) {
+        this.key = key;
+        this.dataType = dataType;
+        this.unsigned = unsigned;
         this.dataTypeParamenterObject = dataTypeParamenterObject;
     }
 
@@ -172,6 +149,21 @@ public class Column {
     }
 
     /**
+     * Constructs a new Column object with the specified parameters.
+     *
+     * @param key        the name or identifier of the column
+     * @param dataType   the data type of the column
+     * @param unsigned   the unsigned state of the column
+     * @param columnType the type of the column
+     */
+    public Column(String key, DataType dataType, UnsignedState unsigned, ColumnType columnType) {
+        this.key = key;
+        this.dataType = dataType;
+        this.unsigned = unsigned;
+        this.columnType = columnType;
+    }
+
+    /**
      * Constructs a Column instance with the specified key, data type, and nullability constraint.
      *
      * @param key      the unique identifier for the column, representing its name
@@ -181,6 +173,21 @@ public class Column {
     public Column(String key, DataType dataType, boolean notNull) {
         this.key = key;
         this.dataType = dataType;
+        this.notNull = notNull;
+    }
+
+    /**
+     * Constructs a Column with the specified properties.
+     *
+     * @param key      the unique identifier for the column
+     * @param dataType the data type of the column
+     * @param unsigned the unsigned state of the column
+     * @param notNull  indicates whether the column is not nullable
+     */
+    public Column(String key, DataType dataType, UnsignedState unsigned, boolean notNull) {
+        this.key = key;
+        this.dataType = dataType;
+        this.unsigned = unsigned;
         this.notNull = notNull;
     }
 
@@ -200,6 +207,23 @@ public class Column {
     }
 
     /**
+     * Constructs a new Column instance with the specified parameters.
+     *
+     * @param key                      the key or name of the column
+     * @param dataType                 the data type of the column
+     * @param dataTypeParamenterObject the parameter object related to the data type of the column
+     * @param unsigned                 the unsigned state of the column, indicating whether the column is unsigned
+     * @param columnType               the type of the column
+     */
+    public Column(String key, DataType dataType, Object dataTypeParamenterObject, UnsignedState unsigned, ColumnType columnType) {
+        this.key = key;
+        this.dataType = dataType;
+        this.dataTypeParamenterObject = dataTypeParamenterObject;
+        this.unsigned = unsigned;
+        this.columnType = columnType;
+    }
+
+    /**
      * Constructs a Column instance with the specified key, data type, additional parameter object, and nullability constraint.
      *
      * @param key                      the unique identifier for the column, representing its name
@@ -211,6 +235,23 @@ public class Column {
         this.key = key;
         this.dataType = dataType;
         this.dataTypeParamenterObject = dataTypeParamenterObject;
+        this.notNull = notNull;
+    }
+
+    /**
+     * Constructs a Column object with the specified attributes.
+     *
+     * @param key                      the key or name of the column.
+     * @param dataType                 the data type of the column.
+     * @param dataTypeParamenterObject the parameter object associated with the data type, if applicable.
+     * @param unsigned                 the unsigned state of the column.
+     * @param notNull                  boolean value indicating whether the column allows null values.
+     */
+    public Column(String key, DataType dataType, Object dataTypeParamenterObject, UnsignedState unsigned, boolean notNull) {
+        this.key = key;
+        this.dataType = dataType;
+        this.dataTypeParamenterObject = dataTypeParamenterObject;
+        this.unsigned = unsigned;
         this.notNull = notNull;
     }
 
@@ -228,6 +269,29 @@ public class Column {
         this.key = key;
         this.dataType = dataType;
         this.dataTypeParamenterObject = dataTypeParamenterObject;
+        this.columnType = columnType;
+        this.notNull = notNull;
+    }
+
+    /**
+     * Constructor to create a Column object with specific attributes.
+     *
+     * @param key                      The name or identifier of the column.
+     * @param dataType                 The data type of the column.
+     * @param dataTypeParamenterObject The parameter object associated with the data type,
+     *                                 which may define additional constraints or specifications.
+     * @param unsigned                 The unsigned state of the column, specifying whether the column
+     *                                 can store only non-negative values.
+     * @param columnType               The type of the column, indicating its role or behavior
+     *                                 within the database (e.g., primary key, foreign key).
+     * @param notNull                  A boolean flag indicating if the column must always have a value
+     *                                 (i.e., cannot be null).
+     */
+    public Column(String key, DataType dataType, Object dataTypeParamenterObject, UnsignedState unsigned, ColumnType columnType, boolean notNull) {
+        this.key = key;
+        this.dataType = dataType;
+        this.dataTypeParamenterObject = dataTypeParamenterObject;
+        this.unsigned = unsigned;
         this.columnType = columnType;
         this.notNull = notNull;
     }
@@ -253,6 +317,137 @@ public class Column {
     }
 
     /**
+     * Constructs a Column object with specified parameters.
+     *
+     * @param key                      The name or identifier of the column.
+     * @param dataType                 The data type of the column.
+     * @param dataTypeParamenterObject Additional parameter object related to the data type, if applicable.
+     * @param unsigned                 Specifies whether the column is unsigned.
+     * @param columnType               The type of column (e.g., primary key, foreign key).
+     * @param defaultValue             The default value for the column.
+     * @param notNull                  Indicates whether the column should have a NOT NULL constraint.
+     */
+    public Column(String key, DataType dataType, Object dataTypeParamenterObject, UnsignedState unsigned, ColumnType columnType, Object defaultValue, boolean notNull) {
+        this.key = key;
+        this.dataType = dataType;
+        this.dataTypeParamenterObject = dataTypeParamenterObject;
+        this.unsigned = unsigned;
+        this.columnType = columnType;
+        this.defaultValue = defaultValue;
+        this.notNull = notNull;
+    }
+
+    /**
+     * Constructs a Column object with the specified attributes.
+     *
+     * @param key                     the unique identifier for the column
+     * @param dataType                the data type of the column
+     * @param unsignedState           the unsigned state of the column, indicating whether the column supports unsigned values
+     * @param dataTypeParameterObject an optional parameter object with additional settings for the data type
+     * @param columnType              the type of the column (e.g., primary key, foreign key, etc.)
+     */
+    public Column(String key, DataType dataType, UnsignedState unsignedState, Object dataTypeParameterObject, ColumnType columnType) {
+        this.key = key;
+        this.dataType = dataType;
+        this.unsigned = unsignedState;
+        this.dataTypeParamenterObject = dataTypeParameterObject;
+        this.columnType = columnType;
+    }
+
+    /**
+     * Constructs a Column object with the specified attributes.
+     *
+     * @param key                     the name or identifier of the column
+     * @param dataType                the data type of the column
+     * @param unsignedState           the unsigned state of the column, specifies if values are unsigned
+     * @param dataTypeParameterObject an optional parameter object associated with the column's data type
+     * @param columnType              the type of column, indicating its specific role or nature
+     * @param notNull                 a boolean indicating if the column is constrained to not allow null values
+     */
+    public Column(String key, DataType dataType, UnsignedState unsignedState, Object dataTypeParameterObject, ColumnType columnType, boolean notNull) {
+        this.key = key;
+        this.dataType = dataType;
+        this.unsigned = unsignedState;
+        this.dataTypeParamenterObject = dataTypeParameterObject;
+        this.columnType = columnType;
+        this.notNull = notNull;
+    }
+
+    /**
+     * Generates a string representation of the column definition using the provided query context.
+     * The generated string outlines the column attributes such as key, data type, constraints,
+     * and default value, based on the column's configuration and the supported database features.
+     *
+     * @param query the query context providing database-specific details and configurations for the column
+     * @return a string representation of the column definition in SQL format, or null in case of unsupported configurations
+     */
+    public String toString(Query query) {
+        Check.ifNull(key, "column-key");
+        Check.ifNull(dataType, "datatype");
+        if (dataType.requireObject()) {
+            Check.ifNull(dataTypeParamenterObject, "dataTypeParameterObject");
+        }
+        StringBuilder column = new StringBuilder(key).append(" ").append(dataType.toSQL(query, dataTypeParamenterObject, unsigned));
+
+        if (notNull) {
+            column.append(" NOT NULL");
+        }
+
+
+        if (columnType != null && columnType != ColumnType.DEFAULT) {
+            DriverType driver = (query.databaseAdapter() != null)
+                    ? query.databaseAdapter().driverType()
+                    : null;
+
+            if (columnType.equals(ColumnType.PRIMARY_KEY_AUTOINCREMENT)) {
+                if (driver == DriverType.MYSQL || driver == DriverType.MARIADB) {
+                    if (!dataType.equals(DataType.INTEGER) && !dataType.equals(DataType.BIGINT)) {
+                        query.databaseAdapter().logger.error("AUTO_INCREMENT only valid for integer types on MySQL/MariaDB. Downgrading to PRIMARY KEY.");
+                        columnType = ColumnType.PRIMARY_KEY;
+                    } else {
+                        column.append(" PRIMARY KEY AUTO_INCREMENT");
+                    }
+                } else if (driver == DriverType.SQLITE) {
+                    if (!dataType.equals(DataType.INTEGER)) {
+                        query.databaseAdapter().logger.error("AUTOINCREMENT requires INTEGER PRIMARY KEY on SQLite. Downgrading to PRIMARY KEY.");
+                        columnType = ColumnType.PRIMARY_KEY;
+                    } else {
+                        column.append(" PRIMARY KEY AUTOINCREMENT");
+                    }
+                } else if (driver == DriverType.POSTGRESQL) {
+                    if (dataType.equals(DataType.BIGINT) || dataType.equals(DataType.INTEGER)) {
+                        column.append(" GENERATED BY DEFAULT AS IDENTITY PRIMARY KEY");
+                    } else {
+                        query.databaseAdapter().logger.error("Identity/serial on non-integer in PostgreSQL is invalid. Downgrading to PRIMARY KEY.");
+                        columnType = ColumnType.PRIMARY_KEY;
+                    }
+                } else {
+                    columnType = ColumnType.PRIMARY_KEY;
+                }
+            }
+
+            if (columnType == ColumnType.PRIMARY_KEY) {
+                column.append(" PRIMARY KEY");
+            } else if (columnType == ColumnType.UNIQUE) {
+                column.append(" UNIQUE");
+            }
+        }
+        if (defaultExpression != null) {
+            column.append(" DEFAULT ").append(defaultExpression);
+        } else if (defaultValue != null) {
+            Object v = (defaultValue instanceof Boolean bool) ? (bool ? 1 : 0) : defaultValue;
+            column.append(" DEFAULT '").append(v).append("'");
+        }
+
+        return column.toString();
+    }
+
+    @Override
+    public String toString() {
+        return null;
+    }
+
+    /**
      * Retrieves the key or unique identifier of the column.
      *
      * @return a string representing the key or name of the column
@@ -275,7 +470,7 @@ public class Column {
      *
      * @return an Object representing an additional parameter related to the column's data type
      */
-    public Object dataTypeParamenterObject() {
+    public Object dataTypeParameterObject() {
         return this.dataTypeParamenterObject;
     }
 
@@ -283,7 +478,7 @@ public class Column {
      * Retrieves the column type associated with this instance of the Column.
      *
      * @return the ColumnType representing the type of constraint or attribute
-     *         applied to the column, such as DEFAULT, PRIMARY_KEY, or UNIQUE
+     * applied to the column, such as DEFAULT, PRIMARY_KEY, or UNIQUE
      */
     public ColumnType columnType() {
         return this.columnType;
@@ -308,6 +503,25 @@ public class Column {
     }
 
     /**
+     * Retrieves the unsigned state of the current object.
+     *
+     * @return the unsigned state represented by an {@code UnsignedState} object
+     */
+    public UnsignedState unsigned() {
+        return unsigned;
+    }
+
+    /**
+     * Retrieves the default expression.
+     *
+     * @return the default expression as a string.
+     */
+    public String defaultExpression() {
+        return this.defaultExpression;
+    }
+
+
+    /**
      * Sets the key or unique identifier of the column.
      *
      * @param key the unique identifier for the column, representing its name
@@ -330,13 +544,24 @@ public class Column {
     }
 
     /**
+     * Sets the unsigned state for the column.
+     *
+     * @param unsigned the unsigned state to be applied to the column
+     * @return the updated Column instance
+     */
+    public Column unsigned(UnsignedState unsigned) {
+        this.unsigned = unsigned;
+        return this;
+    }
+
+    /**
      * Sets the data type parameter object associated with the column.
      *
      * @param dataTypeParamenterObject an Object representing an additional parameter
      *                                 related to the column's data type
      * @return the current instance of the Column for method chaining
      */
-    public Column dataTypeParamenterObject(Object dataTypeParamenterObject) {
+    public Column dataTypeParameterObject(Object dataTypeParamenterObject) {
         this.dataTypeParamenterObject = dataTypeParamenterObject;
         return this;
     }
@@ -372,6 +597,17 @@ public class Column {
      */
     public Column notNull(boolean notNull) {
         this.notNull = notNull;
+        return this;
+    }
+
+    /**
+     * Sets the default expression for the column.
+     *
+     * @param expr the default expression to be set
+     * @return the updated Column instance
+     */
+    public Column defaultExpression(String expr) {
+        this.defaultExpression = expr;
         return this;
     }
 }

@@ -1,5 +1,10 @@
 package dev.coph.simplesql.database.attributes;
 
+import dev.coph.simplesql.driver.DriverType;
+import dev.coph.simplesql.exception.FeatureNotSupportedException;
+
+import java.util.Locale;
+
 /**
  * Represents the Latin7 character set, also known as ISO-8859-13 or Baltic Rim.
  * It is used for data encoding for Baltic languages such as Lithuanian and Latvian,
@@ -266,5 +271,91 @@ public enum CharacterSet {
      * Typically used when consistency in encoding size is essential, or when
      * working with a strict set of multi-language Unicode data without compression.
      */
-    UTF32,
+    UTF32;
+
+    /**
+     * Checks if the SQLite database supports the current character set.
+     *
+     * @return a boolean value indicating whether the SQLite database supports the current character set.
+     * Returns false in the current implementation.
+     */
+    public static boolean sqliteSupports() {
+        return false;
+    }
+
+    /**
+     * Determines whether MySQL supports the current character set.
+     *
+     * @return a boolean value indicating whether MySQL supports the current character set.
+     * Always returns true in the current implementation.
+     */
+    public static boolean mysqlSupports() {
+        return true;
+    }
+
+    /**
+     * Converts the name of the current character set instance to the MySQL-compatible charset name.
+     * The resulting charset name is transformed into lowercase using the root locale.
+     *
+     * @return the MySQL-compatible charset name as a lowercase string.
+     */
+    public String toMySqlCharset() {
+        return name().toLowerCase(Locale.ROOT);
+    }
+
+    /**
+     * Converts the current character set to its PostgreSQL-compatible encoding name.
+     * If the character set does not have a corresponding PostgreSQL encoding,
+     * a {@link FeatureNotSupportedException} is thrown.
+     *
+     * @return the PostgreSQL-compatible encoding name as a {@code String}.
+     * @throws FeatureNotSupportedException if there is no corresponding PostgreSQL encoding
+     *                                      for the current character set.
+     */
+    public String toPostgresEncodingOrThrow() {
+        String enc = toPostgresEncoding();
+        if (enc == null) throw new FeatureNotSupportedException(DriverType.POSTGRESQL);
+        return enc;
+    }
+
+    /**
+     * Converts the current character set to its corresponding PostgreSQL-compatible encoding name.
+     * If the character set is not directly supported for conversion to a PostgreSQL encoding,
+     * it will return {@code null}.
+     *
+     * @return the PostgreSQL-compatible encoding name as a {@code String}, or {@code null}
+     * if there is no corresponding PostgreSQL encoding for the current character set.
+     */
+    public String toPostgresEncoding() {
+        return switch (this) {
+            case UTF8MB4, UTF8MB3 -> "UTF8";
+            case LATIN1 -> "LATIN1";
+            case LATIN2 -> "LATIN2";
+            case LATIN5 -> "LATIN5";
+            case LATIN7 -> "ISO_8859_13";
+            case KOI8R -> "KOI8R";
+            case KOI8U -> "KOI8U";
+            case SJIS -> "SJIS";
+            case EUCJPMS, UJIS -> "EUC_JP";
+            case EUCKR -> "EUC_KR";
+            case GB2312 -> "EUC_CN";
+            case GBK -> "GBK";
+            case BIG5 -> "BIG5";
+            case ASCII -> "SQL_ASCII";
+            case TIS620 -> "TIS620";
+            case UTF16, UTF16LE, UTF32, UCS2, BINARY, CP850, CP852, CP866, CP932,
+                 CP1250, CP1251, CP1256, CP1257, ARMSCII8, DEC8, GEOSTD8, GREEK,
+                 HEBREW, HP8, KEYBCS2, MACCE, MACROMAN, SWE7 -> null;
+        };
+    }
+
+    /**
+     * Determines whether the current character set is supported by PostgreSQL.
+     *
+     * @return true if the current character set has a corresponding PostgreSQL-compatible
+     * encoding; false otherwise.
+     */
+    public boolean postgresSupports() {
+        return toPostgresEncoding() != null;
+    }
 }

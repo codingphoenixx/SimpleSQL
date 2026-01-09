@@ -3,6 +3,12 @@ package dev.coph.simplesql.database.attributes;
 import dev.coph.simplesql.utils.StringEscapeUtils;
 import dev.coph.simpleutilities.check.Check;
 
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 /**
  * This class represents a condition used in SQL queries.
  * It serves to define filter criteria and supports various comparison operators,
@@ -67,6 +73,7 @@ public class Condition {
      */
     private SelectFunction valueSelectFunction;
 
+    private final List<Condition> groupConditions;
 
     /**
      * Constructs a Condition object with a specified key and value.
@@ -77,6 +84,7 @@ public class Condition {
     public Condition(String key, Object value) {
         this.key = key;
         this.value = value;
+        this.groupConditions = null;
     }
 
     /**
@@ -90,6 +98,30 @@ public class Condition {
         this.key = key;
         this.value = value;
         this.operator = operator;
+        this.groupConditions = null;
+    }
+    private Condition(Type type, boolean not, List<Condition> children) {
+        this.type = (type != null) ? type : Type.AND;
+        this.not = not;
+        this.groupConditions = new ArrayList<>(children);
+    }
+
+    public static Condition group(Type type, boolean not, List<Condition> children) {
+        Check.ifNull(children, "children");
+        if (children.isEmpty()) throw new IllegalArgumentException("Group requires at least one child condition");
+        return new Condition(type, not, children);
+    }
+
+    public static Condition and(Condition... children) {
+        return group(Type.AND, false, Arrays.asList(children));
+    }
+
+    public static Condition or(Condition... children) {
+        return group(Type.OR, false, Arrays.asList(children));
+    }
+
+    public static Condition not(Condition child) {
+        return group(Type.AND, true, Collections.singletonList(child));
     }
 
     /**
@@ -114,7 +146,8 @@ public class Condition {
         String queryValue;
         if (operator.needToBeANumber()) {
             queryValue = value.toString();
-            Check.ifNotNumber(value, "value");
+            if (!(value instanceof Timestamp))
+                Check.ifNotNumber(value, "value");
         } else {
             if (rawValue)
                 queryValue = value.toString();
@@ -128,6 +161,14 @@ public class Condition {
 
         return queryKey + " " + operator.operator() + " " + queryValue;
     }
+    public boolean isGroup() {
+        return groupConditions != null;
+    }
+
+    public List<Condition> children() {
+        return groupConditions;
+    }
+
 
     /**
      * Retrieves the key of the condition, representing the column name this condition is applied to.

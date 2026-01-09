@@ -5,76 +5,91 @@ import dev.coph.simplesql.database.attributes.ColumnPosition;
 import dev.coph.simplesql.database.attributes.ColumnType;
 import dev.coph.simplesql.database.attributes.CreateMethode;
 import dev.coph.simplesql.database.attributes.DataType;
-import dev.coph.simplesql.driver.DriverCompatibility;
+import dev.coph.simplesql.driver.DriverType;
+import dev.coph.simplesql.exception.FeatureNotSupportedException;
 import dev.coph.simplesql.query.Query;
+import dev.coph.simplesql.utils.DatabaseCheck;
 import dev.coph.simpleutilities.action.RunnableAction;
 import dev.coph.simpleutilities.check.Check;
 
 /**
- * A query provider class for generating SQL "ALTER TABLE" statements to add a new column to a table.
- * This class extends the {@link TableAlterQueryProvider} and implements the specific logic required
- * to construct the "ADD COLUMN" action within an "ALTER TABLE" statement.
+ * Provides functionality for constructing SQL ALTER TABLE ADD COLUMN queries.
+ * This class extends the {@code TableAlterQueryProvider} and allows specifying
+ * attributes and parameters to add a column to an existing table in a database.
+ * <p>
+ * It supports various configurations to define the column's position, creation
+ * method, and column properties. Additionally, driver-specific compatibility
+ * checks and customization are handled within the implementation.
+ * <p>
+ * Features and capabilities include:
+ * - Setting the column to be added, including its key, data type, attributes,
+ * and constraints, such as NOT NULL.
+ * - Defining the position of the column (e.g., FIRST, AFTER another column, DEFAULT).
+ * - Supporting conditional column creation using {@code CreateMethode.IF_NOT_EXISTS}.
+ * - Generating database-specific SQL ALTER TABLE commands based on the database driver type.
+ * - Configuring an action to be executed after the query is performed.
+ * <p>
+ * This class ensures compatibility with supported database drivers and enforces
+ * validations wherever applicable, such as requiring a valid driver type and non-null column definitions.
  */
 public class TableAlterAddColumnQueryProvider extends TableAlterQueryProvider {
 
-    /**
-     * The position of the column.
-     */
     private ColumnPosition postion = ColumnPosition.DEFAULT;
-    /**
-     * If {@link ColumnPosition} is set to {@code  ColumnPosition.AFTER} the name of the column the new will be added after.
-     */
     private String afterColumnName;
-    private RunnableAction<Boolean> actionAfterQuery;
 
-
-    /**
-     * Defines the strategy for creating database structures such as tables
-     * as part of the query generation process within the {@code TableAlterAddColumnQueryProvider}.
-     * <p>
-     * The {@code createMethode} variable determines how the database structure
-     * creation logic is applied, based on the selected strategy from the
-     * {@link CreateMethode} enumeration. It defaults to {@link CreateMethode#DEFAULT}.
-     */
     private CreateMethode createMethode = CreateMethode.DEFAULT;
-
-    /**
-     * Represents a column to be added to the table schema in the context of a table alteration query.
-     * The column encapsulates the properties and metadata required for defining a database column,
-     * such as name, data type, and constraints.
-     */
     private Column column;
 
-    @Override
-    public DriverCompatibility compatibility() {
-        return driverType -> true;
-    }
+    private RunnableAction<Boolean> actionAfterQuery;
 
     @Override
     public String getAlterTableString(Query query) {
         Check.ifNull(column, "column");
 
-        StringBuilder stringBuilder = new StringBuilder("ADD COLUMN ").append((createMethode == CreateMethode.IF_NOT_EXISTS ? "IF NOT EXISTS " : null)).append(column.toString(query));
+        DriverType driver =
+                query.databaseAdapter() != null ? query.databaseAdapter().driverType() : null;
 
-        if (postion == ColumnPosition.DEFAULT) {
-            return stringBuilder.toString();
-        } else if (postion == ColumnPosition.FIRST) {
-            stringBuilder.append(" FIRST");
-        } else if (postion == ColumnPosition.AFTER) {
-            stringBuilder.append(" AFTER ").append(afterColumnName);
+        DatabaseCheck.missingDriver(driver);
+
+        boolean ifNotExists = (createMethode == CreateMethode.IF_NOT_EXISTS);
+
+        StringBuilder sb = new StringBuilder("ADD COLUMN ");
+
+        if (ifNotExists) {
+            switch (driver) {
+                case MYSQL, MARIADB, POSTGRESQL -> sb.append("IF NOT EXISTS ");
+                default -> throw new FeatureNotSupportedException(driver);
+            }
         }
 
-        return stringBuilder.toString();
+        sb.append(column.toString(query));
+
+        switch (postion) {
+            case DEFAULT -> {
+            }
+            case FIRST -> {
+                switch (driver) {
+                    case MYSQL, MARIADB -> sb.append(" FIRST");
+                    default -> throw new FeatureNotSupportedException(driver);
+                }
+            }
+            case AFTER -> {
+                Check.ifNullOrEmptyMap(afterColumnName, "afterColumnName");
+                switch (driver) {
+                    case MYSQL, MARIADB -> sb.append(" AFTER ").append(afterColumnName);
+                    default -> throw new FeatureNotSupportedException(driver);
+                }
+            }
+        }
+
+        return sb.toString();
     }
 
-
     /**
-     * Adds a column to the list of columns to be included in the table creation query.
-     * If the list of columns has not been initialized, it is initialized before adding the column.
-     * This method supports a fluent API style, allowing method chaining.
+     * Sets the column to be added in the table alteration query.
      *
-     * @param column the Column object representing the database column to be added to the table schema
-     * @return the current instance of TableCreateQueryProvider for method chaining
+     * @param column the column to be added
+     * @return the instance of TableAlterAddColumnQueryProvider for method chaining
      */
     public TableAlterAddColumnQueryProvider column(Column column) {
         this.column = column;
@@ -82,14 +97,11 @@ public class TableAlterAddColumnQueryProvider extends TableAlterQueryProvider {
     }
 
     /**
-     * Adds a column with the specified key and data type to the list of columns
-     * to be included in the table creation query. If the list of columns has not
-     * been initialized, it is initialized before adding the column. This method
-     * supports a fluent API style, allowing method chaining.
+     * Sets the column to be added in the table alteration query.
      *
      * @param key      the name of the column to be added
      * @param dataType the data type of the column to be added
-     * @return the current instance of TableCreateQueryProvider for method chaining
+     * @return the instance of TableAlterAddColumnQueryProvider for method chaining
      */
     public TableAlterAddColumnQueryProvider column(String key, DataType dataType) {
         this.column = new Column(key, dataType);
@@ -97,15 +109,12 @@ public class TableAlterAddColumnQueryProvider extends TableAlterQueryProvider {
     }
 
     /**
-     * Adds a column with the specified key, data type, and an additional parameter object
-     * to the list of columns to be included in the table creation query.
-     * If the list of columns has not been initialized, it is initialized before adding the column.
-     * This method supports a fluent API style, allowing method chaining.
+     * Sets the column to be added in the table alteration query with the specified details.
      *
      * @param key                     the name of the column to be added
      * @param dataType                the data type of the column to be added
-     * @param dataTypeParameterObject an additional parameter object associated with the column's data type
-     * @return the current instance of TableCreateQueryProvider for method chaining
+     * @param dataTypeParameterObject an optional parameter providing additional details about the column's data type
+     * @return the instance of TableAlterAddColumnQueryProvider for method chaining
      */
     public TableAlterAddColumnQueryProvider column(String key, DataType dataType, Object dataTypeParameterObject) {
         this.column = new Column(key, dataType, dataTypeParameterObject);
@@ -113,15 +122,12 @@ public class TableAlterAddColumnQueryProvider extends TableAlterQueryProvider {
     }
 
     /**
-     * Adds a column with the specified key, data type, and an additional parameter object
-     * to the list of columns to be included in the table creation query.
-     * If the list of columns has not been initialized, it is initialized before adding the column.
-     * This method supports a fluent API style, allowing method chaining.
+     * Sets the column to be added to the table alteration query with the specified details.
      *
      * @param key      the name of the column to be added
      * @param dataType the data type of the column to be added
-     * @param notNull  if the column is allowed to have no value
-     * @return the current instance of TableCreateQueryProvider for method chaining
+     * @param notNull  specifies whether the column should have a NOT NULL constraint
+     * @return the instance of TableAlterAddColumnQueryProvider for method chaining
      */
     public TableAlterAddColumnQueryProvider column(String key, DataType dataType, boolean notNull) {
         this.column = new Column(key, dataType, notNull);
@@ -129,70 +135,62 @@ public class TableAlterAddColumnQueryProvider extends TableAlterQueryProvider {
     }
 
     /**
-     * Adds a column with the specified key, data type, and an additional parameter object
-     * to the list of columns to be included in the table creation query.
-     * If the list of columns has not been initialized, it is initialized before adding the column.
-     * This method supports a fluent API style, allowing method chaining.
+     * Sets the column to be added to the table alteration query with the specified details.
      *
      * @param key                     the name of the column to be added
      * @param dataType                the data type of the column to be added
-     * @param dataTypeParameterObject an additional parameter object associated with the column's data type
-     * @param notNull                 if the column is allowed to have no value
-     * @return the current instance of TableCreateQueryProvider for method chaining
+     * @param dataTypeParameterObject an optional parameter providing additional details about the column's data type
+     * @param notNull                 specifies whether the column should have a NOT NULL constraint
+     * @return the instance of TableAlterAddColumnQueryProvider for method chaining
      */
-    public TableAlterAddColumnQueryProvider column(String key, DataType dataType, Object dataTypeParameterObject, boolean notNull) {
+    public TableAlterAddColumnQueryProvider column(
+            String key, DataType dataType, Object dataTypeParameterObject, boolean notNull) {
         this.column = new Column(key, dataType, dataTypeParameterObject, notNull);
         return this;
     }
 
     /**
-     * Adds a column with the specified key, data type, an additional parameter object,
-     * and column type to the list of columns to be included in the table creation query.
-     * If the list of columns has not been initialized, it is initialized before adding the column.
-     * This method supports a fluent API style, allowing method chaining.
+     * Sets the column to be added to the table alteration query with the specified details.
      *
      * @param key                     the name of the column to be added
      * @param dataType                the data type of the column to be added
-     * @param dataTypeParameterObject an additional parameter object associated
-     *                                with the column's data type
-     * @param columnType              the type of the column (e.g., primary key, normal column, etc.)
-     * @return the current instance of TableCreateQueryProvider for method chaining
+     * @param dataTypeParameterObject an optional parameter providing additional details about the column's data type
+     * @param columnType              the type of the column, specifying its characteristics (e.g., PRIMARY_KEY, INDEXED)
+     * @return the instance of TableAlterAddColumnQueryProvider for method chaining
      */
-    public TableAlterAddColumnQueryProvider column(String key, DataType dataType, Object dataTypeParameterObject, ColumnType columnType) {
+    public TableAlterAddColumnQueryProvider column(
+            String key, DataType dataType, Object dataTypeParameterObject, ColumnType columnType) {
         this.column = new Column(key, dataType, dataTypeParameterObject, columnType);
         return this;
     }
 
     /**
-     * Adds a column with the specified key, data type, an additional parameter object,
-     * and column type to the list of columns to be included in the table creation query.
-     * If the list of columns has not been initialized, it is initialized before adding the column.
-     * This method supports a fluent API style, allowing method chaining.
+     * Sets the column to be added to the table alteration query with the specified details.
      *
      * @param key                     the name of the column to be added
      * @param dataType                the data type of the column to be added
-     * @param dataTypeParameterObject an additional parameter object associated
-     *                                with the column's data type
-     * @param columnType              the type of the column (e.g., primary key, normal column, etc.)
-     * @param notNull                 if the column is allowed to be null
-     * @return the current instance of TableCreateQueryProvider for method chaining
+     * @param dataTypeParameterObject an optional parameter providing additional details about the column's data type
+     * @param columnType              the type of the column, specifying its characteristics (e.g., PRIMARY_KEY, INDEXED)
+     * @param notNull                 specifies whether the column should have a NOT NULL constraint
+     * @return the instance of TableAlterAddColumnQueryProvider for method chaining
      */
-    public TableAlterAddColumnQueryProvider column(String key, DataType dataType, Object dataTypeParameterObject, ColumnType columnType, boolean notNull) {
+    public TableAlterAddColumnQueryProvider column(
+            String key,
+            DataType dataType,
+            Object dataTypeParameterObject,
+            ColumnType columnType,
+            boolean notNull) {
         this.column = new Column(key, dataType, dataTypeParameterObject, columnType, notNull);
         return this;
     }
 
-
     /**
-     * Adds a column with the specified key, data type, and column type to the list of columns
-     * to be included in the table creation query. If the list of columns has not been initialized,
-     * it is initialized before adding the column. This method supports a fluent API style,
-     * allowing method chaining.
+     * Sets the column to be added to the table alteration query with the specified details.
      *
      * @param key        the name of the column to be added
      * @param dataType   the data type of the column to be added
-     * @param columnType the type of the column (e.g., primary key, normal column, etc.)
-     * @return the current instance of TableCreateQueryProvider for method chaining
+     * @param columnType the type of the column, specifying its characteristics (e.g., PRIMARY_KEY, INDEXED)
+     * @return the instance of TableAlterAddColumnQueryProvider for method chaining
      */
     public TableAlterAddColumnQueryProvider column(String key, DataType dataType, ColumnType columnType) {
         this.column = new Column(key, dataType, columnType);
@@ -200,50 +198,54 @@ public class TableAlterAddColumnQueryProvider extends TableAlterQueryProvider {
     }
 
     /**
-     * Retrieves the position of the column within the table schema or query structure.
+     * Retrieves the current column position setting.
+     * The column position defines the placement of a column
+     * (e.g., FIRST, AFTER, or DEFAULT) in the context of table alteration queries.
      *
-     * @return the position of the column, represented as an instance of the ColumnPosition enum
-     * (e.g., DEFAULT, FIRST, AFTER).
+     * @return the current {@link ColumnPosition} associated with the query
      */
     public ColumnPosition postion() {
         return this.postion;
     }
 
     /**
-     * Retrieves the name of the column after which the new column will be positioned.
+     * Retrieves the name of the column after which the new column should be added
+     * in the table alteration query. This helps define the position of the new
+     * column relative to existing columns in the table.
      *
-     * @return the name of the column after which the new column will be added, as a String.
+     * @return the name of the column after which the new column should be added
      */
     public String afterColumnName() {
         return this.afterColumnName;
     }
 
     /**
-     * Retrieves the create method used for altering or creating the table schema.
+     * Retrieves the currently configured {@link CreateMethode} for the table alteration query in the provider.
+     * The {@link CreateMethode} determines the strategy to be used during the creation of database structures.
      *
-     * @return the current instance of {@code CreateMethode}, representing the strategy
-     * for database structure creation (e.g., DEFAULT, IF_NOT_EXISTS).
+     * @return the current {@link CreateMethode} associated with this query provider
      */
     public CreateMethode createMethode() {
         return this.createMethode;
     }
 
     /**
-     * Retrieves the column associated with the current instance of the table alter query provider.
+     * Retrieves the column that is currently set in the table alteration query context.
+     * This represents the column being added or modified within the query.
      *
-     * @return the column associated with the current table alteration, as an instance of the Column class.
+     * @return the current {@link Column} associated with the table alteration query
      */
     public Column column() {
         return this.column;
     }
 
     /**
-     * Sets the position of the column within the table schema or query structure.
-     * This method supports a fluent API style, allowing method chaining.
+     * Sets the position of the column to be added in the table alteration query.
+     * The position can determine whether the column is added at the start, after a specific column,
+     * or at the default position.
      *
-     * @param postion the position of the column, represented as an instance of
-     *                {@code ColumnPosition} enum (e.g., DEFAULT, FIRST, AFTER)
-     * @return the current instance of {@code TableAlterAddColumnQueryProvider} for method chaining
+     * @param postion the position of the column, represented by the {@link ColumnPosition} enumeration
+     * @return the instance of TableAlterAddColumnQueryProvider for method chaining
      */
     public TableAlterAddColumnQueryProvider postion(ColumnPosition postion) {
         this.postion = postion;
@@ -251,11 +253,13 @@ public class TableAlterAddColumnQueryProvider extends TableAlterQueryProvider {
     }
 
     /**
-     * Sets the name of the column after which a new column will be added.
-     * This method supports a fluent API style, allowing method chaining.
+     * Specifies the name of the column after which the new column should be added
+     * in the table alteration query. This determines the relative position of
+     * the new column within the table structure.
      *
-     * @param afterColumnName the name of the column after which the new column will be added
-     * @return the current instance of {@code TableAlterAddColumnQueryProvider} for method chaining
+     * @param afterColumnName the name of the column after which the new column
+     *                        should be positioned
+     * @return the instance of TableAlterAddColumnQueryProvider for method chaining
      */
     public TableAlterAddColumnQueryProvider afterColumnName(String afterColumnName) {
         this.afterColumnName = afterColumnName;
@@ -263,17 +267,23 @@ public class TableAlterAddColumnQueryProvider extends TableAlterQueryProvider {
     }
 
     /**
-     * Sets the create method to be used for altering or creating the table schema.
-     * This method supports a fluent API style, enabling method chaining.
+     * Sets the createMethode property and returns the updated instance of TableAlterAddColumnQueryProvider.
      *
-     * @param createMethode an instance of {@code CreateMethode} that specifies the strategy for database structure creation
-     * @return the current instance of {@code TableAlterAddColumnQueryProvider} for method chaining
+     * @param createMethode the CreateMethode object to be set
+     * @return the updated instance of TableAlterAddColumnQueryProvider
      */
     public TableAlterAddColumnQueryProvider createMethode(CreateMethode createMethode) {
         this.createMethode = createMethode;
         return this;
     }
 
+    /**
+     * Sets the action to be executed after the query processing is completed.
+     *
+     * @param actionAfterQuery the action to be executed, represented as a {@link RunnableAction}
+     *                         that processes a {@code Boolean} result
+     * @return the instance of {@code TableAlterAddColumnQueryProvider} for method chaining
+     */
     public TableAlterAddColumnQueryProvider actionAfterQuery(RunnableAction<Boolean> actionAfterQuery) {
         this.actionAfterQuery = actionAfterQuery;
         return this;
