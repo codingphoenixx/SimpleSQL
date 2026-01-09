@@ -13,6 +13,8 @@ public class Main {
 
     public static void main(String[] args) {
         Logger.instance().logLevel(Logger.LogLevel.DEBUG);
+        GenericLogger.instance();
+
         System.out.println("--------------------------------------- MARIADB ------------------------------------------");
         startMariaDB();
         System.out.println("--------------------------------------- SQLITE ------------------------------------------");

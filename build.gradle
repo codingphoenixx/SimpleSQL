@@ -1,30 +1,33 @@
 plugins {
     id 'java'
     id 'maven-publish'
+
 }
 
 group = 'dev.coph'
-version = '4.0.0-rc19'
+version = '4.0.0'
 
 repositories {
     maven {
-        url = uri("http://repo.coph.dev/releases")
-        allowInsecureProtocol =  true
+        url = uri("https://repo.coph.dev/releases")
     }
 
     mavenCentral()
 }
 
 dependencies {
-    implementation 'com.zaxxer:HikariCP:6.3.3'
+    implementation 'com.zaxxer:HikariCP:7.0.2'
 
-    implementation "org.xerial:sqlite-jdbc:3.50.3.0"
-    implementation 'com.mysql:mysql-connector-j:9.4.0'
-    implementation 'org.mariadb.jdbc:mariadb-java-client:3.5.6'
+    implementation "org.xerial:sqlite-jdbc:3.51.1.0"
+    implementation 'com.mysql:mysql-connector-j:9.5.0'
+    implementation 'org.mariadb.jdbc:mariadb-java-client:3.5.7'
     implementation 'org.postgresql:postgresql:42.7.8'
 
-    implementation "dev.coph:simplelogger:3.0.0"
-    implementation "dev.coph:simpleutilities:3.9.2"
+    compileOnly 'org.projectlombok:lombok:1.18.42'
+    annotationProcessor 'org.projectlombok:lombok:1.18.42'
+
+    compileOnly "dev.coph:simplelogger:3.2.1"
+    compileOnly "dev.coph:simpleutilities:3.10.0"
 }
 
 javadoc {
@@ -36,8 +39,7 @@ publishing {
     repositories {
         maven {
             name = "cophrepository"
-            url = "http://repo.coph.dev/releases"
-            allowInsecureProtocol = true
+            url = "https://repo.coph.dev/releases"
             credentials(PasswordCredentials)
             authentication {
                 basic(BasicAuthentication)

@@ -13,12 +13,12 @@ public enum DriverType {
      * Represents the MySQL database driver.
      * This constant holds the class name of the MySQL JDBC driver.
      */
-    MYSQL("com.mysql.cj.jdbc.Driver"),
+    MYSQL("com.mysql.cj.jdbc.Driver", "MySQL"),
     /**
      * Represents the MariaDB database driver.
      * This constant holds the class name of the MariaDB JDBC driver.
      */
-    MARIADB("org.mariadb.jdbc.Driver"),
+    MARIADB("org.mariadb.jdbc.Driver","MariaDB"),
     /**
      * Represents the Postgresql database driver.
      * This constant holds the class name of the Postgresql JDBC driver.
@@ -28,7 +28,7 @@ public enum DriverType {
      * Represents the SQLite database driver.
      * This constant holds the class name of the SQLite JDBC driver.
      */
-    SQLITE("org.sqlite.JDBC");
+    SQLITE("org.sqlite.JDBC", "SQLite");
 
     /**
      * Represents the class name of the JDBC driver associated with the database type.
@@ -36,15 +36,23 @@ public enum DriverType {
      * remains constant for the lifetime of an enum instance.
      */
     private final String driver;
+    /**
+     * Represents a human-readable name for the database driver.
+     * This name is used to provide a more descriptive and user-friendly identifier
+     * for the respective database type.
+     */
+    private final String readableName;
 
     /**
-     * Constructor for the DriverType enum.
-     * Initializes the driver class name associated with the specific database type.
+     * Constructs a {@code DriverType} instance with the specified fully qualified driver
+     * class name and a human-readable name representing the database driver.
      *
-     * @param driver the fully qualified class name of the JDBC driver for the respective database
+     * @param driver the fully qualified class name of the JDBC driver
+     * @param readableName the descriptive, human-readable name of the database driver
      */
-    DriverType(String driver) {
+    DriverType(String driver, String readableName) {
         this.driver = driver;
+        this.readableName = readableName;
     }
 
     /**
@@ -54,5 +62,9 @@ public enum DriverType {
      */
     public String driver() {
         return this.driver;
+    }
+
+    public String readableName() {
+        return this.readableName;
     }
 }

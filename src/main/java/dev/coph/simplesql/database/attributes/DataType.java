@@ -127,53 +127,56 @@ public record DataType(boolean canHaveObject, boolean requireObject, boolean can
     public static final DataType ENUM = new DataType(true, true, false, "ENUM");
 
     /**
-     * Represents the SQL TINYBLOB data type.
-     * <p>
-     * The TINYBLOB data type is used to store very small binary objects with a maximum storage
-     * capacity of 255 bytes. It is a BLOB (Binary Large Object) type specifically designed for
-     * storing binary data, such as images, multimedia, or other non-text files, in a compact
-     * format.
+     * Represents the BINARY data type, which is a fixed-length binary string.
      */
-    public static final DataType TINYBLOB = new DataType(false, false, false, "TINYBLOB");
+    public static final DataType BINARY = new DataType(true, true, "BINARY");
+    /**
+     * Represents the VARBINARY data type, which is a variable-length binary string.
+     */
+    public static final DataType VARBINARY = new DataType(true, true, "VARBINARY");
 
     /**
-     * Represents the SQL "BLOB" data type.
-     * <p>
-     * BLOB, short for Binary Large Object, is a data type used to store large binary data such as images, multimedia, or other binary files.
-     * This variable is an immutable and predefined instance of the DataType class with specific behaviors and characteristics
-     * tailored for the SQL BLOB type.
+     * Represents the TINYBLOB data type, which is a very small binary large object capable of storing binary data
+     * up to a maximum size of 255 bytes.
      */
-    public static final DataType BLOB = new DataType(false, false, false, "BLOB");
+    public static final DataType TINYBLOB = new DataType(false, false, "TINYBLOB");
+    /**
+     * Represents the BLOB data type, which is a binary large object capable of storing binary data up to 65,535 bytes.
+     */
+    public static final DataType BLOB = new DataType(false, false, "BLOB");
+    /**
+     * Represents the MEDIUMBLOB data type, which is a binary large object capable of storing binary data up to 16,777,215 bytes.
+     */
+    public static final DataType MEDIUMBLOB = new DataType(false, false, "MEDIUMBLOB");
+    /**
+     * Represents the LONGBLOB data type, which is a binary large object capable of storing binary data up to 4,294,967,295 bytes.
+     */
+    public static final DataType LONGBLOB = new DataType(false, false, "LONGBLOB");
 
     /**
-     * Represents the SQL MEDIUMBLOB data type within the {@code DataType} schema definition.
-     * MEDIUMBLOB is a binary large object (BLOB) data type that can store variable-length binary data
-     * with a maximum size of 16,777,215 bytes (16MB). It is typically used to store large binary data
-     * such as images or files. This data type does not support unsigned values, does not have
-     * an associated object, and does not require an associated object.
-     */
-    public static final DataType MEDIUMBLOB = new DataType(false, false, false, "MEDIUMBLOB");
-
-    /**
-     * Represents the SQL data type LONGBLOB, commonly used in SQL databases to store
-     * large binary objects such as files, images, or other types of data.
-     * <p>
-     * This data type is designed for handling extremely large amounts of binary data
-     * with a maximum length of 4GB, as supported by the SQL LONGBLOB type.
-     */
-    public static final DataType LONGBLOB = new DataType(false, false, false, "LONGBLOB");
-
-    /**
-     * Represents a data type in a SQL schema. This class defines various attributes and behavior
-     * for different SQL data types, allowing for handling SQL-compatible operations and definitions.
+     * Indicates whether this DataType instance can associate with an object value.
      *
-     * @param canHaveObject Specifies whether the data type can have an associated object.
-     * @param requireObject Specifies whether the data type requires an associated object.
-     * @param canBeUnsigned Specifies whether the data type can hold unsigned values.
-     * @param name          The name of the SQL data type.
+     * This field determines if the corresponding data type is capable of handling
+     * objects as valid values, which might influence how data is represented or
+     * processed in SQL-related operations.
      */
-    public DataType {
-    }
+    private final boolean canHaveObject;
+    /**
+     * Represents whether a {@code DataType} strictly requires an associated object value.
+     *
+     * This field determines if it is mandatory for a data type to be paired with a non-null object
+     * when performing operations such as validation or SQL generation.
+     *
+     * For example, certain data types like {@code VARCHAR} or {@code CHAR} might require an object value
+     * for processing, whereas others like {@code BOOLEAN} or {@code INTEGER} might not.
+     */
+    private final boolean requireObject;
+    /**
+     * Represents the name of the data type. This is a mandatory identifier for a
+     * specific data type used in SQL-related operations or database interactions.
+     * The value of this field is immutable once assigned.
+     */
+    private final String name;
 
     @Override
     public String toString() {

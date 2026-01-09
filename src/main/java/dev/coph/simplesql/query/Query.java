@@ -1,5 +1,6 @@
 package dev.coph.simplesql.query;
 
+import dev.coph.simplelogger.LogLevel;
 import dev.coph.simplelogger.Logger;
 import dev.coph.simplesql.adapter.DatabaseAdapter;
 import dev.coph.simplesql.exception.RequestNotExecutableException;
@@ -29,6 +30,18 @@ import java.util.concurrent.CompletableFuture;
  * - {@code queries}: A collection of queries to be executed.<br>
  */
 public class Query {
+    /**
+     * Constructor for the Query class that initializes it with a given DatabaseAdapter instance.
+     *
+     * @param databaseAdapter the DatabaseAdapter instance to be used for database operations
+     */
+    public Query(DatabaseAdapter databaseAdapter) {
+        this.databaseAdapter = databaseAdapter;
+        this.logger = databaseAdapter.logger;
+    }
+
+    private final Logger logger;
+
     /**
      * The {@code databaseAdapter} field provides access to the underlying database connection
      * and configuration through the {@link DatabaseAdapter} class.
