@@ -92,6 +92,15 @@ public class DataType {
     public static final DataType TIME = new DataType(false, false, "TIME");
 
     /**
+     * Represents the BINARY data type, which is a fixed-length binary string.
+     */
+    private static final DataType BINARY = new DataType(true, true, "BINARY");
+    /**
+     * Represents the VARBINARY data type, which is a variable-length binary string.
+     */
+    private static final DataType VARBINARY = new DataType(true, true, "VARBINARY");
+
+    /**
      * Represents the TINYBLOB data type, which is a very small binary large object capable of storing binary data
      * up to a maximum size of 255 bytes.
      */
