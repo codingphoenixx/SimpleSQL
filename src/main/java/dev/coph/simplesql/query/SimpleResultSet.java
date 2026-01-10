@@ -31,15 +31,18 @@ public record SimpleResultSet(Query query, ResultSet resultSet) {
      * @param consumer          a functional interface to process the ResultSet when it advances to the next row
      * @param exceptionConsumer a functional interface to handle exceptions thrown by the consumer
      * @return the current SimpleResultSet instance for method chaining
-     * @throws SQLException if an SQL error occurs during result set navigation
      */
-    public SimpleResultSet next(ResultSetConsumer consumer, ExceptionConsumer exceptionConsumer) throws SQLException {
-        if (resultSet.next()) {
-            try {
-                consumer.accept(resultSet);
-            } catch (Throwable e) {
-                exceptionConsumer.accept(e);
+    public SimpleResultSet next(ResultSetConsumer consumer, ExceptionConsumer exceptionConsumer) {
+        try {
+            if (resultSet.next()) {
+                try {
+                    consumer.accept(resultSet);
+                } catch (Throwable e) {
+                    exceptionConsumer.accept(e);
+                }
             }
+        } catch (Exception e) {
+            exceptionConsumer.accept(e);
         }
         return this;
     }
@@ -70,9 +73,8 @@ public record SimpleResultSet(Query query, ResultSet resultSet) {
      * @param emptyConsumer     a functional interface to handle the case when there are no more rows in the ResultSet
      * @param exceptionConsumer a functional interface to handle exceptions thrown during result set navigation or consumer execution
      * @return the current SimpleResultSet instance for method chaining
-     * @throws SQLException if an SQL error occurs during result set navigation
      */
-    public SimpleResultSet next(ResultSetConsumer consumer, EmptyResultSetConsumer emptyConsumer, ExceptionConsumer exceptionConsumer) throws SQLException {
+    public SimpleResultSet next(ResultSetConsumer consumer, EmptyResultSetConsumer emptyConsumer, ExceptionConsumer exceptionConsumer) {
         try {
             if (resultSet.next())
                 consumer.accept(resultSet);
@@ -113,16 +115,19 @@ public record SimpleResultSet(Query query, ResultSet resultSet) {
      * @param consumer          a functional interface to process each row of the ResultSet
      * @param exceptionConsumer a functional interface to handle exceptions thrown by the consumer
      * @return the current SimpleResultSet instance for method chaining
-     * @throws SQLException if an SQL error occurs while navigating the ResultSet
      */
-    public SimpleResultSet forEach(ResultSetConsumer consumer, ExceptionConsumer exceptionConsumer) throws SQLException {
+    public SimpleResultSet forEach(ResultSetConsumer consumer, ExceptionConsumer exceptionConsumer) {
 
-        while (resultSet.next()) {
-            try {
-                consumer.accept(resultSet);
-            } catch (Exception e) {
-                exceptionConsumer.accept(e);
+        try {
+            while (resultSet.next()) {
+                try {
+                    consumer.accept(resultSet);
+                } catch (Exception e) {
+                    exceptionConsumer.accept(e);
+                }
             }
+        } catch (Exception e) {
+            exceptionConsumer.accept(e);
         }
 
         return this;
@@ -166,22 +171,23 @@ public record SimpleResultSet(Query query, ResultSet resultSet) {
      * @param exceptionConsumer a functional interface to handle exceptions thrown during result set navigation
      *                          or consumer execution
      * @return the current SimpleResultSet instance for method chaining
-     * @throws SQLException if an SQL error occurs during ResultSet navigation or consumer execution
      */
-    public SimpleResultSet forEach(ResultSetConsumer consumer, EmptyResultSetConsumer emptyConsumer, ExceptionConsumer exceptionConsumer) throws SQLException {
-        int count = 0;
-
-        while (resultSet.next()) {
-            try {
-                consumer.accept(resultSet);
-            } catch (Exception e) {
-                exceptionConsumer.accept(e);
+    public SimpleResultSet forEach(ResultSetConsumer consumer, EmptyResultSetConsumer emptyConsumer, ExceptionConsumer exceptionConsumer) {
+        try {
+            int count = 0;
+            while (resultSet.next()) {
+                try {
+                    consumer.accept(resultSet);
+                } catch (Exception e) {
+                    exceptionConsumer.accept(e);
+                }
+                count++;
             }
-            count++;
+            if (count == 0)
+                emptyConsumer.accept();
+        } catch (Exception e) {
+            exceptionConsumer.accept(e);
         }
-
-        if (count == 0)
-            emptyConsumer.accept();
         return this;
     }
 
