@@ -341,19 +341,32 @@ public class SelectQueryProvider implements QueryProvider {
      */
     private void appendLocking(StringBuilder sql, DriverType driver) {
         switch (driver) {
-            case MYSQL, MARIADB -> {
+            case MYSQL -> {
                 if (lockMode == LockMode.FOR_UPDATE) {
                     sql.append(" FOR UPDATE");
                 } else if (lockMode == LockMode.FOR_SHARE) {
                     sql.append(" FOR SHARE");
-                } else if (lockMode == LockMode.FOR_NO_KEY_UPDATE || lockMode == LockMode.FOR_KEY_SHARE) {
+                } else if (lockMode != null) {
                     throw new FeatureNotSupportedException(driver);
                 }
                 if (skipLocked) {
-                    throw new FeatureNotSupportedException(driver);
+                    sql.append(" SKIP LOCKED");
                 }
                 if (noWait) {
+                    sql.append(" NOWAIT");
+                }
+            }
+            case MARIADB -> {
+                if (lockMode == LockMode.FOR_UPDATE) {
+                    sql.append(" FOR UPDATE");
+                } else if (lockMode != null) {
                     throw new FeatureNotSupportedException(driver);
+                }
+                if (skipLocked) {
+                    sql.append(" SKIP LOCKED");
+                }
+                if (noWait) {
+                    sql.append(" NOWAIT");
                 }
             }
             case POSTGRESQL -> {
