@@ -15,11 +15,22 @@ public abstract class UpdateingQueryProvider implements QueryProvider {
 
     private int affectedRows;
 
-
+    /**
+     * Retrieves the number of rows affected by the execution of the query.
+     *
+     * @return the number of rows affected by the update operation.
+     */
     public int affectedRows() {
         return affectedRows;
     }
 
+    /**
+     * Sets the number of rows affected by the execution of the update query.
+     * This method allows chaining by returning the current instance.
+     *
+     * @param affectedRows the number of rows affected by the update operation.
+     * @return the current instance of {@code UpdateingQueryProvider}.
+     */
     public UpdateingQueryProvider affectedRows(int affectedRows) {
         this.affectedRows = affectedRows;
         return this;
