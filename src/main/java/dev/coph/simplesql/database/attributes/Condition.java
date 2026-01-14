@@ -18,6 +18,7 @@ import java.util.List;
  * configuration options and supports a fluent API style for method chaining.
  */
 public class Condition {
+    private final List<Condition> groupConditions;
     /**
      * Represents the key of a condition used in SQL queries. This key typically corresponds
      * to the column name or attribute in the database that the condition applies to.
@@ -51,9 +52,7 @@ public class Condition {
      * When set to true, it applies a logical NOT operation to the associated condition.
      */
     private boolean not = false;
-
     private boolean rawValue = false;
-
     /**
      * Represents the function to be applied during the selection of data
      * in a query. This can modify how data is processed or aggregated.
@@ -72,8 +71,6 @@ public class Condition {
      * aggregate the value associated with the condition.
      */
     private SelectFunction valueSelectFunction;
-
-    private final List<Condition> groupConditions;
 
     /**
      * Constructs a Condition object with a specified key and value.
@@ -104,9 +101,9 @@ public class Condition {
     /**
      * Constructs a Condition object with the specified type, negation flag, and list of child conditions.
      *
-     * @param type      The type of the condition. If null, the default type will be Type.AND.
-     * @param not       A flag indicating whether this condition is negated.
-     * @param children  The list of child conditions associated with this condition.
+     * @param type     The type of the condition. If null, the default type will be Type.AND.
+     * @param not      A flag indicating whether this condition is negated.
+     * @param children The list of child conditions associated with this condition.
      */
     private Condition(Type type, boolean not, List<Condition> children) {
         this.type = (type != null) ? type : Type.AND;
@@ -118,12 +115,12 @@ public class Condition {
      * Creates and returns a grouped condition by combining multiple child conditions.
      * A group condition can optionally have a logical negation applied.
      *
-     * @param type The type of the condition determining how the grouped conditions should be processed.
-     * @param not A boolean indicating whether the entire group condition should be logically negated.
+     * @param type     The type of the condition determining how the grouped conditions should be processed.
+     * @param not      A boolean indicating whether the entire group condition should be logically negated.
      * @param children A list of child conditions to be grouped. Must contain at least one condition.
      * @return A new Condition object representing the grouped condition.
      * @throws IllegalArgumentException If the provided list of child conditions is empty.
-     * @throws NullPointerException If the provided list of child conditions is null.
+     * @throws NullPointerException     If the provided list of child conditions is null.
      */
     public static Condition group(Type type, boolean not, List<Condition> children) {
         Check.ifNull(children, "children");
@@ -174,30 +171,33 @@ public class Condition {
     @Override
     public String toString() {
         Check.ifNull(key, "key");
-        Check.ifNull(value, "value");
 
         String queryKey = key;
         if (keySelectFunction != null && !keySelectFunction.equals(SelectFunction.NORMAL)) {
             queryKey = keySelectFunction.function() + "(" + key + ")";
         }
 
-        String queryValue;
-        if (operator.needToBeANumber()) {
-            queryValue = value.toString();
-            if (!(value instanceof Timestamp))
-                Check.ifNotNumber(value, "value");
-        } else {
-            if (rawValue)
+        String queryValue = null;
+
+        if (operator.hasValue()) {
+            Check.ifNull(value, "value");
+            if (operator.needToBeANumber()) {
                 queryValue = value.toString();
-            else
-                queryValue = "'" + StringEscapeUtils.escapeSql(value.toString()) + "'";
+                if (!(value instanceof Timestamp))
+                    Check.ifNotNumber(value, "value");
+            } else {
+                if (rawValue)
+                    queryValue = value.toString();
+                else
+                    queryValue = "'" + StringEscapeUtils.escapeSql(value.toString()) + "'";
+            }
+
+            if (valueSelectFunction != null && !valueSelectFunction.equals(SelectFunction.NORMAL) && queryValue != null) {
+                queryValue = valueSelectFunction.function() + "(" + queryValue + ")";
+            }
         }
 
-        if (valueSelectFunction != null && !valueSelectFunction.equals(SelectFunction.NORMAL) && queryValue != null) {
-            queryValue = valueSelectFunction.function() + "(" + queryValue + ")";
-        }
-
-        return queryKey + " " + operator.operator() + " " + queryValue;
+        return queryKey + " " + operator.operator() + (operator.hasValue() && queryValue != null ? " " + queryValue : "");
     }
 
     /**
