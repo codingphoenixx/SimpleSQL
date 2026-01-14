@@ -40,7 +40,8 @@ publishing {
     repositories {
         maven {
             name = "cophrepository"
-            url = "https://repo.coph.dev/releases"
+            url = "http://repo.coph.dev/releases"
+            allowInsecureProtocol true
             credentials(PasswordCredentials)
             authentication {
                 basic(BasicAuthentication)
