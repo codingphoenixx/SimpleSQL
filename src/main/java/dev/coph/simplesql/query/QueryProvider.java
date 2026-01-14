@@ -95,12 +95,12 @@ public interface QueryProvider {
     }
 
     /**
-     * Defines an action to be executed after a query operation.
-     * The returned RunnableAction executes a specific task that processes
-     * the result of a query operation and returns a Boolean outcome.
+     * Creates and returns a {@link RunnableAction} that will be executed after a database query operation.
+     * The action encapsulates processing logic related to the results of the query as represented by
+     * a {@link QueryResult} instance.
      *
-     * @return a RunnableAction instance that performs an action after the query
-     * operation, returning a Boolean indicating the result of the action
+     * @param <T> the type of the {@link QueryProvider} associated with the query
+     * @return a {@link RunnableAction} containing logic to process a {@link QueryResult} object
      */
     <T extends QueryProvider> RunnableAction<QueryResult<T>> actionAfterQuery();
 }

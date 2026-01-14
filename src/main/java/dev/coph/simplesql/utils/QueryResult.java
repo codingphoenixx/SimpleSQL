@@ -2,24 +2,15 @@ package dev.coph.simplesql.utils;
 
 import dev.coph.simplesql.query.QueryProvider;
 
-public class QueryResult<T extends QueryProvider> {
+/**
+ * Represents the result of executing a database query, containing the query provider
+ * responsible for generating or managing the query and a flag indicating the success
+ * of the operation.
+ *
+ * @param <T> the type of the query provider, which must extend {@link QueryProvider}
+ * @param queryProvider the query provider associated with this result
+ * @param success a boolean indicating whether the query execution was successful
+ */
+public record QueryResult<T extends QueryProvider>(T queryProvider, boolean success) {
 
-    private final T queryProvider;
-    private final boolean success;
-
-
-    public QueryResult(T queryProvider, boolean success) {
-        this.queryProvider = queryProvider;
-        this.success = success;
-    }
-
-
-
-    public boolean success() {
-        return success;
-    }
-
-    public T queryProvider() {
-        return queryProvider;
-    }
 }
