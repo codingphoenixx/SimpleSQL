@@ -5,11 +5,12 @@ plugins {
 }
 
 group = 'dev.coph'
-version = '4.0.1'
+version = '4.1.1'
 
 repositories {
     maven {
-        url = uri("https://repo.coph.dev/releases")
+        url = uri("http://repo.coph.dev/releases")
+        allowInsecureProtocol true
     }
 
     mavenCentral()

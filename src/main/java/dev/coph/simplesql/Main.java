@@ -72,7 +72,6 @@ public class Main {
 //      - TableAlterQueryProviders
 
 //TODO:  DELETE Where in
-//TODO:  FOREIGN KEY
 //TODO:  SQL-Operators: WHERE, GROUP BY, HAVING, OFFSET, UNION/UNION ALL, LIKE, BETWEEN, IN
 //TODO:  User administration: CREATE USER, GRANT, REVOKE
 //TODO:  CREATE TRIGGER

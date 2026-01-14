@@ -5,6 +5,7 @@ import dev.coph.simplesql.driver.DriverType;
 import dev.coph.simplesql.exception.FeatureNotSupportedException;
 import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.utils.DatabaseCheck;
+import dev.coph.simplesql.utils.QueryResult;
 import dev.coph.simpleutilities.action.RunnableAction;
 import dev.coph.simpleutilities.check.Check;
 
@@ -35,7 +36,7 @@ public class TableAlterForeignKeyQueryProvider extends TableAlterQueryProvider {
     private ReferentialAction onUpdate;
     private DeferrableType deferrable;
     private InitiallyDeferrable initiallyDeferred;
-    private RunnableAction<Boolean> actionAfterQuery;
+    private RunnableAction<QueryResult<TableAlterForeignKeyQueryProvider>> actionAfterQuery;
 
     @Override
     public String getAlterTableString(Query query) {
@@ -359,13 +360,13 @@ public class TableAlterForeignKeyQueryProvider extends TableAlterQueryProvider {
      *                         the action to execute after the query
      * @return the current instance of TableAlterForeignKeyQueryProvider for method chaining
      */
-    public TableAlterForeignKeyQueryProvider actionAfterQuery(RunnableAction<Boolean> actionAfterQuery) {
+    public TableAlterForeignKeyQueryProvider actionAfterQuery(RunnableAction<QueryResult<TableAlterForeignKeyQueryProvider>> actionAfterQuery) {
         this.actionAfterQuery = actionAfterQuery;
         return this;
     }
 
     @Override
-    public RunnableAction<Boolean> actionAfterQuery() {
+    public RunnableAction<QueryResult<TableAlterForeignKeyQueryProvider>> actionAfterQuery() {
         return actionAfterQuery;
     }
 

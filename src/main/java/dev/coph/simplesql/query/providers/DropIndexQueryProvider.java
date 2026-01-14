@@ -7,6 +7,7 @@ import dev.coph.simplesql.exception.FeatureNotSupportedException;
 import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.query.QueryProvider;
 import dev.coph.simplesql.utils.DatabaseCheck;
+import dev.coph.simplesql.utils.QueryResult;
 import dev.coph.simpleutilities.action.RunnableAction;
 import dev.coph.simpleutilities.check.Check;
 
@@ -33,7 +34,7 @@ public class DropIndexQueryProvider implements QueryProvider {
     private boolean concurrently;
     private DropBehaviour behaviour;
 
-    private RunnableAction<Boolean> actionAfterQuery;
+    private RunnableAction<QueryResult<DropIndexQueryProvider>> actionAfterQuery;
 
     @Override
     public DriverCompatibility compatibility() {
@@ -98,7 +99,7 @@ public class DropIndexQueryProvider implements QueryProvider {
 
 
     @Override
-    public RunnableAction<Boolean> actionAfterQuery() {
+    public RunnableAction<QueryResult<DropIndexQueryProvider>> actionAfterQuery() {
         return actionAfterQuery;
     }
 
@@ -109,7 +110,7 @@ public class DropIndexQueryProvider implements QueryProvider {
      *                         where the {@code Boolean} parameter indicates the success or failure of the query
      * @return the {@code DropIndexQueryProvider} instance, allowing for method chaining
      */
-    public DropIndexQueryProvider actionAfterQuery(RunnableAction<Boolean> actionAfterQuery) {
+    public DropIndexQueryProvider actionAfterQuery(RunnableAction<QueryResult<DropIndexQueryProvider>> actionAfterQuery) {
         this.actionAfterQuery = actionAfterQuery;
         return this;
     }

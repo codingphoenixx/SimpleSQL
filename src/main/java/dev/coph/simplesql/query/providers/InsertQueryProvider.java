@@ -6,6 +6,8 @@ import dev.coph.simplesql.driver.DriverType;
 import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.query.QueryEntry;
 import dev.coph.simplesql.query.QueryProvider;
+import dev.coph.simplesql.query.UpdateingQueryProvider;
+import dev.coph.simplesql.utils.QueryResult;
 import dev.coph.simpleutilities.action.RunnableAction;
 import dev.coph.simpleutilities.check.Check;
 
@@ -18,13 +20,13 @@ import java.util.StringJoiner;
  * It implements the {@code QueryProvider} interface, allowing for customizable
  * and parameterized query generation based on different database adapter types.
  */
-public class InsertQueryProvider implements QueryProvider {
+public class InsertQueryProvider extends UpdateingQueryProvider {
 
     private String table;
 
     private List<QueryEntry> entries;
 
-    private RunnableAction<Boolean> actionAfterQuery;
+    private RunnableAction<QueryResult<InsertQueryProvider>> actionAfterQuery;
 
     private InsertMethode insertMethode = InsertMethode.INSERT;
     private List<String> conflictColumns;
@@ -53,7 +55,7 @@ public class InsertQueryProvider implements QueryProvider {
      *                         where the Boolean parameter represents the success or failure of the query
      * @return the current {@code InsertQueryProvider} instance for method chaining
      */
-    public InsertQueryProvider actionAfterQuery(RunnableAction<Boolean> actionAfterQuery) {
+    public InsertQueryProvider actionAfterQuery(RunnableAction<QueryResult<InsertQueryProvider>> actionAfterQuery) {
         this.actionAfterQuery = actionAfterQuery;
         return this;
     }
@@ -145,7 +147,7 @@ public class InsertQueryProvider implements QueryProvider {
     }
 
     @Override
-    public RunnableAction<Boolean> actionAfterQuery() {
+    public RunnableAction<QueryResult<InsertQueryProvider>> actionAfterQuery() {
         return actionAfterQuery;
     }
 

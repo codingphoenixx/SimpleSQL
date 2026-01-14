@@ -8,6 +8,7 @@ import dev.coph.simplesql.exception.FeatureNotSupportedException;
 import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.query.QueryProvider;
 import dev.coph.simplesql.utils.DatabaseCheck;
+import dev.coph.simplesql.utils.QueryResult;
 import dev.coph.simpleutilities.action.RunnableAction;
 import dev.coph.simpleutilities.check.Check;
 
@@ -34,7 +35,7 @@ public class DatabaseCreateQueryProvider implements QueryProvider {
     private String lcCtype;
 
 
-    private RunnableAction<Boolean> actionAfterQuery;
+    private RunnableAction<QueryResult<DatabaseCreateQueryProvider>> actionAfterQuery;
 
     @Override
     public DriverCompatibility compatibility() {
@@ -194,13 +195,13 @@ public class DatabaseCreateQueryProvider implements QueryProvider {
      * @return the current instance of {@code DatabaseCreateQueryProvider} to allow
      * for method chaining.
      */
-    public DatabaseCreateQueryProvider actionAfterQuery(RunnableAction<Boolean> actionAfterQuery) {
+    public DatabaseCreateQueryProvider actionAfterQuery(RunnableAction<QueryResult<DatabaseCreateQueryProvider>> actionAfterQuery) {
         this.actionAfterQuery = actionAfterQuery;
         return this;
     }
 
     @Override
-    public RunnableAction<Boolean> actionAfterQuery() {
+    public RunnableAction<QueryResult<DatabaseCreateQueryProvider>> actionAfterQuery() {
         return actionAfterQuery;
     }
 

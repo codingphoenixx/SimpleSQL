@@ -4,11 +4,11 @@ import dev.coph.simplelogger.Logger;
 import dev.coph.simplesql.adapter.DatabaseAdapter;
 import dev.coph.simplesql.exception.RequestNotExecutableException;
 import dev.coph.simplesql.query.providers.*;
+import dev.coph.simplesql.utils.QueryResult;
 import dev.coph.simpleutilities.check.Check;
 
-import java.sql.Connection;
-import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.*;
 import java.util.concurrent.CompletableFuture;
 
@@ -391,15 +391,15 @@ public class Query {
             throw new IllegalStateException("The connection to the database was not established");
         }
 
-        try (Connection connection = databaseAdapter.dataSource().getConnection()) {
-            boolean originalAutoCommit = connection.getAutoCommit();
+        try (var connection = databaseAdapter.dataSource().getConnection()) {
+            var originalAutoCommit = connection.getAutoCommit();
             if (useTransaction)
                 connection.setAutoCommit(false);
             succeeded = false;
 
             try {
                 if (queries.size() == 1) {
-                    QueryProvider queryProvider = queries.get(0);
+                    var queryProvider = queries.get(0);
                     if (!queryProvider.compatibility().isCompatible(databaseAdapter.driverType())) {
                         throw new UnsupportedOperationException(
                                 "The current request is not supported by the database driver. Failing request. " +
@@ -407,7 +407,7 @@ public class Query {
                         );
                     }
 
-                    String sql = queryProvider.generateSQLString(this);
+                    var sql = queryProvider.generateSQLString(this);
                     if (sql == null) {
                         logger.error("Generated SQL-String is null. Canceling request");
                         if (useTransaction)
@@ -420,16 +420,17 @@ public class Query {
                         logger.debug("Executing query: " + sql);
 
                         if (queryProvider instanceof SelectQueryProvider selectRequest) {
-                            try (ResultSet rs = ps.executeQuery()) {
-                                SimpleResultSet srs = new SimpleResultSet(this, rs);
+                            try (var rs = ps.executeQuery()) {
+                                var srs = new SimpleResultSet(this, rs);
                                 selectRequest.simpleResultSet(srs);
                                 succeeded = true;
                                 if (selectRequest.resultActionAfterQuery() != null) {
                                     selectRequest.resultActionAfterQuery().run(srs);
                                 }
                             }
-                        } else if (queryProvider instanceof UpdateQueryProvider) {
-                            ps.executeUpdate();
+                        } else if (queryProvider instanceof UpdateingQueryProvider updateingQueryProvider) {
+                            var updated = ps.executeUpdate();
+                            updateingQueryProvider.affectedRows(updated);
                             succeeded = true;
                         } else {
                             ps.execute();
@@ -441,23 +442,14 @@ public class Query {
                     }
 
                     if (queryProvider.actionAfterQuery() != null) {
-                        queryProvider.actionAfterQuery().run(succeeded);
+                        queryProvider.actionAfterQuery().run(new QueryResult(queryProvider, succeeded));
                     }
 
                 } else {
-                    class Bucket {
-                        final String sql;
-                        final List<QueryProvider> providers = new ArrayList<>();
-
-                        Bucket(String sql) {
-                            this.sql = sql;
-                        }
-                    }
-
-                    Map<String, Bucket> batchBuckets = new LinkedHashMap<>();
+                    Map<String, QueryBucket> batchBuckets = new LinkedHashMap<>();
                     List<QueryProvider> selectProviders = new ArrayList<>();
 
-                    for (QueryProvider qp : queries) {
+                    for (var qp : queries) {
                         try {
                             if (!qp.compatibility().isCompatible(databaseAdapter.driverType())) {
                                 throw new UnsupportedOperationException(
@@ -465,87 +457,106 @@ public class Query {
                                                 "Please check the documentation for supported database operations and try again with a compatible request."
                                 );
                             }
-                            String sql = qp.generateSQLString(this);
+                            var sql = qp.generateSQLString(this);
                             if (sql == null) {
                                 logger.debug("Generated SQL-String is null. Ignoring request.");
-                                if (qp.actionAfterQuery() != null) qp.actionAfterQuery().run(false);
+                                if (qp.actionAfterQuery() != null)
+                                    qp.actionAfterQuery().run(new QueryResult(qp, false));
                                 continue;
                             }
 
                             if (qp instanceof SelectQueryProvider) {
                                 selectProviders.add(qp);
                             } else {
-                                batchBuckets.computeIfAbsent(sql, Bucket::new).providers.add(qp);
+                                batchBuckets.computeIfAbsent(sql, QueryBucket::new).providers.add(qp);
                             }
                         } catch (Exception e) {
                             logger.error("Failed to generate SQL for query: " + qp, e);
                             if (qp.actionAfterQuery() != null) {
-                                qp.actionAfterQuery().run(false);
+                                qp.actionAfterQuery().run(new QueryResult(qp, false));
                             }
                         }
                     }
 
-                    boolean allOk = true;
+                    var allOk = true;
 
-                    for (Bucket bucket : batchBuckets.values()) {
-                        String sql = bucket.sql;
+                    for (var bucket : batchBuckets.values()) {
+                        var sql = bucket.sql;
                         logger.debug("Executing batch for SQL: " + sql + " with size " + bucket.providers.size());
                         try (var ps = connection.prepareStatement(sql)) {
-                            for (QueryProvider qp : bucket.providers) {
+                            for (var qp : bucket.providers) {
                                 try {
                                     qp.bindParameters(ps);
                                     ps.addBatch();
                                 } catch (Exception e) {
                                     logger.error("Failed to bind parameters for query: " + qp, e);
                                     allOk = false;
-                                    if (qp.actionAfterQuery() != null) qp.actionAfterQuery().run(false);
+                                    if (qp.actionAfterQuery() != null)
+                                        qp.actionAfterQuery().run(new QueryResult(qp, false));
                                 }
                             }
                             try {
-                                ps.executeBatch();
-                                for (QueryProvider qp : bucket.providers) {
-                                    if (qp.actionAfterQuery() != null) qp.actionAfterQuery().run(true);
+                                var idx = 0;
+                                var results = ps.executeBatch();
+                                for (var qp : bucket.providers) {
+                                    var affected = -1;
+                                    if (idx < results.length) {
+                                        affected = results[idx];
+                                    }
+                                    boolean success = affected != java.sql.Statement.EXECUTE_FAILED;
+                                    if (qp instanceof UpdateingQueryProvider updateingQueryProvider) {
+                                        int affectedRows =
+                                                (affected == Statement.SUCCESS_NO_INFO) ? -1 : affected;
+                                        updateingQueryProvider.affectedRows(affectedRows);
+                                    }
+
+                                    if (qp.actionAfterQuery() != null)
+                                        qp.actionAfterQuery().run(new QueryResult(qp, success));
+
+                                    idx++;
                                 }
                             } catch (SQLException e) {
                                 logger.error("Failed to execute batch for SQL: " + sql, e);
                                 allOk = false;
-                                for (QueryProvider qp : bucket.providers) {
-                                    if (qp.actionAfterQuery() != null) qp.actionAfterQuery().run(false);
+                                for (var qp : bucket.providers) {
+                                    if (qp.actionAfterQuery() != null)
+                                        qp.actionAfterQuery().run(new QueryResult(qp, false));
                                 }
                             }
                         } catch (SQLException e) {
                             logger.error("Failed to prepare batch for SQL: " + sql, e);
                             allOk = false;
-                            for (QueryProvider qp : bucket.providers) {
-                                if (qp.actionAfterQuery() != null) qp.actionAfterQuery().run(false);
+                            for (var qp : bucket.providers) {
+                                if (qp.actionAfterQuery() != null)
+                                    qp.actionAfterQuery().run(new QueryResult(qp, false));
                             }
                         }
                     }
 
-                    for (QueryProvider qp : selectProviders) {
-                        String sql = qp.generateSQLString(this);
+                    for (var qp : selectProviders) {
+                        var sql = qp.generateSQLString(this);
                         if (sql == null) {
                             logger.warn("Generated SQL-String is null. Ignoring request.");
-                            if (qp.actionAfterQuery() != null) qp.actionAfterQuery().run(false);
+                            if (qp.actionAfterQuery() != null) qp.actionAfterQuery().run(new QueryResult(qp, false));
                             allOk = false;
                             continue;
                         }
                         logger.debug("Executing query: " + sql);
                         try (var ps = connection.prepareStatement(sql)) {
                             qp.bindParameters(ps);
-                            SelectQueryProvider select = (SelectQueryProvider) qp;
-                            try (ResultSet rs = ps.executeQuery()) {
-                                SimpleResultSet srs = new SimpleResultSet(this, rs);
+                            var select = (SelectQueryProvider) qp;
+                            try (var rs = ps.executeQuery()) {
+                                var srs = new SimpleResultSet(this, rs);
                                 select.simpleResultSet(srs);
                                 if (select.resultActionAfterQuery() != null) {
                                     select.resultActionAfterQuery().run(srs);
                                 }
-                                if (qp.actionAfterQuery() != null) qp.actionAfterQuery().run(true);
+                                if (qp.actionAfterQuery() != null) qp.actionAfterQuery().run(new QueryResult(qp, true));
                             }
                         } catch (Exception e) {
                             logger.error("Failed to execute query: " + sql, e);
                             allOk = false;
-                            if (qp.actionAfterQuery() != null) qp.actionAfterQuery().run(false);
+                            if (qp.actionAfterQuery() != null) qp.actionAfterQuery().run(new QueryResult(qp, false));
                         }
                     }
 
@@ -683,7 +694,19 @@ public class Query {
      * @return true if the operation succeeded, false otherwise
      */
     public boolean succeeded() {
-        return this.succeeded;
+        return this.executed && this.succeeded;
+    }
+
+    /**
+     * Determines whether an operation has not succeeded.
+     * The method checks if the operation was either not executed
+     * or if it was executed but did not succeed.
+     *
+     * @return true if the operation was not executed or if it did not succeed;
+     *         false otherwise.
+     */
+    public boolean notSucceeded(){
+        return !executed || !succeeded;
     }
 
     /**

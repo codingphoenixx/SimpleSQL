@@ -8,6 +8,7 @@ import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.query.QueryProvider;
 import dev.coph.simplesql.query.SimpleResultSet;
 import dev.coph.simplesql.utils.DatabaseCheck;
+import dev.coph.simplesql.utils.QueryResult;
 import dev.coph.simpleutilities.action.RunnableAction;
 import dev.coph.simpleutilities.check.Check;
 
@@ -40,7 +41,7 @@ public class SelectQueryProvider implements QueryProvider {
 
     private Group group;
     private RunnableAction<SimpleResultSet> resultActionAfterQuery;
-    private RunnableAction<Boolean> actionAfterQuery;
+    private RunnableAction<QueryResult<SelectQueryProvider>> actionAfterQuery;
     private SimpleResultSet simpleResultSet;
     private List<Object> boundParams = List.of();
 
@@ -133,7 +134,7 @@ public class SelectQueryProvider implements QueryProvider {
     }
 
     @Override
-    public RunnableAction<Boolean> actionAfterQuery() {
+    public RunnableAction<QueryResult<SelectQueryProvider>> actionAfterQuery() {
         return actionAfterQuery;
     }
 
@@ -381,7 +382,7 @@ public class SelectQueryProvider implements QueryProvider {
      *                         parameter indicating the success or failure of the query execution.
      * @return the current {@code SelectQueryProvider} instance for method chaining.
      */
-    public SelectQueryProvider actionAfterQuery(RunnableAction<Boolean> actionAfterQuery) {
+    public SelectQueryProvider actionAfterQuery(RunnableAction<QueryResult<SelectQueryProvider>> actionAfterQuery) {
         this.actionAfterQuery = actionAfterQuery;
         return this;
     }

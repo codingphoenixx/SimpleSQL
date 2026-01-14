@@ -9,6 +9,7 @@ import dev.coph.simplesql.driver.DriverType;
 import dev.coph.simplesql.exception.FeatureNotSupportedException;
 import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.utils.DatabaseCheck;
+import dev.coph.simplesql.utils.QueryResult;
 import dev.coph.simpleutilities.action.RunnableAction;
 import dev.coph.simpleutilities.check.Check;
 
@@ -40,7 +41,7 @@ public class TableAlterAddColumnQueryProvider extends TableAlterQueryProvider {
     private CreateMethode createMethode = CreateMethode.DEFAULT;
     private Column column;
 
-    private RunnableAction<Boolean> actionAfterQuery;
+    private RunnableAction<QueryResult<TableAlterAddColumnQueryProvider>> actionAfterQuery;
 
     @Override
     public String getAlterTableString(Query query) {
@@ -284,13 +285,13 @@ public class TableAlterAddColumnQueryProvider extends TableAlterQueryProvider {
      *                         that processes a {@code Boolean} result
      * @return the instance of {@code TableAlterAddColumnQueryProvider} for method chaining
      */
-    public TableAlterAddColumnQueryProvider actionAfterQuery(RunnableAction<Boolean> actionAfterQuery) {
+    public TableAlterAddColumnQueryProvider actionAfterQuery(RunnableAction<QueryResult<TableAlterAddColumnQueryProvider>> actionAfterQuery) {
         this.actionAfterQuery = actionAfterQuery;
         return this;
     }
 
     @Override
-    public RunnableAction<Boolean> actionAfterQuery() {
+    public RunnableAction<QueryResult<TableAlterAddColumnQueryProvider>> actionAfterQuery() {
         return actionAfterQuery;
     }
 }

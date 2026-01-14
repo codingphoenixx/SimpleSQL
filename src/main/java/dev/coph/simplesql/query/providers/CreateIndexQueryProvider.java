@@ -9,6 +9,7 @@ import dev.coph.simplesql.exception.FeatureNotSupportedException;
 import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.query.QueryProvider;
 import dev.coph.simplesql.utils.DatabaseCheck;
+import dev.coph.simplesql.utils.QueryResult;
 import dev.coph.simpleutilities.action.RunnableAction;
 import dev.coph.simpleutilities.check.Check;
 
@@ -35,7 +36,7 @@ public class CreateIndexQueryProvider implements QueryProvider {
     private Method method;
     private boolean concurrently;
     private List<String> includeColumns;
-    private RunnableAction<Boolean> actionAfterQuery;
+    private RunnableAction<QueryResult<CreateIndexQueryProvider>> actionAfterQuery;
     private List<Object> boundParams = List.of();
 
     @Override
@@ -236,7 +237,7 @@ public class CreateIndexQueryProvider implements QueryProvider {
     }
 
     @Override
-    public RunnableAction<Boolean> actionAfterQuery() {
+    public RunnableAction<QueryResult<CreateIndexQueryProvider>> actionAfterQuery() {
         return actionAfterQuery;
     }
 
@@ -249,7 +250,7 @@ public class CreateIndexQueryProvider implements QueryProvider {
      *                         validation, or custom processing logic.
      * @return the current {@code CreateIndexQueryProvider} instance to allow method chaining.
      */
-    public CreateIndexQueryProvider actionAfterQuery(RunnableAction<Boolean> actionAfterQuery) {
+    public CreateIndexQueryProvider actionAfterQuery(RunnableAction<QueryResult<CreateIndexQueryProvider>> actionAfterQuery) {
         this.actionAfterQuery = actionAfterQuery;
         return this;
     }

@@ -4,6 +4,7 @@ import dev.coph.simplesql.driver.DriverType;
 import dev.coph.simplesql.exception.FeatureNotSupportedException;
 import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.utils.DatabaseCheck;
+import dev.coph.simplesql.utils.QueryResult;
 import dev.coph.simpleutilities.action.RunnableAction;
 import dev.coph.simpleutilities.check.Check;
 
@@ -25,7 +26,7 @@ public class TableAlterDropColumnQueryProvider extends TableAlterQueryProvider {
     private DropType dropType;
     private String dropObjectName;
     private String constraintName;
-    private RunnableAction<Boolean> actionAfterQuery;
+    private RunnableAction<QueryResult<TableAlterDropColumnQueryProvider>> actionAfterQuery;
 
     @Override
     public String getAlterTableString(Query query) {
@@ -155,13 +156,13 @@ public class TableAlterDropColumnQueryProvider extends TableAlterQueryProvider {
      * @return the current instance of {@code TableAlterDropColumnQueryProvider}
      * for method chaining
      */
-    public TableAlterDropColumnQueryProvider actionAfterQuery(RunnableAction<Boolean> actionAfterQuery) {
+    public TableAlterDropColumnQueryProvider actionAfterQuery(RunnableAction<QueryResult<TableAlterDropColumnQueryProvider>> actionAfterQuery) {
         this.actionAfterQuery = actionAfterQuery;
         return this;
     }
 
     @Override
-    public RunnableAction<Boolean> actionAfterQuery() {
+    public RunnableAction<QueryResult<TableAlterDropColumnQueryProvider>> actionAfterQuery() {
         return actionAfterQuery;
     }
 

@@ -6,6 +6,7 @@ import dev.coph.simplesql.driver.DriverType;
 import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.query.QueryProvider;
 import dev.coph.simplesql.utils.DatabaseCheck;
+import dev.coph.simplesql.utils.QueryResult;
 import dev.coph.simpleutilities.action.RunnableAction;
 import dev.coph.simpleutilities.check.Check;
 
@@ -21,7 +22,7 @@ public class DatabaseDropQueryProvider implements QueryProvider {
 
     private DeleteMethode deleteMethode = DeleteMethode.DEFAULT;
 
-    private RunnableAction<Boolean> actionAfterQuery;
+    private RunnableAction<QueryResult<DatabaseDropQueryProvider>> actionAfterQuery;
 
 
     @Override
@@ -55,7 +56,7 @@ public class DatabaseDropQueryProvider implements QueryProvider {
 
 
     @Override
-    public RunnableAction<Boolean> actionAfterQuery() {
+    public RunnableAction<QueryResult<DatabaseDropQueryProvider>> actionAfterQuery() {
         return actionAfterQuery;
     }
 
@@ -66,7 +67,7 @@ public class DatabaseDropQueryProvider implements QueryProvider {
      *                         where the Boolean parameter represents the success or failure of the query
      * @return the current instance of {@code DatabaseDropQueryProvider} for method chaining
      */
-    public DatabaseDropQueryProvider actionAfterQuery(RunnableAction<Boolean> actionAfterQuery) {
+    public DatabaseDropQueryProvider actionAfterQuery(RunnableAction<QueryResult<DatabaseDropQueryProvider>> actionAfterQuery) {
         this.actionAfterQuery = actionAfterQuery;
         return this;
     }

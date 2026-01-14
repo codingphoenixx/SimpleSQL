@@ -9,7 +9,9 @@ import dev.coph.simplesql.driver.DriverType;
 import dev.coph.simplesql.exception.FeatureNotSupportedException;
 import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.query.QueryProvider;
+import dev.coph.simplesql.query.UpdateingQueryProvider;
 import dev.coph.simplesql.utils.DatabaseCheck;
+import dev.coph.simplesql.utils.QueryResult;
 import dev.coph.simpleutilities.action.RunnableAction;
 import dev.coph.simpleutilities.check.Check;
 
@@ -24,14 +26,14 @@ import java.util.*;
  * to configure various aspects of the query. It also provides compatibility checks for
  * database drivers as well as support for generating parameterized SQL query strings.
  */
-public class DeleteQueryProvider implements QueryProvider {
+public class DeleteQueryProvider extends UpdateingQueryProvider {
 
     private String table;
     private Order order;
     private LinkedHashSet<Condition> conditions;
     private Limit limit;
 
-    private RunnableAction<Boolean> actionAfterQuery;
+    private RunnableAction<QueryResult<DeleteQueryProvider>> actionAfterQuery;
 
     private List<Object> boundParams = List.of();
 
@@ -138,7 +140,7 @@ public class DeleteQueryProvider implements QueryProvider {
     }
 
     @Override
-    public RunnableAction<Boolean> actionAfterQuery() {
+    public RunnableAction<QueryResult<DeleteQueryProvider>> actionAfterQuery() {
         return actionAfterQuery;
     }
 
@@ -149,7 +151,7 @@ public class DeleteQueryProvider implements QueryProvider {
      *                         where the Boolean parameter represents the success or failure of the query
      * @return the current {@code DeleteQueryProvider} instance for method chaining
      */
-    public DeleteQueryProvider actionAfterQuery(RunnableAction<Boolean> actionAfterQuery) {
+    public DeleteQueryProvider actionAfterQuery(RunnableAction<QueryResult<DeleteQueryProvider>> actionAfterQuery) {
         this.actionAfterQuery = actionAfterQuery;
         return this;
     }

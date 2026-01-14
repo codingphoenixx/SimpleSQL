@@ -4,6 +4,7 @@ import dev.coph.simplesql.database.attributes.ActionType;
 import dev.coph.simplesql.exception.FeatureNotSupportedException;
 import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.utils.DatabaseCheck;
+import dev.coph.simplesql.utils.QueryResult;
 import dev.coph.simpleutilities.action.RunnableAction;
 import dev.coph.simpleutilities.check.Check;
 
@@ -22,7 +23,7 @@ public class TableAlterColumnDefaultValueQueryProvider extends TableAlterQueryPr
     private String columnName;
     private ActionType action;
     private Object defaultValue;
-    private RunnableAction<Boolean> actionAfterQuery;
+    private RunnableAction<QueryResult<TableAlterColumnDefaultValueQueryProvider>> actionAfterQuery;
 
     private List<Object> boundParams = List.of();
 
@@ -153,13 +154,13 @@ public class TableAlterColumnDefaultValueQueryProvider extends TableAlterQueryPr
      * to allow for method chaining
      */
     public TableAlterColumnDefaultValueQueryProvider actionAfterQuery(
-            RunnableAction<Boolean> actionAfterQuery) {
+            RunnableAction<QueryResult<TableAlterColumnDefaultValueQueryProvider>> actionAfterQuery) {
         this.actionAfterQuery = actionAfterQuery;
         return this;
     }
 
     @Override
-    public RunnableAction<Boolean> actionAfterQuery() {
+    public RunnableAction<QueryResult<TableAlterColumnDefaultValueQueryProvider>> actionAfterQuery() {
         return actionAfterQuery;
     }
 }

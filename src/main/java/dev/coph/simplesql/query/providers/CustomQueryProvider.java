@@ -3,6 +3,7 @@ package dev.coph.simplesql.query.providers;
 import dev.coph.simplesql.driver.DriverCompatibility;
 import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.query.QueryProvider;
+import dev.coph.simplesql.utils.QueryResult;
 import dev.coph.simpleutilities.action.RunnableAction;
 
 /**
@@ -14,7 +15,7 @@ import dev.coph.simpleutilities.action.RunnableAction;
 public class CustomQueryProvider implements QueryProvider {
 
     private final String sql;
-    private RunnableAction<Boolean> actionAfterQuery;
+    private RunnableAction<QueryResult<CustomQueryProvider>> actionAfterQuery;
 
     /**
      * Constructs a CustomQueryProvider with the specified SQL string.
@@ -36,7 +37,7 @@ public class CustomQueryProvider implements QueryProvider {
     }
 
     @Override
-    public RunnableAction<Boolean> actionAfterQuery() {
+    public RunnableAction<QueryResult<CustomQueryProvider>> actionAfterQuery() {
         return actionAfterQuery;
     }
 
@@ -46,7 +47,7 @@ public class CustomQueryProvider implements QueryProvider {
      * @param actionAfterQuery the {@code RunnableAction<Boolean>} to be executed post-query,
      *                         where the Boolean parameter represents the success or failure of the query
      */
-    public void actionAfterQuery(RunnableAction<Boolean> actionAfterQuery) {
+    public void actionAfterQuery(RunnableAction<QueryResult<CustomQueryProvider>> actionAfterQuery) {
         this.actionAfterQuery = actionAfterQuery;
     }
 }

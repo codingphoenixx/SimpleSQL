@@ -47,28 +47,16 @@ public class InsertRequestTest implements Test {
         var insert = Query.insert()
                 .table("test")
                 .entry(COLUMN_NAME, COLUMN_VALUE)
-                .actionAfterQuery(success -> {
-                    if (!success) {
+                .actionAfterQuery(result -> {
+                    if (!result.success()) {
                         logger.debug("Not succeeded");
                     }
+                    ref.succeeded = result.queryProvider().affectedRows() == 1;
                 });
         Query query = new Query(databaseAdapter).executeQuery(insert);
 
-        if (!query.succeeded())
+        if (query.notSucceeded())
             return false;
-
-        SelectQueryProvider select = Query.select()
-                .table("test")
-                .resultActionAfterQuery(srs -> {
-                    if (!srs.resultSet().next()) {
-                        return;
-                    }
-                    int value = srs.resultSet().getInt(COLUMN_NAME);
-                    if (value == COLUMN_VALUE) {
-                        ref.succeeded = true;
-                    }
-                });
-        query = new Query(databaseAdapter).executeQuery(select);
 
         return ref.succeeded;
     }

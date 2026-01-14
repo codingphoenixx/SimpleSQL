@@ -7,6 +7,7 @@ import dev.coph.simplesql.exception.FeatureNotSupportedException;
 import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.query.QueryProvider;
 import dev.coph.simplesql.utils.DatabaseCheck;
+import dev.coph.simplesql.utils.QueryResult;
 import dev.coph.simpleutilities.action.RunnableAction;
 import dev.coph.simpleutilities.check.Check;
 
@@ -19,7 +20,7 @@ import dev.coph.simpleutilities.check.Check;
 public class TruncateQueryProvider implements QueryProvider {
 
     private String table;
-    private RunnableAction<Boolean> actionAfterQuery;
+    private RunnableAction<QueryResult<TruncateQueryProvider>> actionAfterQuery;
     private IdentityMode identityMode;
     private DropBehaviour behaviour = DropBehaviour.NONE;
 
@@ -117,13 +118,13 @@ public class TruncateQueryProvider implements QueryProvider {
      *                         a {@code RunnableAction<Boolean>}
      * @return the current instance of {@code TruncateQueryProvider} for method chaining
      */
-    public TruncateQueryProvider actionAfterQuery(RunnableAction<Boolean> actionAfterQuery) {
+    public TruncateQueryProvider actionAfterQuery(RunnableAction<QueryResult<TruncateQueryProvider>> actionAfterQuery) {
         this.actionAfterQuery = actionAfterQuery;
         return this;
     }
 
     @Override
-    public RunnableAction<Boolean> actionAfterQuery() {
+    public RunnableAction<QueryResult<TruncateQueryProvider>> actionAfterQuery() {
         return actionAfterQuery;
     }
 

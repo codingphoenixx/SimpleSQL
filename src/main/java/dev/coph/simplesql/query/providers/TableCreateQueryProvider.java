@@ -8,6 +8,7 @@ import dev.coph.simplesql.driver.DriverType;
 import dev.coph.simplesql.query.Query;
 import dev.coph.simplesql.query.QueryProvider;
 import dev.coph.simplesql.utils.DatabaseCheck;
+import dev.coph.simplesql.utils.QueryResult;
 import dev.coph.simpleutilities.action.RunnableAction;
 import dev.coph.simpleutilities.check.Check;
 
@@ -29,7 +30,7 @@ public class TableCreateQueryProvider implements QueryProvider {
 
     private CreateMethode createMethode = CreateMethode.DEFAULT;
 
-    private RunnableAction<Boolean> actionAfterQuery;
+    private RunnableAction<QueryResult<TableCreateQueryProvider>> actionAfterQuery;
 
     private boolean temporary;
     private String tableComment;
@@ -143,9 +144,9 @@ public class TableCreateQueryProvider implements QueryProvider {
                         String idxName = ix.name() != null ? ix.name() : ("idx_" + table + "_" + String.join("_", ix.columns()));
                         String ddl = "CREATE " + (ix.unique() ? "UNIQUE " : "") + "INDEX IF NOT EXISTS "
                                 + idxName + " ON " + table + " (" + String.join(", ", ix.columns()) + ");";
-                        RunnableAction<Boolean> prev = actionAfterQuery;
-                        actionAfterQuery = (success) -> {
-                            prev.run(success);
+                        RunnableAction<QueryResult<TableCreateQueryProvider>> prev = actionAfterQuery;
+                        actionAfterQuery = (queryResult) -> {
+                            prev.run(queryResult);
                             new Query(query.databaseAdapter()).useTransaction(false).executeQuery(new CustomQueryProvider(ddl));
                         };
                     }
@@ -487,13 +488,13 @@ public class TableCreateQueryProvider implements QueryProvider {
      *                         indicating the result of the query operation
      * @return the instance of TableCreateQueryProvider for method chaining
      */
-    public TableCreateQueryProvider actionAfterQuery(RunnableAction<Boolean> actionAfterQuery) {
+    public TableCreateQueryProvider actionAfterQuery(RunnableAction<QueryResult<TableCreateQueryProvider>> actionAfterQuery) {
         this.actionAfterQuery = actionAfterQuery;
         return this;
     }
 
     @Override
-    public RunnableAction<Boolean> actionAfterQuery() {
+    public RunnableAction<QueryResult<TableCreateQueryProvider>> actionAfterQuery() {
         return actionAfterQuery;
     }
 

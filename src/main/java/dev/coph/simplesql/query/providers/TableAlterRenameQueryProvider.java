@@ -2,6 +2,7 @@ package dev.coph.simplesql.query.providers;
 
 import dev.coph.simplesql.driver.DriverCompatibility;
 import dev.coph.simplesql.query.Query;
+import dev.coph.simplesql.utils.QueryResult;
 import dev.coph.simpleutilities.action.RunnableAction;
 import dev.coph.simpleutilities.check.Check;
 
@@ -16,7 +17,7 @@ public class TableAlterRenameQueryProvider extends TableAlterQueryProvider {
      * The new name for the table
      */
     private String newTableName;
-    private RunnableAction<Boolean> actionAfterQuery;
+    private RunnableAction<QueryResult<TableAlterRenameQueryProvider>> actionAfterQuery;
 
     @Override
     public DriverCompatibility compatibility() {
@@ -59,13 +60,13 @@ public class TableAlterRenameQueryProvider extends TableAlterQueryProvider {
      *                         represents the result of the query execution (e.g., success or failure).
      * @return the current instance of {@code TableAlterRenameQueryProvider} to allow method chaining.
      */
-    public TableAlterRenameQueryProvider actionAfterQuery(RunnableAction<Boolean> actionAfterQuery) {
+    public TableAlterRenameQueryProvider actionAfterQuery(RunnableAction<QueryResult<TableAlterRenameQueryProvider>> actionAfterQuery) {
         this.actionAfterQuery = actionAfterQuery;
         return this;
     }
 
     @Override
-    public RunnableAction<Boolean> actionAfterQuery() {
+    public RunnableAction<QueryResult<TableAlterRenameQueryProvider>> actionAfterQuery() {
         return actionAfterQuery;
     }
 }

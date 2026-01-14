@@ -1,6 +1,7 @@
 package dev.coph.simplesql.query;
 
 import dev.coph.simplesql.driver.DriverCompatibility;
+import dev.coph.simplesql.utils.QueryResult;
 import dev.coph.simpleutilities.action.RunnableAction;
 
 import java.math.BigDecimal;
@@ -101,5 +102,5 @@ public interface QueryProvider {
      * @return a RunnableAction instance that performs an action after the query
      * operation, returning a Boolean indicating the result of the action
      */
-    RunnableAction<Boolean> actionAfterQuery();
+    <T extends QueryProvider> RunnableAction<QueryResult<T>> actionAfterQuery();
 }

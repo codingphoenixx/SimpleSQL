@@ -5,6 +5,7 @@ import dev.coph.simplesql.database.attributes.UnsignedState;
 import dev.coph.simplesql.driver.DriverType;
 import dev.coph.simplesql.exception.FeatureNotSupportedException;
 import dev.coph.simplesql.query.Query;
+import dev.coph.simplesql.utils.QueryResult;
 import dev.coph.simpleutilities.action.RunnableAction;
 import dev.coph.simpleutilities.check.Check;
 
@@ -19,7 +20,7 @@ public class TableAlterModifyTypeQueryProvider extends TableAlterQueryProvider {
     private Object dataTypeParameter;
     private UnsignedState unsigned = UnsignedState.INACTIVE;
     private String columnName;
-    private RunnableAction<Boolean> actionAfterQuery;
+    private RunnableAction<QueryResult<TableAlterModifyTypeQueryProvider>> actionAfterQuery;
 
     private String postgresUsingExpression;
 
@@ -153,14 +154,13 @@ public class TableAlterModifyTypeQueryProvider extends TableAlterQueryProvider {
      * @param actionAfterQuery the {@code RunnableAction<Boolean>} representing the action to execute post-query
      * @return the current instance of {@code TableAlterModifyTypeQueryProvider} for chaining further modifications
      */
-    public TableAlterModifyTypeQueryProvider actionAfterQuery(
-            dev.coph.simpleutilities.action.RunnableAction<Boolean> actionAfterQuery) {
+    public TableAlterModifyTypeQueryProvider actionAfterQuery(RunnableAction<QueryResult<TableAlterModifyTypeQueryProvider>> actionAfterQuery) {
         this.actionAfterQuery = actionAfterQuery;
         return this;
     }
 
     @Override
-    public RunnableAction<Boolean> actionAfterQuery() {
+    public RunnableAction<QueryResult<TableAlterModifyTypeQueryProvider>> actionAfterQuery() {
         return actionAfterQuery;
     }
 }
