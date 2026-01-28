@@ -1,7 +1,7 @@
 package dev.coph.simplesql.query.providers;
 
 import dev.coph.simplesql.database.attributes.CharacterSet;
-import dev.coph.simplesql.database.attributes.CreateMethode;
+import dev.coph.simplesql.database.attributes.CreateMethod;
 import dev.coph.simplesql.driver.DriverCompatibility;
 import dev.coph.simplesql.driver.DriverType;
 import dev.coph.simplesql.exception.FeatureNotSupportedException;
@@ -26,7 +26,7 @@ public class DatabaseCreateQueryProvider implements QueryProvider {
 
     private String database;
 
-    private CreateMethode createMethode = CreateMethode.DEFAULT;
+    private CreateMethod createMethod = CreateMethod.DEFAULT;
 
     private CharacterSet characterSet = CharacterSet.UTF8MB4;
 
@@ -54,7 +54,7 @@ public class DatabaseCreateQueryProvider implements QueryProvider {
 
         StringBuilder sql = new StringBuilder("CREATE DATABASE ");
 
-        boolean ifNotExists = (createMethode == CreateMethode.IF_NOT_EXISTS);
+        boolean ifNotExists = (createMethod == CreateMethod.IF_NOT_EXISTS);
 
         switch (driver) {
             case MYSQL, MARIADB -> {
@@ -124,12 +124,12 @@ public class DatabaseCreateQueryProvider implements QueryProvider {
      * Sets the create method for the query provider and returns the current instance for method chaining.
      * If the provided create method is {@code null}, the default create method will be used.
      *
-     * @param createMethode the {@code CreateMethode} to define the creation strategy for the database structure.
+     * @param createMethod the {@code CreateMethod} to define the creation strategy for the database structure.
      *                      If {@code null}, the default create method will be applied.
      * @return the current instance of {@code DatabaseCreateQueryProvider} for method chaining.
      */
-    public DatabaseCreateQueryProvider createMethode(CreateMethode createMethode) {
-        this.createMethode = createMethode != null ? createMethode : CreateMethode.DEFAULT;
+    public DatabaseCreateQueryProvider createMethode(CreateMethod createMethod) {
+        this.createMethod = createMethod != null ? createMethod : CreateMethod.DEFAULT;
         return this;
     }
 
@@ -215,14 +215,14 @@ public class DatabaseCreateQueryProvider implements QueryProvider {
     }
 
     /**
-     * Retrieves the current {@code CreateMethode} indicating the strategy for creating
+     * Retrieves the current {@code CreateMethod} indicating the strategy for creating
      * database structures, such as tables. If the value is not explicitly set, it may
      * return a default strategy.
      *
-     * @return the {@code CreateMethode} representing the database creation strategy
+     * @return the {@code CreateMethod} representing the database creation strategy
      */
-    public CreateMethode createMethode() {
-        return this.createMethode;
+    public CreateMethod createMethode() {
+        return this.createMethod;
     }
 
     /**

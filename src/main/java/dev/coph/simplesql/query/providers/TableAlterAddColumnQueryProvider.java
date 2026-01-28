@@ -3,7 +3,7 @@ package dev.coph.simplesql.query.providers;
 import dev.coph.simplesql.database.Column;
 import dev.coph.simplesql.database.attributes.ColumnPosition;
 import dev.coph.simplesql.database.attributes.ColumnType;
-import dev.coph.simplesql.database.attributes.CreateMethode;
+import dev.coph.simplesql.database.attributes.CreateMethod;
 import dev.coph.simplesql.database.attributes.DataType;
 import dev.coph.simplesql.driver.DriverType;
 import dev.coph.simplesql.exception.FeatureNotSupportedException;
@@ -26,7 +26,7 @@ import dev.coph.simpleutilities.check.Check;
  * - Setting the column to be added, including its key, data type, attributes,
  * and constraints, such as NOT NULL.
  * - Defining the position of the column (e.g., FIRST, AFTER another column, DEFAULT).
- * - Supporting conditional column creation using {@code CreateMethode.IF_NOT_EXISTS}.
+ * - Supporting conditional column creation using {@code CreateMethod.IF_NOT_EXISTS}.
  * - Generating database-specific SQL ALTER TABLE commands based on the database driver type.
  * - Configuring an action to be executed after the query is performed.
  * <p>
@@ -38,7 +38,7 @@ public class TableAlterAddColumnQueryProvider extends TableAlterQueryProvider {
     private ColumnPosition postion = ColumnPosition.DEFAULT;
     private String afterColumnName;
 
-    private CreateMethode createMethode = CreateMethode.DEFAULT;
+    private CreateMethod createMethod = CreateMethod.DEFAULT;
     private Column column;
 
     private RunnableAction<QueryResult<TableAlterAddColumnQueryProvider>> actionAfterQuery;
@@ -52,7 +52,7 @@ public class TableAlterAddColumnQueryProvider extends TableAlterQueryProvider {
 
         DatabaseCheck.missingDriver(driver);
 
-        boolean ifNotExists = (createMethode == CreateMethode.IF_NOT_EXISTS);
+        boolean ifNotExists = (createMethod == CreateMethod.IF_NOT_EXISTS);
 
         StringBuilder sb = new StringBuilder("ADD COLUMN ");
 
@@ -221,13 +221,13 @@ public class TableAlterAddColumnQueryProvider extends TableAlterQueryProvider {
     }
 
     /**
-     * Retrieves the currently configured {@link CreateMethode} for the table alteration query in the provider.
-     * The {@link CreateMethode} determines the strategy to be used during the creation of database structures.
+     * Retrieves the currently configured {@link CreateMethod} for the table alteration query in the provider.
+     * The {@link CreateMethod} determines the strategy to be used during the creation of database structures.
      *
-     * @return the current {@link CreateMethode} associated with this query provider
+     * @return the current {@link CreateMethod} associated with this query provider
      */
-    public CreateMethode createMethode() {
-        return this.createMethode;
+    public CreateMethod createMethode() {
+        return this.createMethod;
     }
 
     /**
@@ -268,13 +268,13 @@ public class TableAlterAddColumnQueryProvider extends TableAlterQueryProvider {
     }
 
     /**
-     * Sets the createMethode property and returns the updated instance of TableAlterAddColumnQueryProvider.
+     * Sets the createMethod property and returns the updated instance of TableAlterAddColumnQueryProvider.
      *
-     * @param createMethode the CreateMethode object to be set
+     * @param createMethod the CreateMethod object to be set
      * @return the updated instance of TableAlterAddColumnQueryProvider
      */
-    public TableAlterAddColumnQueryProvider createMethode(CreateMethode createMethode) {
-        this.createMethode = createMethode;
+    public TableAlterAddColumnQueryProvider createMethode(CreateMethod createMethod) {
+        this.createMethod = createMethod;
         return this;
     }
 

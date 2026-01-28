@@ -28,7 +28,7 @@ public class TableCreateQueryProvider implements QueryProvider {
 
     private String table;
 
-    private CreateMethode createMethode = CreateMethode.DEFAULT;
+    private CreateMethod createMethod = CreateMethod.DEFAULT;
 
     private RunnableAction<QueryResult<TableCreateQueryProvider>> actionAfterQuery;
 
@@ -62,7 +62,7 @@ public class TableCreateQueryProvider implements QueryProvider {
 
         sql.append("TABLE ");
 
-        if (createMethode == CreateMethode.IF_NOT_EXISTS) {
+        if (createMethod == CreateMethod.IF_NOT_EXISTS) {
             sql.append("IF NOT EXISTS ");
         }
 
@@ -229,14 +229,15 @@ public class TableCreateQueryProvider implements QueryProvider {
         this.engine = engine;
     }
 
+
     /**
-     * Sets the CreateMethode instance and returns the current instance of TableCreateQueryProvider.
+     * Sets the CreateMethod instance and returns the current instance of TableCreateQueryProvider.
      *
-     * @param createMethode the CreateMethode instance to be set
+     * @param createMethod the CreateMethod instance to be set
      * @return the current instance of TableCreateQueryProvider
      */
-    public TableCreateQueryProvider createMethode(CreateMethode createMethode) {
-        this.createMethode = createMethode;
+    public TableCreateQueryProvider createMethod(CreateMethod createMethod) {
+        this.createMethod = createMethod;
         return this;
     }
 
@@ -508,12 +509,12 @@ public class TableCreateQueryProvider implements QueryProvider {
     }
 
     /**
-     * Retrieves the current {@code CreateMethode} associated with the table creation query.
+     * Retrieves the current {@code CreateMethod} associated with the table creation query.
      *
-     * @return the {@code CreateMethode} instance representing the method of creation for the table.
+     * @return the {@code CreateMethod} instance representing the method of creation for the table.
      */
-    public CreateMethode createMethode() {
-        return this.createMethode;
+    public CreateMethod createMethod() {
+        return this.createMethod;
     }
 
     /**

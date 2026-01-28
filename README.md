@@ -77,7 +77,7 @@ public class Main {
                 .column("uuid", DataType.VARCHAR, 64, ColumnType.UNIQUE)
                 .column("comment", DataType.LONGTEXT)
                 .column("number", DataType.INTEGER, ColumnType.PRIMARY_KEY_AUTOINCREMENT)
-                .createMethode(CreateMethode.IF_NOT_EXISTS);
+                .createMethod(CreateMethode.IF_NOT_EXISTS);
 
         //Senden der Request
         new Query(databaseAdapter).async(true).queries(tableCreateQuery).execute();

@@ -3,7 +3,7 @@ package dev.coph.simplesql.utils.test.implementations;
 import dev.coph.simplelogger.Logger;
 import dev.coph.simplesql.adapter.DatabaseAdapter;
 import dev.coph.simplesql.database.attributes.ColumnType;
-import dev.coph.simplesql.database.attributes.CreateMethode;
+import dev.coph.simplesql.database.attributes.CreateMethod;
 import dev.coph.simplesql.database.attributes.DataType;
 import dev.coph.simplesql.database.attributes.DeleteMethode;
 import dev.coph.simplesql.driver.DriverType;
@@ -38,12 +38,12 @@ public class TableCreateRequestTest implements Test {
     public boolean execute(DatabaseAdapter databaseAdapter) {
         TableCreateQueryProvider provider = Query.tableCreate()
                 .table("test")
-                .createMethode(CreateMethode.IF_NOT_EXISTS)
+                .createMethod(CreateMethod.IF_NOT_EXISTS)
                 .column("col_key", DataType.VARCHAR, 128, ColumnType.PRIMARY_KEY);
 
         TableCreateQueryProvider provider2 = Query.tableCreate()
                 .table("test2")
-                .createMethode(CreateMethode.IF_NOT_EXISTS)
+                .createMethod(CreateMethod.IF_NOT_EXISTS)
                 .column("col_key", DataType.VARCHAR, 128)
                 .column("col_key2", DataType.VARCHAR, 128)
                 .primaryKey(List.of("col_key", "col_key2"));
