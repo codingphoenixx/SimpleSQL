@@ -216,7 +216,6 @@ public class DatabaseAdapter {
             Check.ifNull(driverType, "drivertype");
             if (driverType == DriverType.MYSQL || driverType == DriverType.MARIADB) {
                 Check.ifNull(host, "host");
-                Check.ifNull(database, "database");
                 Check.ifNull(user, "user");
                 Check.ifNull(password, "password");
             } else if (driverType == DriverType.SQLITE) {
