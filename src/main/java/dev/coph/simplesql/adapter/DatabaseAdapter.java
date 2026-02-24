@@ -78,7 +78,7 @@ public class DatabaseAdapter {
         this.hikariConfig = new HikariConfig();
 
         if (driverType == DriverType.MYSQL || driverType == DriverType.MARIADB) {
-            this.hikariConfig.setJdbcUrl("jdbc:" + driverType.name().toLowerCase() + "://" + host + ":" + port + "/" + database + "?autoReconnect=true");
+            this.hikariConfig.setJdbcUrl("jdbc:" + driverType.name().toLowerCase() + "://" + host + ":" + port + (database != null ? "/" + database : "") + "?autoReconnect=true");
             this.hikariConfig.setUsername(user);
             this.hikariConfig.setPassword(password);
             this.hikariConfig.addDataSourceProperty("cachePrepStmts", "true");
